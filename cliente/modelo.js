@@ -14,12 +14,8 @@ function Sistema() {
     return true;
   };
 
-  this.obtenerNicks = function () {
-    var nicks = [];
-    for (var nick in this.usuarios) {
-      nicks.push(nick);
-    }
-    return nicks;
+  this.obtenerTodosNicks = function () {
+    return Object.keys(this.usuarios);
   };
 
   this.eliminarUsuario = function (nick) {
