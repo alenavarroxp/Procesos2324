@@ -5,6 +5,7 @@ function Sistema() {
     this.usuarios[nick] = new Usuario(nick);
     console.log("Usuario agregado: " + nick);
   };
+
   this.obtenerUsuarios = function () {
     return this.usuarios;
   };
