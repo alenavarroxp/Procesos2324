@@ -1,0 +1,21 @@
+{
+  "name": "procesos2324",
+  "version": "1.0.0",
+  "description": "Arquitectura base de la asignatura Procesos Curso 23-24",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "testW": "node_modules\\.bin\\jasmine-node servidor",
+    "test": "./node_modules/.bin/jasmine-node servidor"
+  },
+  "author": "Alejandro Navarro",
+  "license": "MIT",
+  "bugs":{
+    "url": "https://github.com/alenavarroxp/Procesos2324/issues"
+  },
+  "homepage": "https://github.com/alenavarroxp/Procesos2324#readme",
+  "dependencies": {
+    "express": "^4.18.2",
+    "jasmine-node": "^3.0.0"
+  }
+}
