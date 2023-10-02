@@ -16,7 +16,7 @@ describe("El sistema", function () {
     sistema.agregarUsuario("pepe");
     expect(sistema.numeroUsuarios()).toEqual({"num":1});
     expect(sistema.obtenerTodosNicks()).toEqual(["pepe"]);
-    expect(sistema.usuarioActivo("pepe")).toEqual({"res":true});
+    expect(sistema.usuarioActivo("pepe")).toEqual({"activo":true});
     expect(sistema.usuarios["pepe"].nick).toEqual("pepe");
   });
 
@@ -31,11 +31,11 @@ describe("El sistema", function () {
 
   it("usuario activo", function () {
     sistema.agregarUsuario("pepe");
-    expect(sistema.usuarioActivo("pepe")).toEqual({"res":true});
+    expect(sistema.usuarioActivo("pepe")).toEqual({"activo":true});
     expect(sistema.obtenerTodosNicks()).toEqual(["pepe"]);
     expect(sistema.numeroUsuarios()).toEqual({"num":1});
     sistema.eliminarUsuario("pepe");
-    expect(sistema.usuarioActivo("pepe")).toEqual({"res":false});
+    expect(sistema.usuarioActivo("pepe")).toEqual({"activo":false});
     expect(sistema.obtenerTodosNicks()).toEqual([]);
     expect(sistema.numeroUsuarios()).toEqual({"num":0});
   });

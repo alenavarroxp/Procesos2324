@@ -17,8 +17,8 @@ function Sistema() {
   };
 
   this.usuarioActivo = function (nick) {
-    if (this.usuarios[nick] == null) return { res: false };
-    return { res: true };
+    if (this.usuarios[nick] == null) return { activo: false };
+    return { activo: true };
   };
 
   this.obtenerTodosNicks = function () {
@@ -28,11 +28,11 @@ function Sistema() {
   this.eliminarUsuario = function (nick) {
     if (this.usuarios[nick] == null) {
       console.log("El usuario no existe: " + nick);
-      return { res: false };
+      return { nick: -1 };
     }
     delete this.usuarios[nick];
     console.log("Usuario eliminado: " + nick);
-    return { res: true };
+    return { nick: nick };
   };
 
   this.numeroUsuarios = function () {
