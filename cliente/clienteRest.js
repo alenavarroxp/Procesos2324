@@ -45,7 +45,11 @@ function ClienteRest() {
 
   this.usuarioActivo = function (nick) {
     $.getJSON("/usuarioActivo/" + nick, function (data) {
-      console.log(data);
+      if(data.activo){
+        console.log("El usuario "+nick+" está activo");
+      }else{
+        console.log("El usuario "+nick+" no está activo");
+      }
     });
   };
 
