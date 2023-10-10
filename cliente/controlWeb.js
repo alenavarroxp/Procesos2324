@@ -8,8 +8,7 @@ function ControlWeb() {
     $("#au").append(cadena);
     $("#btnAU").on("click", function () {
       let nick = $("#nick").val();
-      let res = new ClienteRest();
-      res.agregarUsuario(nick);
+      rest.agregarUsuario(nick);
       $("#mAU").remove();
     });
   };
@@ -20,8 +19,7 @@ function ControlWeb() {
     cadena += '</div>';
     $("#au").append(cadena);
     $("#btnOU").on("click", function () {
-      let res = new ClienteRest();
-      res.obtenerUsuarios();
+      rest.obtenerUsuarios();
       $("#mOU").remove();
     });
   }
@@ -32,8 +30,7 @@ function ControlWeb() {
     cadena += '</div>';
     $("#au").append(cadena);
     $("#btnNU").on("click", function () {
-      let res = new ClienteRest();
-      res.numeroUsuarios();
+      rest.numeroUsuarios();
       $("#mNU").remove();
     });
   }
@@ -47,8 +44,7 @@ function ControlWeb() {
     $("#au").append(cadena);
     $("#btnUA").on("click", function () {
       let nick = $("#nick").val();
-      let res = new ClienteRest();
-      res.usuarioActivo(nick);
+      rest.usuarioActivo(nick);
       $("#mUA").remove();
     });
   }
@@ -62,9 +58,14 @@ function ControlWeb() {
     $("#au").append(cadena);
     $("#btnEU").on("click", function () {
       let nick = $("#nick").val();
-      let res = new ClienteRest();
-      res.eliminarUsuario(nick);
+      rest.eliminarUsuario(nick);
       $("#mEU").remove();
     });
+  }
+
+  this.mostrarMsg = function (msg) {
+    $("#mMsg").remove();
+    let cadena ='<h2 id="mMsg">'+msg+'</h2>';
+    $("#msg").append(cadena);
   }
 }
