@@ -5,6 +5,8 @@ function ControlWeb() {
     cadena += '<input type="text" class="form-control" id="nick">';
     cadena +=
       '<button id="btnAU" type="submit" class="btn btn-primary">Agregar Usuario</button>';
+    cadena +=
+      '<div><a href="/auth/google"><img src ="./cliente/img/google_signin_buttons/web/2x/btn_google_signin_dark_focus_web@2x.png" style="height:40px;"></a></div>';
     cadena += "</div>";
     $("#au").append(cadena);
     $("#btnAU").on("click", function () {
@@ -84,7 +86,7 @@ function ControlWeb() {
   };
 
   this.salir = function () {
-    $.removeCookie("nick")
+    $.removeCookie("nick");
     location.reload();
   };
 }

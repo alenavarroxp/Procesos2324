@@ -1,10 +1,47 @@
 const fs = require("fs");
 const express = require("express");
 const app = express();
+const passport = require("passport");
+const cookieSession = require("cookie-session");
+const passportSetup = require("./servidor/passport-setup.js");
 const modelo = require("./servidor/modelo.js");
 const PORT = process.env.PORT || 3000;
 
 app.use(express.static(__dirname + "/"));
+
+app.use(
+  cookieSession({
+    name: "Sistema",
+    keys: ["key1", "key2"],
+  })
+);
+app.use(passport.initialize());
+app.use(passport.session());
+
+app.get(
+  "/auth/google",
+  passport.authenticate("google", { scope: ["profile", "email"] })
+);
+
+app.get(
+  "/google/callback",
+  passport.authenticate("google", { failureRedirect: "/fallo" }),
+  function (req, res) {
+    res.redirect("/good");
+  }
+);
+
+app.get("/good", function (req, res) {
+  let nick = req.user.emails[0].value;
+  if (nick) sistema.agregarUsuario(nick);
+
+  res.cookie("nick", nick);
+  res.redirect("/");
+});
+
+app.get("/fallo", function (req, res) {
+  res.send({nick:"NoOK"});
+});
 
 let sistema = new modelo.Sistema();
 
