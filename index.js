@@ -33,14 +33,16 @@ app.get(
 
 app.get("/good", function (req, res) {
   let nick = req.user.emails[0].value;
-  if (nick) sistema.agregarUsuario(nick);
+ 
+  sistema.obtenerOCrearUsuario(nick);
+  // sistema.agregarUsuario(nick);
 
   res.cookie("nick", nick);
   res.redirect("/");
 });
 
 app.get("/fallo", function (req, res) {
-  res.send({nick:"NoOK"});
+  res.send({ nick: "NoOK" });
 });
 
 let sistema = new modelo.Sistema();
