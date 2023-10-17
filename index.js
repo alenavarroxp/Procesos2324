@@ -31,14 +31,38 @@ app.get(
   }
 );
 
-app.get("/good", function (req, res) {
-  let nick = req.user.emails[0].value;
- 
-  sistema.obtenerOCrearUsuario(nick);
-  // sistema.agregarUsuario(nick);
+app.get(
+  "/auth/github",
+  passport.authenticate("github", { scope: ["user:email"] })
+);
 
-  res.cookie("nick", nick);
-  res.redirect("/");
+app.get(
+  "/github/callback",
+  passport.authenticate("github", { failureRedirect: "/fallo" }),
+  function (req, res) {
+    res.redirect("/good");
+  }
+);
+
+app.get("/good", function (req, res) {
+  switch (req.user.provider) {
+    case "google":
+      let nick = req.user.emails[0].value;
+      sistema.obtenerOCrearUsuario(nick);
+      res.cookie("nick", nick);
+      res.redirect("/");
+      break;
+    case "github":
+      console.log(req.user)
+      let nick2 = req.user.username;
+      sistema.obtenerOCrearUsuario(nick2);
+      res.cookie("nick", nick2);
+      res.redirect("/");
+      break;
+    default:
+      res.redirect("/");
+      break;
+  }
 });
 
 app.get("/fallo", function (req, res) {

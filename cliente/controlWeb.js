@@ -6,7 +6,8 @@ function ControlWeb() {
     cadena +=
       '<button id="btnAU" type="submit" class="btn btn-primary">Agregar Usuario</button>';
     cadena +=
-      '<div><a href="/auth/google"><img src ="./cliente/img/google_signin_buttons/web/2x/btn_google_signin_dark_focus_web@2x.png" style="height:40px;"></a></div>';
+      '<div><a href="/auth/google"><img src ="./cliente/img/google_signin_buttons/web/2x/btn_google_signin_dark_focus_web@2x.png" style="height:50px;"></a></div>';
+    cadena += '<div><a href="/auth/github/"><img src ="./cliente/img/github_signin_buttons/github-button.png" style="height:40px;"></a></div>';
     cadena += "</div>";
     $("#au").append(cadena);
     $("#btnAU").on("click", function () {
