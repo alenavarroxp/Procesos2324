@@ -1,6 +1,6 @@
 const passport = require("passport");
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
-const GitHubStrategy = require("passport-github").Strategy;
+const GitHubStrategy = require("passport-github2").Strategy;
 
 passport.serializeUser(function (user, done) {
   done(null, user);
@@ -34,6 +34,6 @@ passport.use(
     callbackURL: "http://localhost:3000/github/callback",
   },
   function (accessToken, refreshToken, profile, done) {
-    return done(null, profile);
+    return done(null, profile);  
   })
 );
