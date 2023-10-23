@@ -4,11 +4,11 @@ function ControlWeb() {
     cadena += '<label for="nick">Introduce el nick:</label>';
     cadena += '<input type="text" class="form-control" id="nick">';
     cadena +=
-      '<button id="btnAU" type="submit" class="btn btn-primary">Agregar Usuario</button>';
-    cadena +=
-      '<div><a href="/auth/google"><img src ="./cliente/img/google_signin_buttons/web/2x/btn_google_signin_dark_focus_web@2x.png" style="height:50px;"></a></div>';
-    cadena += '<div><a href="/auth/github/"><img src ="./cliente/img/github_signin_buttons/github-button.png" style="height:40px;"></a></div>';
-    cadena += "</div>";
+      '<button id="btnAU" type="submit" class="btn btn-primary" style="margin:10px">Agregar Usuario</button>';
+      cadena += '<div style="display: flex; justify-content: center; align-items: center;">';
+      cadena += '<div class= "animate__animated animate__bounceIn animate__delay-1s" style="margin: 40px;"><a href="/auth/google"><img src="./cliente/img/google_signin_buttons/web/2x/btn_google_signin_dark_focus_web@2x.png" style="height: 40px;"></a></div>';
+      cadena += '<div class= "animate__animated animate__bounceIn animate__delay-2s" style="margin: 40px;"><a href="/auth/github/"><img src="./cliente/img/github_signin_buttons/github-button.png" style="height: 40px;"></a></div>';
+      cadena += '</div>';
     $("#au").append(cadena);
     $("#btnAU").on("click", function () {
       let nick = $("#nick").val();

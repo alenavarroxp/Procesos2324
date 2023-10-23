@@ -7,6 +7,10 @@ const passportSetup = require("./servidor/passport-setup.js");
 const modelo = require("./servidor/modelo.js");
 const PORT = process.env.PORT || 3000;
 
+const args = process.argv.slice(2);
+let test = false;
+test = eval(args[0]); //test=true
+
 app.use(express.static(__dirname + "/"));
 
 app.use(
@@ -53,7 +57,7 @@ app.get("/good", function (req, res) {
       res.redirect("/");
       break;
     case "github":
-      console.log(req.user)
+      console.log(req.user);
       let nick2 = req.user.username;
       sistema.obtenerOCrearUsuario(nick2);
       res.cookie("nick", nick2);
@@ -69,7 +73,7 @@ app.get("/fallo", function (req, res) {
   res.send({ nick: "NoOK" });
 });
 
-let sistema = new modelo.Sistema();
+let sistema = new modelo.Sistema(test);
 
 app.get("/", function (request, response) {
   var contenido = fs.readFileSync(__dirname + "/cliente/index.html");

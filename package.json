@@ -4,7 +4,7 @@
   "description": "Arquitectura base de la asignatura Procesos Curso 23-24",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
+    "start": "node index.js test=false",
     "testW": "node_modules\\.bin\\jasmine-node servidor",
     "test": "./node_modules/.bin/jasmine-node servidor"
   },
@@ -15,6 +15,7 @@
   },
   "homepage": "https://github.com/alenavarroxp/Procesos2324#readme",
   "dependencies": {
+    "animate.css": "^4.1.1",
     "cookie-session": "^2.0.0",
     "express": "^4.18.2",
     "jasmine-node": "^3.0.0",
