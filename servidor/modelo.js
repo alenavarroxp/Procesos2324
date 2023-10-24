@@ -49,9 +49,14 @@ function Sistema(test) {
     });
   }
 
-  this.obtenerOCrearUsuario = function (email) {
-    this.cad.buscarOCrearUsuario(email, function (res) {
-      console.log("Usuario obtenido o creado: " + res.email);
+  this.usuarioGoogle = function (usr, callback) {
+    let copia = usr;
+    this.cad.buscarOCrearUsuario(usr, function (obj) {
+      if (obj.email == null) {
+        console.log("El usuario " + copia + " ya estaba registrado");
+        obj.email = copia;
+      }
+      callback(obj);
     });
   };
 }

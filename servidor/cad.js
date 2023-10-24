@@ -4,12 +4,12 @@ var ObjectId = require("mongodb").ObjectId;
 function CAD() {
   this.usuarios;
 
-  this.buscarOCrearUsuario = function (email, callback) {
+  this.buscarOCrearUsuario = function (usr, callback) {
     //buscarOCrear(this.usuarios,{email:email},callback);
-    obtenerOCrear(this.usuarios, { email: email }, callback);
+    buscarOCrear(this.usuarios, usr, callback);
   };
 
-  function obtenerOCrear(coleccion, criterio, callback) {
+  function buscarOCrear(coleccion, criterio, callback) {
     coleccion.findOneAndUpdate(
       criterio,
       { $set: criterio },

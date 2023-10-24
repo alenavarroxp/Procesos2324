@@ -1,3 +1,4 @@
+const bodyParser = require("body-parser");
 const fs = require("fs");
 const express = require("express");
 const app = express();
@@ -19,6 +20,9 @@ app.use(
     keys: ["key1", "key2"],
   })
 );
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -51,17 +55,19 @@ app.get(
 app.get("/good", function (req, res) {
   switch (req.user.provider) {
     case "google":
-      let nick = req.user.emails[0].value;
-      sistema.obtenerOCrearUsuario(nick);
-      res.cookie("nick", nick);
-      res.redirect("/");
+      let email = req.user.emails[0].value;
+      sistema.usuarioGoogle({ email: email }, function (obj) {
+        res.cookie("nick", obj.email);
+        res.redirect("/");
+      });
       break;
     case "github":
       console.log(req.user);
-      let nick2 = req.user.username;
-      sistema.obtenerOCrearUsuario(nick2);
-      res.cookie("nick", nick2);
-      res.redirect("/");
+      let email2 = req.user.username;
+      sistema.usuarioGoogle({ email: email2 }, function (obj) {
+        res.cookie("nick", obj.email2);
+        res.redirect("/");
+      });
       break;
     default:
       res.redirect("/");
@@ -108,6 +114,15 @@ app.get("/eliminarUsuario/:nick", function (request, response) {
   let nick = request.params.nick;
   let res = sistema.eliminarUsuario(nick);
   response.send(res);
+});
+
+app.post("/enviarJwt", function (request, response) {
+  let jwt = request.body.jwt;
+  let user = JSON.parse(atob(jwt.split(".")[1]));
+  let email = user.email;
+  sistema.usuarioGoogle({ "email": email }, function (obj) {
+    response.send({ nick: obj.email });
+  });
 });
 
 app.listen(PORT, () => {
