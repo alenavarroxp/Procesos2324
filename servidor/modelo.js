@@ -49,7 +49,7 @@ function Sistema(test) {
     });
   }
 
-  this.usuarioGoogle = function (usr, callback) {
+  this.usuarioOAuth = function (usr, callback) {
     let copia = usr;
     this.cad.buscarOCrearUsuario(usr, function (obj) {
       if (obj.email == null) {

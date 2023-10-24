@@ -56,7 +56,7 @@ app.get("/good", function (req, res) {
   switch (req.user.provider) {
     case "google":
       let email = req.user.emails[0].value;
-      sistema.usuarioGoogle({ email: email }, function (obj) {
+      sistema.usuarioOAuth({ email: email }, function (obj) {
         res.cookie("nick", obj.email);
         res.redirect("/");
       });
@@ -64,7 +64,7 @@ app.get("/good", function (req, res) {
     case "github":
       console.log(req.user);
       let email2 = req.user.username;
-      sistema.usuarioGoogle({ email: email2 }, function (obj) {
+      sistema.usuarioOAuth({ email: email2 }, function (obj) {
         res.cookie("nick", obj.email2);
         res.redirect("/");
       });
@@ -116,11 +116,12 @@ app.get("/eliminarUsuario/:nick", function (request, response) {
   response.send(res);
 });
 
+
 app.post("/enviarJwt", function (request, response) {
   let jwt = request.body.jwt;
   let user = JSON.parse(atob(jwt.split(".")[1]));
   let email = user.email;
-  sistema.usuarioGoogle({ "email": email }, function (obj) {
+  sistema.usuarioOAuth({ "email": email }, function (obj) {
     response.send({ nick: obj.email });
   });
 });

@@ -94,4 +94,12 @@ function ClienteRest() {
       //dataType:'json'
     });
   };
+
+  this.registroUsuario = function (email, password) {
+    
+  }
+
+  this.crearPartida = function () {
+    cw.mostrarCrearPartida();
+  }
 }

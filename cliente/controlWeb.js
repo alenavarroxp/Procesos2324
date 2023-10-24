@@ -85,7 +85,8 @@ function ControlWeb() {
     if (nick) {
       cw.mostrarMsg("Bienvenido al sistema, " + nick);
     } else {
-      cw.mostrarAgregarUsuario();
+      // cw.mostrarAgregarUsuario();
+      cw.mostrarRegistro();
       cw.init();
     }
   };
@@ -114,8 +115,21 @@ function ControlWeb() {
     $("#mAU").remove();
   };
 
+  this.mostrarRegistro = function () {
+    $("#fmRegistro").remove();
+    $("#registro").load("./cliente/registro.html",function(){
+      $("#btnRegistro").on("click", function () {
+        let email = $("#email").val();
+        let pwd = $("#pwd").val();
+        if(email && pwd){
+          rest.registrarUsuario(email,pwd);
+          console.log(email,pwd)
+        }
+      });
+    });
+  };
+
   this.mostrarOpciones = function () {
-    //Quiero mostrar un boton de Crear Partida y otro de Unirse Partida
     let cadena = '<div id="mOP" class="form-group">';
     cadena +=
       '<button id="btnCP" type="submit" class="btn btn-primary">Crear Partida</button>';
@@ -124,14 +138,47 @@ function ControlWeb() {
     cadena += "</div>";
     $("#au").append(cadena);
     $("#btnCP").on("click", function () {
-      //rest.crearPartida();
-      this.mostrarCrearPartida();
+      rest.crearPartida();
     });
     $("#btnUP").on("click", function () {
       //rest.unirsePartida();
       // $("#mOP").remove();
     });
-  }
+  };
+
+  this.mostrarCrearPartida = function () {
+    cadena = '<div id="mCP" class="form-group">';
+    cadena += '<label for="nombre">Nombre de la partida:</label>';
+    cadena += '<input type="text" class="form-control" id="nombre">';
+    cadena += '<label for="goles">Cantidad de goles:</label>';
+    cadena += '<input type="number" class="form-control" id="goles" min="0">';
+    cadena +=
+      '<label for="tiempo-select">Selecciona la duración del partido:</label>';
+    cadena += '<select id="tiempo-select" class="form-control">';
+    cadena += '<option value="2:00">2 minutos</option>';
+    cadena += '<option value="5:00">5 minutos</option>';
+    cadena += '<option value="10:00">10 minutos</option>';
+    cadena += '<option value="custom">Personalizado</option>';
+    cadena += "</select>";
+    cadena += '<div id="custom-input" style="display: none;">';
+    cadena +=
+      '<label for="custom-time">Introduce el tiempo manualmente (hh:mm:ss):</label>';
+    cadena += '<input type="text" id="custom-time" class="form-control">';
+    cadena += "</div>";
+    cadena +=
+      '<button id="btnCP" type="submit" class="btn btn-primary">Crear Partida</button>';
+    cadena += "</div>";
+    $("#au").append(cadena);
+
+    $("#tiempo-select").change(function () {
+      var customInput = $("#custom-input");
+      if ($(this).val() === "custom") {
+        customInput.show();
+      } else {
+        customInput.hide();
+      }
+    });
+  };
 
   this.salir = function () {
     $.removeCookie("nick");
