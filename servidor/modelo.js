@@ -9,7 +9,9 @@ function Sistema(test) {
     if (!this.usuarios[nick]) {
       this.usuarios[nick] = new Usuario(nick);
       res.nick = nick;
-      console.log("Usuario agregado: " + nick);
+      this.usuarioOAuth({ email: nick }, function (obj) {
+        console.log("Usuario agregado: " + obj.email);
+      });
     } else {
       console.log("El usuario ya existe: " + nick);
     }
@@ -53,10 +55,24 @@ function Sistema(test) {
     let copia = usr;
     this.cad.buscarOCrearUsuario(usr, function (obj) {
       if (obj.email == null) {
-        console.log("El usuario " + copia + " ya estaba registrado");
+        console.log("El usuario " + usr.email + " ya estaba registrado");
         obj.email = copia;
       }
       callback(obj);
+    });
+  };
+
+  this.registrarUsuario = function (email, pwd, callback) {
+    let nuevoUsuario = new Usuario();
+    nuevoUsuario.email = email;
+    nuevoUsuario.clave = pwd;
+    this.usuarioOAuth({ email: nuevoUsuario.email }, function (obj) {
+      if (obj.error) {
+        callback({ error: "El usuario ya existe" });
+      } else {
+        console.log("Usuario registrado", nuevoUsuario);
+        callback({ email: nuevoUsuario.email });
+      }
     });
   };
 }

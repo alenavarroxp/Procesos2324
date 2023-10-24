@@ -10,21 +10,26 @@ function CAD() {
   };
 
   function buscarOCrear(coleccion, criterio, callback) {
-    coleccion.findOneAndUpdate(
-      criterio,
-      { $set: criterio },
-      { upsert: true, returnDocument: "after", projection: { email: 1 } },
-      function (err, doc) {
-        if (err) {
-          throw err;
-        } else {
-          console.log("Elemento actualizado");
-          console.log(doc.value.email);
-          callback({ email: doc.value.email });
-        }
+    coleccion.findOne(criterio, function (err, doc) {
+      if (err) {
+        throw err;
       }
-    );
+      if (doc) {
+        // Si el usuario ya existe, devolver un mensaje de error.
+        callback({ error: "El usuario ya existe" });
+      } else {
+        // Si el usuario no existe, crearlo.
+        coleccion.insertOne(criterio, function (err, result) {
+          if (err) {
+            throw err;
+          }
+          console.log("Elemento insertado");
+          callback({ email: criterio.email });
+        });
+      }
+    });
   }
+  
 
   this.conectar = async function (callback) {
     let cad = this;

@@ -12,6 +12,7 @@ function ClienteRest() {
         console.log("El nick ya está ocupado");
       }
       cw.mostrarMsg(msg);
+      cw.mostrarOpciones();
     });
   };
 
@@ -95,11 +96,17 @@ function ClienteRest() {
     });
   };
 
-  this.registroUsuario = function (email, password) {
-    
-  }
+  this.registrarUsuario = function (email, password ) {
+    $.getJSON("/registrarUsuario/" + email + "/" + password, function (data) {
+      if(data.error){
+        cw.mostrarMsg(data.error);}
+      else{
+        cw.mostrarMsg("Usuario registrado correctamente")
+      }
+    });
+  };
 
   this.crearPartida = function () {
     cw.mostrarCrearPartida();
-  }
+  };
 }

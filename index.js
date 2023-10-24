@@ -116,6 +116,15 @@ app.get("/eliminarUsuario/:nick", function (request, response) {
   response.send(res);
 });
 
+app.get("/registrarUsuario/:email/:pwd", function (request, response) {
+  let email = request.params.email;
+  let pwd = request.params.pwd;
+  sistema.registrarUsuario(email, pwd, function(result){
+    response.send(result);
+  });
+  
+});
+
 
 app.post("/enviarJwt", function (request, response) {
   let jwt = request.body.jwt;

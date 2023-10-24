@@ -130,6 +130,7 @@ function ControlWeb() {
   };
 
   this.mostrarOpciones = function () {
+    $("#registro").remove();
     let cadena = '<div id="mOP" class="form-group">';
     cadena +=
       '<button id="btnCP" type="submit" class="btn btn-primary">Crear Partida</button>';
