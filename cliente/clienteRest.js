@@ -11,6 +11,7 @@ function ClienteRest() {
       } else {
         console.log("El nick ya está ocupado");
       }
+      cw.limpiar();
       cw.mostrarMsg(msg);
       cw.mostrarOpciones();
     });
@@ -96,15 +97,53 @@ function ClienteRest() {
     });
   };
 
-  this.registrarUsuario = function (email, password ) {
-    $.getJSON("/registrarUsuario/" + email + "/" + password, function (data) {
-      if(data.error){
-        cw.mostrarMsg(data.error);}
-      else{
-        cw.mostrarMsg("Usuario registrado correctamente")
-      }
-    });
+  this.registrarUsuario = function (email, password) {
+    $.ajax({
+      type: "POST",
+      url: "/registrarUsuario",
+      data: JSON.stringify({ email: email, password: password }),
+      success: function (data) {
+        if (data.nick != -1) {
+          console.log("Usuario " + data.nick + " ha sido registrado");
+          $.cookie("nick", data.nick)
+          cw.limpiar();
+          // cw.mostrarMsg("Bienvenido al sistema, " + data.nick);
+          cw.mostrarInicioSesion();
+        } else {
+          console.log("El nick ya está ocupado");
+        }
+      },
+      error: function (xhr, textStatus, errorThrown){
+        console.log("Status: " + textStatus);
+        console.log("Error: " + errorThrown);
+      }, 
+      contentType: "application/json",
+    })
   };
+
+  this.iniciarSesion = function (email, password){
+    $.ajax({
+      type: "POST",
+      url: "/iniciarSesion",
+      data: JSON.stringify({ email: email, password: password }),
+      success: function (data) {
+        if (data.email) {
+          console.log("Usuario " + data.email + " ha iniciado sesion");
+          $.cookie("nick", data.email)
+          cw.limpiar();
+          cw.mostrarMsg("Bienvenido al sistema, " + data.email);
+          cw.mostrarOpciones();
+        } else {
+          console.log("El nick ya está ocupado");
+        }
+      },
+      error: function (xhr, textStatus, errorThrown){
+        console.log("Status: " + textStatus);
+        console.log("Error: " + errorThrown);
+      },
+      contentType: "application/json",
+    })
+  }
 
   this.crearPartida = function () {
     cw.mostrarCrearPartida();

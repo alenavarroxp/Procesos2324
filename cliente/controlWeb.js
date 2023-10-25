@@ -84,9 +84,12 @@ function ControlWeb() {
     let nick = $.cookie("nick");
     if (nick) {
       cw.mostrarMsg("Bienvenido al sistema, " + nick);
+      cw.mostrarOpciones();
     } else {
       // cw.mostrarAgregarUsuario();
-      cw.mostrarRegistro();
+      cw.limpiar();
+      cw.conseguirUsuarios();
+      cw.mostrarInicioSesion();
       cw.init();
     }
   };
@@ -113,9 +116,12 @@ function ControlWeb() {
 
   this.limpiar = function () {
     $("#mAU").remove();
+    $("#fmInicioSesion").remove();
+    $("#fmRegistro").remove();
   };
 
   this.mostrarRegistro = function () {
+    $("#fmInicioSesion").remove();
     $("#fmRegistro").remove();
     $("#registro").load("./cliente/registro.html",function(){
       $("#btnRegistro").on("click", function () {
@@ -129,11 +135,33 @@ function ControlWeb() {
     });
   };
 
+  this.mostrarInicioSesion = function () {
+    $("#fmRegistro").remove();
+    $("#inicioSesion").load("./cliente/inicioSesion.html",function(){
+      $("#btnInicioSesion").on("click", function () {
+        let email = $("#email").val();
+        let pwd = $("#pwd").val();
+        if(email && pwd){
+          rest.iniciarSesion(email,pwd);
+          console.log("INICIO SESION ",email,pwd)
+        }else{
+          cw.mostrarMsg("Introduce un email y una contraseña")
+        }
+      });
+    });
+  };
+
+  this.conseguirUsuarios = function () {
+    $.getJSON("/obtenerUsuarios", function (data) {
+      console.log(data);
+    });
+  };
+
   this.mostrarOpciones = function () {
     $("#registro").remove();
-    let cadena = '<div id="mOP" class="form-group">';
+    let cadena = '<div id="mOP" class="form-group" style="text-align: center; padding: 10px;">';
     cadena +=
-      '<button id="btnCP" type="submit" class="btn btn-primary">Crear Partida</button>';
+      '<button id="btnCP" type="submit" class="btn btn-primary" style="margin-right: 10px;">Crear Partida</button>';
     cadena +=
       '<button id="btnUP" type="submit" class="btn btn-primary">Unirse Partida</button>';
     cadena += "</div>";
@@ -148,6 +176,7 @@ function ControlWeb() {
   };
 
   this.mostrarCrearPartida = function () {
+    $("#mCP").remove();
     cadena = '<div id="mCP" class="form-group">';
     cadena += '<label for="nombre">Nombre de la partida:</label>';
     cadena += '<input type="text" class="form-control" id="nombre">';

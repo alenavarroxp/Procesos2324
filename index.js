@@ -65,7 +65,8 @@ app.get("/good", function (req, res) {
       console.log(req.user);
       let email2 = req.user.username;
       sistema.usuarioOAuth({ email: email2 }, function (obj) {
-        res.cookie("nick", obj.email2);
+        console.log("obj", obj)
+        res.cookie("nick", obj.email.email);
         res.redirect("/");
       });
       break;
@@ -116,14 +117,9 @@ app.get("/eliminarUsuario/:nick", function (request, response) {
   response.send(res);
 });
 
-app.get("/registrarUsuario/:email/:pwd", function (request, response) {
-  let email = request.params.email;
-  let pwd = request.params.pwd;
-  sistema.registrarUsuario(email, pwd, function(result){
-    response.send(result);
-  });
-  
-});
+
+
+
 
 
 app.post("/enviarJwt", function (request, response) {
@@ -132,6 +128,19 @@ app.post("/enviarJwt", function (request, response) {
   let email = user.email;
   sistema.usuarioOAuth({ "email": email }, function (obj) {
     response.send({ nick: obj.email });
+  });
+});
+
+app.post("/registrarUsuario", function (request, response) {
+  sistema.registrarUsuario(request.body, function(result){
+    response.send({ nick: result.email });
+  });
+  
+});
+
+app.post("/iniciarSesion", function (request, response) {
+  sistema.iniciarSesion(request.body, function (obj) {
+    response.send(obj);
   });
 });
 

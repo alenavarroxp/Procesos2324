@@ -19,7 +19,12 @@ function Sistema(test) {
   };
 
   this.obtenerUsuarios = function () {
-    return this.usuarios;
+    // console.log("Obteniendo usuarios", this.usuarios);
+    // this.cad.obtenerUsuarios(function (usuarios) {
+    //   this.usuarios = usuarios;
+    //   console.log("Usuarios obtenidos", this.usuarios);
+    //   return this.usuarios;
+    // });
   };
 
   this.usuarioActivo = function (nick) {
@@ -62,25 +67,41 @@ function Sistema(test) {
     });
   };
 
-  this.registrarUsuario = function (email, pwd, callback) {
-    let nuevoUsuario = new Usuario();
-    nuevoUsuario.email = email;
-    nuevoUsuario.clave = pwd;
-    this.usuarioOAuth({ email: nuevoUsuario.email }, function (obj) {
-      if (obj.error) {
-        callback({ error: "El usuario ya existe" });
-      } else {
-        console.log("Usuario registrado", nuevoUsuario);
-        callback({ email: nuevoUsuario.email });
+  this.registrarUsuario = function (obj, callback) {
+    let modelo = this;
+    if(!obj.nick){
+      obj.nick = obj.email;
+    }
+    this.cad.buscarOCrearUsuario(obj,function(usr){
+      if(!usr){
+        modelo.cad.insertarUsuario(obj,function(res){
+          callback(res);
+        })
+      }else{
+        callback({"email":-1})
       }
-    });
+    })
+  };
+
+  this.iniciarSesion = function (obj, callback) {
+   let modelo = this;
+   if(!obj.nick){
+     obj.nick = obj.email;
+   }
+    this.cad.buscarUsuario(obj,function(usr){
+      if(!usr){
+        callback({"email":-1})
+      }else{
+        callback(usr);
+      }
+    })
   };
 }
 
-function Usuario(nick) {
-  this.nick = nick;
-  this.email;
-  this.clave;
+function Usuario(email, pwd) {
+  this.nick = "";
+  this.email = email;
+  this.clave = pwd;
 }
 
 module.exports.Sistema = Sistema;
