@@ -118,18 +118,19 @@ function ControlWeb() {
     $("#mAU").remove();
     $("#fmInicioSesion").remove();
     $("#fmRegistro").remove();
+    $("#mOP").remove();
   };
 
   this.mostrarRegistro = function () {
     $("#fmInicioSesion").remove();
-    $("#fmRegistro").remove();
-    $("#registro").load("./cliente/registro.html",function(){
+    $("#mOP").remove();
+    $("#registro").load("./cliente/registro.html", function () {
       $("#btnRegistro").on("click", function () {
         let email = $("#email").val();
         let pwd = $("#pwd").val();
-        if(email && pwd){
-          rest.registrarUsuario(email,pwd);
-          console.log(email,pwd)
+        if (email && pwd) {
+          rest.registrarUsuario(email, pwd);
+          console.log(email, pwd);
         }
       });
     });
@@ -137,15 +138,16 @@ function ControlWeb() {
 
   this.mostrarInicioSesion = function () {
     $("#fmRegistro").remove();
-    $("#inicioSesion").load("./cliente/inicioSesion.html",function(){
+    $("#mOP").remove();
+    $("#inicioSesion").load("./cliente/inicioSesion.html", function () {
       $("#btnInicioSesion").on("click", function () {
         let email = $("#email").val();
         let pwd = $("#pwd").val();
-        if(email && pwd){
-          rest.iniciarSesion(email,pwd);
-          console.log("INICIO SESION ",email,pwd)
-        }else{
-          cw.mostrarMsg("Introduce un email y una contraseña")
+        if (email && pwd) {
+          rest.iniciarSesion(email, pwd);
+          console.log("INICIO SESION ", email, pwd);
+        } else {
+          cw.mostrarMsg("Introduce un email y una contraseña");
         }
       });
     });
@@ -158,8 +160,8 @@ function ControlWeb() {
   };
 
   this.mostrarOpciones = function () {
-    $("#registro").remove();
-    let cadena = '<div id="mOP" class="form-group" style="text-align: center; padding: 10px;">';
+    let cadena =
+      '<div id="mOP" class="form-group" style="text-align: center; padding: 10px;">';
     cadena +=
       '<button id="btnCP" type="submit" class="btn btn-primary" style="margin-right: 10px;">Crear Partida</button>';
     cadena +=
@@ -210,7 +212,7 @@ function ControlWeb() {
     });
   };
 
-  this.mostrarUnirsePartida = function() {
+  this.mostrarUnirsePartida = function () {
     $("#mCP").remove();
     $("#mUP").remove();
     cadena = '<div id="mUP" class="form-group">';
@@ -220,7 +222,7 @@ function ControlWeb() {
       '<button id="btnUP" type="submit" class="btn btn-primary" style="margin:10px">Unirse Partida</button>';
     cadena += "</div>";
     $("#au").append(cadena);
-  }
+  };
 
   this.salir = function () {
     $.removeCookie("nick");
