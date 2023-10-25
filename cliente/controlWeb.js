@@ -170,13 +170,13 @@ function ControlWeb() {
       rest.crearPartida();
     });
     $("#btnUP").on("click", function () {
-      //rest.unirsePartida();
-      // $("#mOP").remove();
+      rest.unirsePartida();
     });
   };
 
   this.mostrarCrearPartida = function () {
     $("#mCP").remove();
+    $("#mUP").remove();
     cadena = '<div id="mCP" class="form-group">';
     cadena += '<label for="nombre">Nombre de la partida:</label>';
     cadena += '<input type="text" class="form-control" id="nombre">';
@@ -196,7 +196,7 @@ function ControlWeb() {
     cadena += '<input type="text" id="custom-time" class="form-control">';
     cadena += "</div>";
     cadena +=
-      '<button id="btnCP" type="submit" class="btn btn-primary">Crear Partida</button>';
+      '<button id="btnCP" type="submit" class="btn btn-primary" style="margin:10px">Crear Partida</button>';
     cadena += "</div>";
     $("#au").append(cadena);
 
@@ -209,6 +209,18 @@ function ControlWeb() {
       }
     });
   };
+
+  this.mostrarUnirsePartida = function() {
+    $("#mCP").remove();
+    $("#mUP").remove();
+    cadena = '<div id="mUP" class="form-group">';
+    cadena += '<label for="nombre">Nombre de la partida:</label>';
+    cadena += '<input type="text" class="form-control" id="nombre">';
+    cadena +=
+      '<button id="btnUP" type="submit" class="btn btn-primary" style="margin:10px">Unirse Partida</button>';
+    cadena += "</div>";
+    $("#au").append(cadena);
+  }
 
   this.salir = function () {
     $.removeCookie("nick");

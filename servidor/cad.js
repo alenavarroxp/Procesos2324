@@ -17,6 +17,7 @@ function CAD() {
   }
 
   this.insertarUsuario = function (usuario,callback){
+    console.log("INSERTARUSUARIO")
     insertar(this.usuarios, usuario, callback);
   }
 
@@ -33,6 +34,7 @@ function CAD() {
 
   function insertar(coleccion, elemento, callback){
     coleccion.insertOne(elemento, function (err, result){
+      
       if(err){
         console.log("error")
       }else{
@@ -43,7 +45,6 @@ function CAD() {
   }
 
   this.buscarOCrearUsuario = function (usr, callback) {
-    //buscarOCrear(this.usuarios,{email:email},callback);
     buscarOCrear(this.usuarios, usr, callback);
   };
 
@@ -54,8 +55,7 @@ function CAD() {
            else { 
                 console.log("Elemento actualizado"); 
                 console.log(doc.value.email);
-                //console.log(doc);
-                callback({email:doc.value.email});
+                callback({"email":doc.value.email});
             }
          });  
     }

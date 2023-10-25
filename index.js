@@ -66,7 +66,7 @@ app.get("/good", function (req, res) {
       let email2 = req.user.username;
       sistema.usuarioOAuth({ email: email2 }, function (obj) {
         console.log("obj", obj)
-        res.cookie("nick", obj.email.email);
+        res.cookie("nick", obj.email);
         res.redirect("/");
       });
       break;

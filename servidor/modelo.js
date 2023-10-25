@@ -69,32 +69,33 @@ function Sistema(test) {
 
   this.registrarUsuario = function (obj, callback) {
     let modelo = this;
-    if(!obj.nick){
+    if (!obj.nick) {
       obj.nick = obj.email;
     }
-    this.cad.buscarOCrearUsuario(obj,function(usr){
-      if(!usr){
-        modelo.cad.insertarUsuario(obj,function(res){
+    this.cad.buscarUsuario(obj, function (usr) {
+      console.log("usr", usr);
+      if (!usr) {
+        modelo.cad.insertarUsuario(obj, function (res) {
           callback(res);
-        })
-      }else{
-        callback({"email":-1})
+        });
+      } else {
+        callback({ email: -1 });
       }
-    })
+    });
   };
 
   this.iniciarSesion = function (obj, callback) {
-   let modelo = this;
-   if(!obj.nick){
-     obj.nick = obj.email;
-   }
-    this.cad.buscarUsuario(obj,function(usr){
-      if(!usr){
-        callback({"email":-1})
-      }else{
+    let modelo = this;
+    if (!obj.nick) {
+      obj.nick = obj.email;
+    }
+    this.cad.buscarUsuario(obj, function (usr) {
+      if (!usr) {
+        callback({ error: "Usuario no registrado" });
+      } else {
         callback(usr);
       }
-    })
+    });
   };
 }
 
