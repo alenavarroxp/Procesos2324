@@ -29,9 +29,14 @@ passport.use(
 //GITHUB
 passport.use(
   new GitHubStrategy({
-    clientID: "8c88b9dee6960a9943c2",
-    clientSecret: "25ee1a62f8aac920eac284c8903e0cdbb24ad4f5",
-    callbackURL: "http://localhost:3000/github/callback",
+    //LOCAL OAUTH
+    // clientID: "8c88b9dee6960a9943c2",
+    // clientSecret: "25ee1a62f8aac920eac284c8903e0cdbb24ad4f5",
+    // callbackURL: "http://localhost:3000/github/callback",
+    //PRODUCIÓN OAUTH
+    clientID: "8ca5ad36387754bc027c",
+    clientSecret: "652dfc3e55bb7a0ab35bf6928da67433feecca61",
+    callbackURL: "https://arquitectura-base-github-5rfb3lj4yq-ew.a.run.app/github/callback"
   },
   function (accessToken, refreshToken, profile, done) {
     return done(null, profile);  

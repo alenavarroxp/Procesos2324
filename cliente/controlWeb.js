@@ -82,13 +82,13 @@ function ControlWeb() {
 
   this.comprobarSesion = function () {
     let nick = $.cookie("nick");
+    console.log
     if (nick) {
       cw.mostrarMsg("Bienvenido al sistema, " + nick);
       cw.mostrarOpciones();
     } else {
       // cw.mostrarAgregarUsuario();
       cw.limpiar();
-      cw.conseguirUsuarios();
       cw.mostrarInicioSesion();
       cw.init();
     }
@@ -152,12 +152,7 @@ function ControlWeb() {
       });
     });
   };
-
-  this.conseguirUsuarios = function () {
-    $.getJSON("/obtenerUsuarios", function (data) {
-      console.log(data);
-    });
-  };
+ 
 
   this.mostrarOpciones = function () {
     let cadena =

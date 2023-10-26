@@ -134,8 +134,8 @@ function ClienteRest() {
         }
         if (data.email) {
           console.log("Usuario " + data.email + " ha iniciado sesion");
-          $.cookie("nick", data.email)
           cw.limpiar();
+          $.cookie("nick", data.email)
           cw.mostrarMsg("Bienvenido al sistema, " + data.email);
           cw.mostrarOpciones();
         } else {

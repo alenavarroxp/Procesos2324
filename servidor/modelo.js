@@ -9,9 +9,13 @@ function Sistema(test) {
     if (!this.usuarios[nick]) {
       this.usuarios[nick] = new Usuario(nick);
       res.nick = nick;
-      this.usuarioOAuth({ email: nick }, function (obj) {
-        console.log("Usuario agregado: " + obj.email);
-      });
+      if (!this.test) {
+        this.usuarioOAuth({ email: nick }, function (obj) {
+          console.log("Usuario agregado: " + obj.email);
+        });
+      }else{
+        console.log("Usuario agregado: " + nick);
+      }
     } else {
       console.log("El usuario ya existe: " + nick);
     }
@@ -19,12 +23,7 @@ function Sistema(test) {
   };
 
   this.obtenerUsuarios = function () {
-    // console.log("Obteniendo usuarios", this.usuarios);
-    // this.cad.obtenerUsuarios(function (usuarios) {
-    //   this.usuarios = usuarios;
-    //   console.log("Usuarios obtenidos", this.usuarios);
-    //   return this.usuarios;
-    // });
+    return this.usuarios;
   };
 
   this.usuarioActivo = function (nick) {
@@ -93,7 +92,7 @@ function Sistema(test) {
       if (!usr) {
         callback({ error: "Usuario no registrado" });
       } else {
-        if(obj.password != usr.password){
+        if (obj.password != usr.password) {
           callback({ error: "Contraseña incorrecta" });
           return;
         }
@@ -104,7 +103,7 @@ function Sistema(test) {
 }
 
 function Usuario(email, pwd) {
-  this.nick = "";
+  this.nick = email;
   this.email = email;
   this.clave = pwd;
 }
