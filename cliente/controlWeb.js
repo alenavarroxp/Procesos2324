@@ -98,7 +98,8 @@ function ControlWeb() {
     let cw = this;
     google.accounts.id.initialize({
       client_id:
-        "726975145917-reol4tr88j6m8a0mqehb0k6sop45mto2.apps.googleusercontent.com", //prod
+        // "726975145917-reol4tr88j6m8a0mqehb0k6sop45mto2.apps.googleusercontent.com", //local
+        "726975145917-rae33a02hgmi3pjid1dh2dq334igsvqr.apps.googleusercontent.com", //prod
       auto_select: false,
       callback: cw.handleCredentialsResponse,
     });
