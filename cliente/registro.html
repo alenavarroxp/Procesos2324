@@ -1,14 +1,81 @@
-<div id="fmRegistro">
-    <form>
-        <div class="form-group">
-            <label for="email">Email address:</label>
-            <input type="email" class="form-control" placeholder="Enter email" id="email">
+<div class="flex h-screen relative" id="fmRegistro">
+    <div class="w-1/4 p-8 flex items-center justify-center">
+        <div style="position: absolute; top: 30px; left: 30px;">
+            <a onclick="cw.mostrarInicioSesion()" class="text-blue-600 block mb-4 cursor-pointer">
+                <i class="fas fa-arrow-left text-xl"></i>
+            </a>
         </div>
-        <div class="form-group">
-            <label for="pwd">Password:</label>
-            <input type="password" class="form-control" placeholder="Enter password" id="pwd">
+        <div class="text-center">
+            <h3 class="text-3xl mb-6 font-bold text-blue-600">¡Crea tu cuenta ahora!</h3>
+            <form>
+                <div class="mb-4 text-left relative">
+                    <label for="nick" class="text-sm font-semibold">Nombre de usuario:</label>
+                    <div class="flex items-center border-2 rounded-lg focus-within:border-blue-500">
+                        <span class="absolute left-3">
+                            <i class="fas fa-at text-blue-600"></i>
+                        </span>
+                        <input type="text" class="w-full px-10 py-2 rounded-lg border-none focus:outline-none"
+                            placeholder="Introduce tu nombre de usuario" id="nick">
+                    </div>
+                </div>
+
+
+                <div class="mb-4 text-left relative">
+                    <label for="email" class="text-sm font-semibold">Correo electrónico:</label>
+                    <div class="flex items-center border-2 rounded-lg focus-within:border-blue-500">
+                        <span class="absolute left-3">
+                            <i class="fas fa-envelope text-blue-600"></i>
+                        </span>
+                        <input type="email" class="w-full px-10 py-2 rounded-lg border-none focus:outline-none"
+                            placeholder="Introduce tu correo electrónico" id="email">
+                    </div>
+                </div>
+
+                <div class="mb-6 text-left relative">
+                    <label for="pwd" class="text-sm font-semibold">Contraseña:</label>
+                    <div class="flex items-center border-2 rounded-lg focus-within:border-blue-500">
+                        <span class="absolute left-3">
+                            <i class="fas fa-lock text-blue-600"></i>
+                        </span>
+                        <input type="password" class="w-full px-10 py-2 rounded-lg border-none focus:outline-none"
+                            placeholder="Introduce tu contraseña" id="pwd">
+                        <button type="button" onclick="togglePassword('pwd')" class="absolute right-3">
+                            <i id="togglePassword" class="fas fa-eye-slash"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="mensajeError"
+                    class="text-red-500 text-sm font-semibold mt-0 mb-4 justify-center items-center hidden">
+                    <i class="fas fa-exclamation-circle text-red-500 mr-2"></i>
+                    <span>Mensaje de error</span>
+                </div>
+
+                <button type="submit" id="btnRegistro"
+                    class="bg-blue-500 text-white py-2 px-4 rounded-full hover:bg-blue-600">
+                    Registrar
+                </button>
+            </form>
         </div>
 
-        <button type="submit" id="btnRegistro" class="btn btn-primary">Registrar</button>
-    </form>
+    </div>
+    <div class="w-3/4 flex items-center justify-center">
+        <img src="./cliente/img/login.jpeg" class="w-full h-full" draggable="false" alt="Imagen de registro">
+    </div>
 </div>
+<script>
+    function togglePassword(inputId) {
+        const pwdInput = document.getElementById(inputId);
+        const pwdToggle = document.getElementById('togglePassword');
+
+        if (pwdInput.type === "password") {
+            pwdInput.type = "text";
+            pwdToggle.classList.remove("fa-eye-slash");
+            pwdToggle.classList.add("fa-eye");
+        } else {
+            pwdInput.type = "password";
+            pwdToggle.classList.remove("fa-eye");
+            pwdToggle.classList.add("fa-eye-slash");
+        }
+    }
+</script>

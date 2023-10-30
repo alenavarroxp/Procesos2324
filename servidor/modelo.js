@@ -68,9 +68,7 @@ function Sistema(test) {
 
   this.registrarUsuario = function (obj, callback) {
     let modelo = this;
-    if (!obj.nick) {
-      obj.nick = obj.email;
-    }
+    
     this.cad.buscarUsuario(obj, function (usr) {
       console.log("usr", usr);
       if (!usr) {
