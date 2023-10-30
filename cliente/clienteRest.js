@@ -109,8 +109,7 @@ function ClienteRest() {
           // $.cookie("nick", data.nick)
           cw.mostrarToast(
             "Consulta tu correo para confirmar tu cuenta",
-            top,
-            "rgb(255,210,0)"
+            top
           );
           cw.limpiar();
           cw.mostrarInicioSesion();
@@ -175,4 +174,29 @@ function ClienteRest() {
       contentType: "application/json",
     });
   };
+
+  this.crearPartida = function (email, nombrePartida, cantidadJugadores, duracion, numGoles) {
+    $.ajax({
+      type: "POST",
+      url: "/crearPartida",
+      data: JSON.stringify({ email:email, nombrePartida: nombrePartida, cantidadJugadores: cantidadJugadores, duracion: duracion, numGoles: numGoles }),
+      success: function (data) {
+        console.log("DATA", data);
+        if (data.error) {
+          cw.mostrarMsg(data.error);
+        }
+        if (data.nombrePartida) {
+          console.log("Partida " + data.nombrePartida + " ha sido creada");
+          cw.limpiar();
+          cw.mostrarToast("Partida " + data.nombrePartida + " ha sido creada", top);
+          cw.mostrarInicio();
+        }
+      },
+      error: function (xhr, textStatus, errorThrown) {
+        console.log("Status: " + textStatus);
+        console.log("Error: " + errorThrown);
+      },
+      contentType: "application/json",
+    });
+  }
 }

@@ -95,7 +95,7 @@ function ControlWeb() {
     }
   };
 
-  this.mostrarToast = function (msg, position, color) {
+  this.mostrarToast = function (msg, gravity, position, color) {
     const toastConfig = {
       text: msg,
       duration: 5000,
@@ -113,12 +113,9 @@ function ControlWeb() {
       },
     };
 
-    if (position) {
-      toastConfig.gravity = position;
-    }
-    if (color) {
-      toastConfig.style.background = color;
-    }
+    toastConfig.position = position ? position : toastConfig.position;
+    toastConfig.gravity = gravity ? gravity : toastConfig.gravity;
+    toastConfig.style.background = color ? color : toastConfig.style.background;
 
     Toastify(toastConfig).showToast();
   };
@@ -248,7 +245,22 @@ function ControlWeb() {
   this.mostrarCrearPartida = async function () {
     await cw.animarInicio();
     $("#home").remove();
-    $("#crearPartida").load("./cliente/crearPartida.html", function () {});
+    $("#crearPartida").load("./cliente/crearPartida.html", function () {
+      $("#btnCrearPartida").on("click", function () {
+        event.preventDefault();
+        let email = $.cookie("nick");
+        let nombrePartida = $("#nombrePartida").val();
+        let cantidadJugadores = $("#cantidadJugadores").val();
+        let duracion = $("#duracionPartida").val();
+        let numGoles = $("#numGoles").val();
+        if(email && nombrePartida && cantidadJugadores && duracion && numGoles){
+          rest.crearPartida(email, nombrePartida, cantidadJugadores, duracion, numGoles);
+          $("#mensajeError").remove();
+        } else {
+          cw.mostrarMsg("Introduce los campos obligatorios")
+        }
+      });
+    });
   };
 
   this.mostrarUnirsePartida = async function () {

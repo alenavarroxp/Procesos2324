@@ -87,23 +87,22 @@ function Sistema(test) {
   };
 
   this.iniciarSesion = function (obj, callback) {
-    console.log("INICIAR SESION", obj)
-      if (!obj.nick) {
-        obj.nick = obj.email;
-      }
+    console.log("INICIAR SESION", obj);
+    if (!obj.nick) {
+      obj.nick = obj.email;
+    }
 
-      this.cad.buscarUsuario(obj, function (usr) {
-        if (!usr) {
-          callback({ error: "Usuario no registrado" });
-        } else {
-          if (obj.password != usr.password) {
-            callback({ error: "Contraseña incorrecta" });
-            return;
-          }
-          callback(usr);
+    this.cad.buscarUsuario(obj, function (usr) {
+      if (!usr) {
+        callback({ error: "Usuario no registrado" });
+      } else {
+        if (obj.password != usr.password) {
+          callback({ error: "Contraseña incorrecta" });
+          return;
         }
-      });
-    
+        callback(usr);
+      }
+    });
   };
 
   this.confirmarUsuario = function (email, key, callback) {
@@ -116,7 +115,26 @@ function Sistema(test) {
   this.reenviarCorreo = function (obj, callback) {
     correo.enviarEmail(obj.email, obj.key, "Confirmar cuenta");
     callback(obj);
-  }
+  };
+
+  this.crearPartida = function (obj, callback) {
+    let modelo = this;
+    this.cad.buscarOCrearPartida(obj, function (partida) {
+      if(!partida){
+        obj.id = Date.now().toString();
+        obj.estado = "esperando";
+        console.log("OBJPPARTIDA", obj);
+        modelo.cad.insertarPartida(obj, function (res) {
+          console.log("RES", res)
+          callback(res);
+        });
+      }else{
+        console.log("PARTIDA", partida);
+        callback(partida);
+      }
+      
+    });
+  };
 }
 
 function Usuario(email, pwd) {

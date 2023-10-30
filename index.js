@@ -157,6 +157,12 @@ app.post("/reenviarCorreo", function (request, response) {
   });
 });
 
+app.post("/crearPartida", function (request, response) {
+  sistema.crearPartida(request.body, function (obj) {
+    response.send(obj);
+  });
+});
+
 app.listen(PORT, () => {
   console.log(`App está escuchando en el puerto ${PORT}`);
   console.log("Ctrl+C para salir");
