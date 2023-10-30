@@ -119,7 +119,7 @@ function Sistema(test) {
 
   this.crearPartida = function (obj, callback) {
     let modelo = this;
-    this.cad.buscarOCrearPartida(obj, function (partida) {
+    this.cad.buscarPartida(obj, function (partida) {
       if(!partida){
         obj.id = Date.now().toString();
         obj.estado = "esperando";

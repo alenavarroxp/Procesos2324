@@ -24,11 +24,11 @@ function CAD() {
 
   function buscar(coleccion, criterio, callback) {
     let col = coleccion;
-    coleccion.find(criterio).toArray(function (error, usuarios) {
-      if (usuarios.length == 0) {
+    coleccion.find(criterio).toArray(function (error, coleccion) {
+      if (coleccion.length == 0) {
         callback(undefined);
       } else {
-        callback(usuarios[0]);
+        callback(coleccion[0]);
       }
     });
   }
@@ -86,29 +86,10 @@ function CAD() {
     );
   }
 
-  this.buscarOCrearPartida = function (partida, callback) {
-    buscarOCrearPartida(this.partidas, partida, callback);
+  this.buscarPartida = function (partida, callback) {
+    buscar(this.partidas, {nombrePartida:partida.nombrePartida}, callback);
   };
-
-  function buscarOCrearPartida(coleccion, criterio, callback) {
-    coleccion.findOneAndUpdate(
-      criterio,
-      { $set: criterio },
-      {
-        upsert: true,
-        returnDocument: "after",
-        projection: { nombrePartida: 1 },
-      },
-      function (err, doc) {
-        if (err) {
-          throw err;
-        } else {
-          console.log("Partida actualizada");
-          callback({ nombrePartida: doc.value.nombrePartida });
-        }
-      }
-    );
-  }
+ 
 
   this.insertarPartida = function (partida, callback) {
     console.log("INSERTARPARTIDA");
