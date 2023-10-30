@@ -84,8 +84,8 @@ function ClienteRest() {
           console.log("El nick ya está ocupado");
         }
         cw.limpiar();
-        cw.mostrarMsg(msg);
-        cw.mostrarOpciones();
+        cw.mostrarToast(msg,top);
+        cw.mostrarInicio();
       },
       error: function (xhr, textStatus, errorThrown) {
         //console.log(JSON.parse(xhr.responseText));
@@ -97,22 +97,22 @@ function ClienteRest() {
     });
   };
 
-  this.registrarUsuario = function (email, password) {
+  this.registrarUsuario = function (nick,email, password) {
     $.ajax({
       type: "POST",
       url: "/registrarUsuario",
-      data: JSON.stringify({ email: email, password: password }),
+      data: JSON.stringify({nick:nick, email: email, password: password }),
       success: function (data) {
         console.log("data", data)
-        if (data.nick != -1) {
+        if (data.nick != undefined) {
           console.log("Usuario " + data.nick + " ha sido registrado");
-          $.cookie("nick", data.nick)
+          // $.cookie("nick", data.nick)
           cw.limpiar();
           cw.mostrarInicioSesion();
-          cw.mostrarMsg("Usuario " + data.nick + " ha sido registrado");
+          cw.mostrarToast("Usuario " + data.nick + " ha sido registrado");
         } else {
-          console.log("El nick ya está ocupado");
-          cw.mostrarMsg("El nick ya está ocupado");
+          console.log("El usuario ya está registrado");
+          cw.mostrarMsg("El usuario ya está registrado");
         }
       },
       error: function (xhr, textStatus, errorThrown){
@@ -136,11 +136,9 @@ function ClienteRest() {
           console.log("Usuario " + data.email + " ha iniciado sesion");
           cw.limpiar();
           $.cookie("nick", data.email)
-          cw.mostrarMsg("Bienvenido al sistema, " + data.email);
-          cw.mostrarOpciones();
-        } else {
-          console.log("El nick ya está ocupado");
-        }
+          cw.mostrarToast("Bienvenido al sistema, " + data.email,top);
+          cw.mostrarInicio();
+        } 
       },
       error: function (xhr, textStatus, errorThrown){
         console.log("Status: " + textStatus);
@@ -149,12 +147,5 @@ function ClienteRest() {
       contentType: "application/json",
     })
   }
-
-  this.crearPartida = function () {
-    cw.mostrarCrearPartida();
-  };
-
-  this.unirsePartida = function () {
-    cw.mostrarUnirsePartida();
-  }
+   
 }

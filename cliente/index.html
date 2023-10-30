@@ -27,46 +27,28 @@
   <script src="./cliente/controlWeb.js"></script>
 
 
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@3.9.4/dist/full.css" rel="stylesheet" type="text/css" />
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+
+
+  <script src="https://unpkg.com/@lottiefiles/lottie-player@0.2.0/dist/lottie-player.js"></script>
+
+
 </head>
 
 
+<body onload="ini();">
 
-<body onload="ini();" style="overflow: hidden;">
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark animate__animated animate__slideInDown">
-    <!-- Brand/logo -->
-    <a class="navbar-brand text-white" href="#">Mi Sistema</a>
-
-    <!-- Botón de hamburguesa para pantallas pequeñas -->
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
-      aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-
-    <!-- Enlaces -->
-    <div class="collapse navbar-collapse " id="navbarNav">
-      <ul class="navbar-nav ml-auto">
-        <li class="nav-item">
-          <a class="nav-link text-white" href="#" onclick="cw.mostrarInicioSesion()">Inicio de sesión</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link text-white" href="#" onclick="cw.mostrarRegistro();">Registro</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link text-white" href="#" onclick="cw.salir()">Salir</a>
-        </li>
-      </ul>
-    </div>
-  </nav>
-
-  <div class="container-fluid"
-    style="display: flex; flex-direction: column; align-items: center;   justify-content: center; padding: 20px;">
-    <h3 style="margin: 10px 0; text-align: center;">Arquitectura base</h3>
-    <div id="msg" style="margin: 10px 0; text-align: center; width: max-content;"></div>
-    <div id="au" style="margin: 10px 0; text-align: center;"></div>
-    <div id="inicioSesion" style="margin: 10px 0; text-align: center;"></div>
-    <div id="registro" style="margin: 0 0; text-align: center;"></div>
-
-  </div>
+  <div>
+    <div id="inicioSesion"></div>
+    <div id="registro"></div>
+    <div id="inicio"></div>
+    <div id="unirsePartida"></div>
+    <div id="crearPartida"></div>
+  </div>  
 
   <script>
     function ini() {
@@ -75,6 +57,7 @@
       cw.comprobarSesion();
     };
   </script>
+  <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 </body>
 
 </html>

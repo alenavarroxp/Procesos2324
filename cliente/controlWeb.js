@@ -75,20 +75,44 @@ function ControlWeb() {
   };
 
   this.mostrarMsg = function (msg) {
-    $("#mMsg").remove();
-    let cadena = '<h2 id="mMsg">' + msg + "</h2>";
-    $("#msg").append(cadena);
+    const mensajeError = document.getElementById("mensajeError");
+    mensajeError.innerHTML = `<i class="fas fa-exclamation-circle text-red-500 mr-2"></i><span>${msg}</span>`;
+    mensajeError.classList.remove("hidden");
+  };
+
+  this.mostrarToast = function (msg, position) {
+    const toastConfig = {
+      text: msg,
+      duration: 5000,
+      newWindow: true,
+      close: false,
+      gravity: "bottom",
+      position: "right",
+      stopOnFocus: true,
+      avatar: "",
+      style: {
+        background: "rgb(37,99,235)",
+        color: "#fff", // Color del texto en blanco
+        display: "flex",
+        alignItems: "center",
+      },
+    };
+
+    if (position) {
+      toastConfig.gravity = position;
+    }
+
+    Toastify(toastConfig).showToast();
   };
 
   this.comprobarSesion = function () {
     let nick = $.cookie("nick");
-    console.log
     if (nick) {
-      cw.mostrarMsg("Bienvenido al sistema, " + nick);
-      cw.mostrarOpciones();
+      cw.mostrarToast("Bienvenido al sistema, " + nick, top);
+      cw.mostrarInicio();
     } else {
       // cw.mostrarAgregarUsuario();
-      cw.limpiar();
+      // cw.limpiar();
       cw.mostrarInicioSesion();
       cw.init();
     }
@@ -99,7 +123,7 @@ function ControlWeb() {
     google.accounts.id.initialize({
       client_id:
         // "726975145917-reol4tr88j6m8a0mqehb0k6sop45mto2.apps.googleusercontent.com", //local
-        "726975145917-rae33a02hgmi3pjid1dh2dq334igsvqr.apps.googleusercontent.com", //prod
+      "726975145917-rae33a02hgmi3pjid1dh2dq334igsvqr.apps.googleusercontent.com", //prod
       auto_select: false,
       callback: cw.handleCredentialsResponse,
     });
@@ -124,14 +148,17 @@ function ControlWeb() {
 
   this.mostrarRegistro = function () {
     $("#fmInicioSesion").remove();
-    $("#mOP").remove();
     $("#registro").load("./cliente/registro.html", function () {
       $("#btnRegistro").on("click", function () {
+        event.preventDefault();
+        let nick = $("#nick").val();
         let email = $("#email").val();
         let pwd = $("#pwd").val();
-        if (email && pwd) {
-          rest.registrarUsuario(email, pwd);
-          console.log(email, pwd);
+        if (nick && email && pwd) {
+          rest.registrarUsuario(nick, email, pwd);
+          console.log(nick,email, pwd);
+        } else {
+          cw.mostrarMsg("Introduce los campos obligatorios");
         }
       });
     });
@@ -142,6 +169,7 @@ function ControlWeb() {
     $("#mOP").remove();
     $("#inicioSesion").load("./cliente/inicioSesion.html", function () {
       $("#btnInicioSesion").on("click", function () {
+        event.preventDefault();
         let email = $("#email").val();
         let pwd = $("#pwd").val();
         if (email && pwd) {
@@ -153,71 +181,60 @@ function ControlWeb() {
       });
     });
   };
- 
 
-  this.mostrarOpciones = function () {
-    let cadena =
-      '<div id="mOP" class="form-group" style="text-align: center; padding: 10px;">';
-    cadena +=
-      '<button id="btnCP" type="submit" class="btn btn-primary" style="margin-right: 10px;">Crear Partida</button>';
-    cadena +=
-      '<button id="btnUP" type="submit" class="btn btn-primary">Unirse Partida</button>';
-    cadena += "</div>";
-    $("#au").append(cadena);
-    $("#btnCP").on("click", function () {
-      rest.crearPartida();
-    });
-    $("#btnUP").on("click", function () {
-      rest.unirsePartida();
+  this.mostrarInicio = function () {
+    $("#inicio").load("./cliente/inicio.html", function () {
+      $("#btnSalir").on("click", function () {
+        cw.salir();
+      });
+
+      $("#btnCrearPartida").on("click", function () {
+        cw.mostrarCrearPartida();
+      });
+
+      $("#btnUnirsePartida").on("click", function () {
+        cw.mostrarUnirsePartida();
+      });
     });
   };
 
-  this.mostrarCrearPartida = function () {
-    $("#mCP").remove();
-    $("#mUP").remove();
-    cadena = '<div id="mCP" class="form-group">';
-    cadena += '<label for="nombre">Nombre de la partida:</label>';
-    cadena += '<input type="text" class="form-control" id="nombre">';
-    cadena += '<label for="goles">Cantidad de goles:</label>';
-    cadena += '<input type="number" class="form-control" id="goles" min="0">';
-    cadena +=
-      '<label for="tiempo-select">Selecciona la duración del partido:</label>';
-    cadena += '<select id="tiempo-select" class="form-control">';
-    cadena += '<option value="2:00">2 minutos</option>';
-    cadena += '<option value="5:00">5 minutos</option>';
-    cadena += '<option value="10:00">10 minutos</option>';
-    cadena += '<option value="custom">Personalizado</option>';
-    cadena += "</select>";
-    cadena += '<div id="custom-input" style="display: none;">';
-    cadena +=
-      '<label for="custom-time">Introduce el tiempo manualmente (hh:mm:ss):</label>';
-    cadena += '<input type="text" id="custom-time" class="form-control">';
-    cadena += "</div>";
-    cadena +=
-      '<button id="btnCP" type="submit" class="btn btn-primary" style="margin:10px">Crear Partida</button>';
-    cadena += "</div>";
-    $("#au").append(cadena);
+  this.animarInicio = function () {
+    return new Promise ((resolve)=>{
+      
+    const crearPartida = document.getElementById("crearPartida");
+    const unirsePartida = document.getElementById("unirsePartida");
 
-    $("#tiempo-select").change(function () {
-      var customInput = $("#custom-input");
-      if ($(this).val() === "custom") {
-        customInput.show();
-      } else {
-        customInput.hide();
-      }
-    });
+    crearPartida.classList.add("animate__animated", "animate__slideOutLeft");
+    unirsePartida.classList.add("animate__animated", "animate__slideOutRight");
+
+    setTimeout(function () {
+      crearPartida.style.display = "none";
+      unirsePartida.style.display = "none";
+
+      setTimeout(function () {
+        crearPartida.classList.remove("animate__fadeOutLeft");
+        unirsePartida.classList.remove("animate__fadeOutRight");
+
+        crearPartida.style.display = "block";
+        unirsePartida.style.display = "block";
+
+        resolve();
+      }, 50); // Ajusta este tiempo para permitir que los elementos se muestren antes de retirar las clases de animación
+    }, 1000); // Ajusta el tiempo según la duración de la animación
+    })
+
   };
 
-  this.mostrarUnirsePartida = function () {
-    $("#mCP").remove();
-    $("#mUP").remove();
-    cadena = '<div id="mUP" class="form-group">';
-    cadena += '<label for="nombre">Nombre de la partida:</label>';
-    cadena += '<input type="text" class="form-control" id="nombre">';
-    cadena +=
-      '<button id="btnUP" type="submit" class="btn btn-primary" style="margin:10px">Unirse Partida</button>';
-    cadena += "</div>";
-    $("#au").append(cadena);
+  this.mostrarCrearPartida = async function () {
+    await cw.animarInicio();
+    $("#inicio").remove();
+    $("#crearPartida").load("./cliente/crearPartida.html", function () {});
+  };
+
+  this.mostrarUnirsePartida = async function () {
+    await cw.animarInicio();
+    $("#inicio").remove();
+    $("#unirsePartida").load("./cliente/unirsePartida.html", function () {});
   };
 
   this.salir = function () {

@@ -1,0 +1,61 @@
+<div class="flex h-screen overflow-hidden">
+    <div class="w-full flex flex-row justify-center items-stretch">
+        <div id="crearPartida" class="w-1/2 bg-gray-700 flex flex-col items-center justify-center h-screen relative">
+            <div class="bg-cover bg-center w-full h-full relative"
+                style="background-image: url('./cliente/img/crearGame.jpeg')">
+                <div class="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none"
+                    style="background-color: rgba(0, 0, 0, 0.6);">
+                    <h1 class="text-white text-6xl mb-4 font-semibold"
+                        style="text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);">Crear Partida</h1>
+                    <p class="text-white text-lg" style="text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);">Crea tu propio
+                        terreno de juego, establece tus reglas y lleva a otros a un viaje emocionante.</p>
+                </div>
+            </div>
+
+            <div class="absolute bottom-0 mb-16 w-3/4 text-center">
+                <div id="slidingButton" class="animate__animated animate__bounceInUp animate__delay-0.5s mx-auto">
+                    <button id="btnCrearPartida" onclick="cw.animarInicio()"
+                        class="bg-blue-500 text-white rounded-full font-bold py-3 px-6 text-xl hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-100 ">
+                        CREA UNA PARTIDA
+                    </button>
+                </div>
+            </div>
+
+
+        </div>
+
+
+        <div id="unirsePartida" class="w-1/2 bg-gray-700 flex flex-col items-center justify-center h-screen relative">
+            <div class="bg-cover bg-center w-full h-full relative"
+                style="background-image: url('./cliente/img/joinGame.jpeg')">
+                <div class="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none"
+                    style="background-color: rgba(0, 0, 0, 0.6);">
+                    <h1 class="text-white text-6xl mb-4 font-semibold"
+                        style="text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);">
+                        Únete a una partida existente
+                    </h1>
+                    <p class="text-white">
+                        Únete a una partida existente y participa en la diversión junto a otros jugadores.
+                    </p>
+                </div>
+            </div>
+            <div class="absolute bottom-0 mb-16 w-3/4 text-center">
+                <div id="slidingButton" class="animate__animated animate__bounceInUp animate__delay-1s mx-auto">
+                    <button id="btnUnirsePartida" onclick="cw.animarInicio()"
+                        class="bg-green-500 text-white font-bold py-3 px-8 text-lg rounded-full hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-opacity-100">
+                        UNIRTE A UNA PARTIDA
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+<h1 class="text-5xl font-bold text-white pointer-events-none"
+    style="position: absolute; top: 15%; left: 50%; transform: translate(-50%, -50%);">¿Qué quieres hacer?
+</h1>
+
+<div class="absolute top-4 left-4 cursor-pointer flex items-center text-white" onclick="cw.salir()">
+    <i class="fas fa-door-open text-xl"></i>
+    <p class="ml-2 font-semibold">Salir</p>
+</div>
