@@ -12,54 +12,78 @@ function CAD() {
   //     callback(result);
   //   });
   // };
-  this.buscarUsuario = function (obj,callback){
-    buscar(this.usuarios,{"email":obj.email},callback);
-  }
+  this.buscarUsuario = function (obj, callback) {
+    buscar(this.usuarios, { email: obj.email }, callback);
+  };
 
-  this.insertarUsuario = function (usuario,callback){
-    console.log("INSERTARUSUARIO")
+  this.insertarUsuario = function (usuario, callback) {
+    console.log("INSERTARUSUARIO");
     insertar(this.usuarios, usuario, callback);
-  }
+  };
 
-  function buscar(coleccion, criterio, callback){
+  function buscar(coleccion, criterio, callback) {
     let col = coleccion;
-    coleccion.find(criterio).toArray(function (error,usuarios){
-      if(usuarios.length == 0){
+    coleccion.find(criterio).toArray(function (error, usuarios) {
+      if (usuarios.length == 0) {
         callback(undefined);
-      }else{
+      } else {
         callback(usuarios[0]);
       }
-    })
+    });
   }
 
-  function insertar(coleccion, elemento, callback){
-    coleccion.insertOne(elemento, function (err, result){
-      
-      if(err){
-        console.log("error")
-      }else{
-        console.log("Nuevo elemento creado")
+  function insertar(coleccion, elemento, callback) {
+    coleccion.insertOne(elemento, function (err, result) {
+      if (err) {
+        console.log("error");
+      } else {
+        console.log("Nuevo elemento creado");
         callback(elemento);
       }
-    })
+    });
   }
 
   this.buscarOCrearUsuario = function (usr, callback) {
     buscarOCrear(this.usuarios, usr, callback);
   };
 
-  function buscarOCrear(coleccion,criterio,callback)
-    {
-        coleccion.findOneAndUpdate(criterio, {$set: criterio}, {upsert: true,returnDocument:"after",projection:{email:1}}, function(err,doc) {
-           if (err) { throw err; }
-           else { 
-                console.log("Elemento actualizado"); 
-                console.log(doc.value.email);
-                callback({"email":doc.value.email});
-            }
-         });  
-    }
+  function buscarOCrear(coleccion, criterio, callback) {
+    coleccion.findOneAndUpdate(
+      criterio,
+      { $set: criterio },
+      { upsert: true, returnDocument: "after", projection: { email: 1 } },
+      function (err, doc) {
+        if (err) {
+          throw err;
+        } else {
+          console.log("Elemento actualizado");
+          console.log(doc.value.email);
+          callback({ email: doc.value.email });
+        }
+      }
+    );
+  }
 
+  this.confirmarUsuario = function (email, key, callback) {
+    confirmar(this.usuarios, email, key, callback);
+  };
+
+  function confirmar(coleccion, email, key, callback) {
+    coleccion.findOneAndUpdate(
+      { email: email, key: key },
+      { $set: { confirmada: true } },
+      { returnDocument: "after" },
+      function (err, doc) {
+        if (err) {
+          throw err;
+        } else {
+          console.log("Elemento actualizado");
+          console.log(doc.value);
+          callback(doc.value);
+        }
+      }
+    );
+  }
 
   this.conectar = async function (callback) {
     let cad = this;

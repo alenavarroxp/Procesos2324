@@ -84,7 +84,7 @@ function ClienteRest() {
           console.log("El nick ya está ocupado");
         }
         cw.limpiar();
-        cw.mostrarToast(msg,top);
+        cw.mostrarToast(msg, top);
         cw.mostrarInicio();
       },
       error: function (xhr, textStatus, errorThrown) {
@@ -97,16 +97,21 @@ function ClienteRest() {
     });
   };
 
-  this.registrarUsuario = function (nick,email, password) {
+  this.registrarUsuario = function (nick, email, password) {
     $.ajax({
       type: "POST",
       url: "/registrarUsuario",
-      data: JSON.stringify({nick:nick, email: email, password: password }),
+      data: JSON.stringify({ nick: nick, email: email, password: password }),
       success: function (data) {
-        console.log("data", data)
+        console.log("data", data);
         if (data.nick != undefined) {
           console.log("Usuario " + data.nick + " ha sido registrado");
           // $.cookie("nick", data.nick)
+          cw.mostrarToast(
+            "Consulta tu correo para confirmar tu cuenta",
+            top,
+            "rgb(255,210,0)"
+          );
           cw.limpiar();
           cw.mostrarInicioSesion();
           cw.mostrarToast("Usuario " + data.nick + " ha sido registrado");
@@ -115,37 +120,59 @@ function ClienteRest() {
           cw.mostrarMsg("El usuario ya está registrado");
         }
       },
-      error: function (xhr, textStatus, errorThrown){
+      error: function (xhr, textStatus, errorThrown) {
         console.log("Status: " + textStatus);
         console.log("Error: " + errorThrown);
-      }, 
+      },
       contentType: "application/json",
-    })
+    });
   };
 
-  this.iniciarSesion = function (email, password){
+  this.iniciarSesion = function (email, password) {
     $.ajax({
       type: "POST",
       url: "/iniciarSesion",
       data: JSON.stringify({ email: email, password: password }),
       success: function (data) {
-        if(data.error){
+        console.log("DATA", data);
+        if (data.confirmada == false) {
+          cw.mostrarMsg(
+            "Tienes que confirmar tu cuenta para acceder",
+            "Reenviar correo de confirmación",
+            function () {
+              $.ajax({
+                type: "POST",
+                url: "/reenviarCorreo",
+                data: JSON.stringify({ email: data.email, key: data.key }),
+                success: function (data) {
+                  cw.mostrarToast("Correo reenviado a "+data.email,top);
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                  console.log("Status: " + textStatus);
+                  console.log("Error: " + errorThrown);
+                },
+                contentType: "application/json",
+              });
+            }
+          );
+          return;
+        }
+        if (data.error) {
           cw.mostrarMsg(data.error);
         }
         if (data.email) {
           console.log("Usuario " + data.email + " ha iniciado sesion");
           cw.limpiar();
-          $.cookie("nick", data.email)
-          cw.mostrarToast("Bienvenido al sistema, " + data.email,top);
+          $.cookie("nick", data.email);
+          cw.mostrarToast("Bienvenido al sistema, " + data.email, top);
           cw.mostrarInicio();
-        } 
+        }
       },
-      error: function (xhr, textStatus, errorThrown){
+      error: function (xhr, textStatus, errorThrown) {
         console.log("Status: " + textStatus);
         console.log("Error: " + errorThrown);
       },
       contentType: "application/json",
-    })
-  }
-   
+    });
+  };
 }

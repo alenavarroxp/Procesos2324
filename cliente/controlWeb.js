@@ -74,13 +74,28 @@ function ControlWeb() {
     });
   };
 
-  this.mostrarMsg = function (msg) {
+  this.mostrarMsg = function (msg, additionalMsg, onClickFunction) {
     const mensajeError = document.getElementById("mensajeError");
-    mensajeError.innerHTML = `<i class="fas fa-exclamation-circle text-red-500 mr-2"></i><span>${msg}</span>`;
+    mensajeError.innerHTML = `
+    <div>
+        <i class="fas fa-exclamation-circle text-red-500 mr-2"></i>
+        <span>${msg}</span>
+    </div>`;
+
+    if (additionalMsg) {
+      mensajeError.innerHTML += `
+      <div id="reenviarCorreo">
+          <span class="font-bold hover:underline cursor-pointer hover:text-red-600">${additionalMsg}</span>
+      </div>`;
+    }
     mensajeError.classList.remove("hidden");
+    if (onClickFunction) {
+      const reenviarCorreo = document.getElementById("reenviarCorreo");
+      reenviarCorreo.addEventListener("click", onClickFunction);
+    }
   };
 
-  this.mostrarToast = function (msg, position) {
+  this.mostrarToast = function (msg, position, color) {
     const toastConfig = {
       text: msg,
       duration: 5000,
@@ -100,6 +115,9 @@ function ControlWeb() {
 
     if (position) {
       toastConfig.gravity = position;
+    }
+    if (color) {
+      toastConfig.style.background = color;
     }
 
     Toastify(toastConfig).showToast();
@@ -156,7 +174,7 @@ function ControlWeb() {
         let pwd = $("#pwd").val();
         if (nick && email && pwd) {
           rest.registrarUsuario(nick, email, pwd);
-          console.log(nick,email, pwd);
+          console.log(nick, email, pwd);
         } else {
           cw.mostrarMsg("Introduce los campos obligatorios");
         }
@@ -183,6 +201,7 @@ function ControlWeb() {
   };
 
   this.mostrarInicio = function () {
+    $("#crearPartidaForm").remove();
     $("#inicio").load("./cliente/inicio.html", function () {
       $("#btnSalir").on("click", function () {
         cw.salir();
@@ -199,41 +218,42 @@ function ControlWeb() {
   };
 
   this.animarInicio = function () {
-    return new Promise ((resolve)=>{
-      
-    const crearPartida = document.getElementById("crearPartida");
-    const unirsePartida = document.getElementById("unirsePartida");
+    return new Promise((resolve) => {
+      const crearPartida = document.getElementById("crearPartida");
+      const unirsePartida = document.getElementById("unirsePartida");
 
-    crearPartida.classList.add("animate__animated", "animate__slideOutLeft");
-    unirsePartida.classList.add("animate__animated", "animate__slideOutRight");
-
-    setTimeout(function () {
-      crearPartida.style.display = "none";
-      unirsePartida.style.display = "none";
+      crearPartida.classList.add("animate__animated", "animate__slideOutLeft");
+      unirsePartida.classList.add(
+        "animate__animated",
+        "animate__slideOutRight"
+      );
 
       setTimeout(function () {
-        crearPartida.classList.remove("animate__fadeOutLeft");
-        unirsePartida.classList.remove("animate__fadeOutRight");
+        crearPartida.style.display = "none";
+        unirsePartida.style.display = "none";
 
-        crearPartida.style.display = "block";
-        unirsePartida.style.display = "block";
+        setTimeout(function () {
+          crearPartida.classList.remove("animate__fadeOutLeft");
+          unirsePartida.classList.remove("animate__fadeOutRight");
 
-        resolve();
-      }, 50); // Ajusta este tiempo para permitir que los elementos se muestren antes de retirar las clases de animación
-    }, 1000); // Ajusta el tiempo según la duración de la animación
-    })
+          crearPartida.style.display = "block";
+          unirsePartida.style.display = "block";
 
+          resolve();
+        }, 50); // Ajusta este tiempo para permitir que los elementos se muestren antes de retirar las clases de animación
+      }, 1000); // Ajusta el tiempo según la duración de la animación
+    });
   };
 
   this.mostrarCrearPartida = async function () {
     await cw.animarInicio();
-    $("#inicio").remove();
+    $("#home").remove();
     $("#crearPartida").load("./cliente/crearPartida.html", function () {});
   };
 
   this.mostrarUnirsePartida = async function () {
     await cw.animarInicio();
-    $("#inicio").remove();
+    $("#home").remove();
     $("#unirsePartida").load("./cliente/unirsePartida.html", function () {});
   };
 

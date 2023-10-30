@@ -65,7 +65,7 @@ app.get("/good", function (req, res) {
       console.log(req.user);
       let email2 = req.user.username;
       sistema.usuarioOAuth({ email: email2 }, function (obj) {
-        console.log("obj", obj)
+        console.log("obj", obj);
         res.cookie("nick", obj.email);
         res.redirect("/");
       });
@@ -117,29 +117,42 @@ app.get("/eliminarUsuario/:nick", function (request, response) {
   response.send(res);
 });
 
-
-
-
-
+app.get("/confirmarUsuario/:email/:key", function (request, response) {
+  let email = request.params.email;
+  let key = request.params.key;
+  sistema.confirmarUsuario(email, key, function (obj) {
+    if (obj.confirmada) {
+      response.cookie("nick", obj.email);
+      response.redirect("/");
+    } else {
+      response.redirect("/fallo");
+    }
+  });
+});
 
 app.post("/enviarJwt", function (request, response) {
   let jwt = request.body.jwt;
   let user = JSON.parse(atob(jwt.split(".")[1]));
   let email = user.email;
-  sistema.usuarioOAuth({ "email": email }, function (obj) {
+  sistema.usuarioOAuth({ email: email }, function (obj) {
     response.send({ nick: obj.email });
   });
 });
 
 app.post("/registrarUsuario", function (request, response) {
-  sistema.registrarUsuario(request.body, function(result){
+  sistema.registrarUsuario(request.body, function (result) {
     response.send({ nick: result.nick });
   });
-  
 });
 
 app.post("/iniciarSesion", function (request, response) {
   sistema.iniciarSesion(request.body, function (obj) {
+    response.send(obj);
+  });
+});
+
+app.post("/reenviarCorreo", function (request, response) {
+  sistema.reenviarCorreo(request.body, function (obj) {
     response.send(obj);
   });
 });
