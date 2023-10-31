@@ -97,6 +97,28 @@ function ClienteRest() {
     });
   };
 
+  this.verificacionRecaptcha = function (token,callback) {
+    $.ajax({
+      type: "POST",
+      url: "/verificacionRecaptcha",
+      data: JSON.stringify({ token: token }),
+      success: function (data) {
+        if (data.success) {
+          console.log("Captcha correcto");
+          callback(true)
+        } else {
+          console.log("Captcha incorrecto");
+          callback(false)
+        }
+      },
+      error: function (xhr, textStatus, errorThrown) {
+        console.log("Status: " + textStatus);
+        console.log("Error: " + errorThrown);
+      },
+      contentType: "application/json",
+    });
+  };
+
   this.registrarUsuario = function (nick, email, password) {
     $.ajax({
       type: "POST",
@@ -107,10 +129,7 @@ function ClienteRest() {
         if (data.nick != undefined) {
           console.log("Usuario " + data.nick + " ha sido registrado");
           // $.cookie("nick", data.nick)
-          cw.mostrarToast(
-            "Consulta tu correo para confirmar tu cuenta",
-            top
-          );
+          cw.mostrarToast("Consulta tu correo para confirmar tu cuenta", top);
           cw.limpiar();
           cw.mostrarInicioSesion();
           cw.mostrarToast("Usuario " + data.nick + " ha sido registrado");
@@ -144,7 +163,7 @@ function ClienteRest() {
                 url: "/reenviarCorreo",
                 data: JSON.stringify({ email: data.email, key: data.key }),
                 success: function (data) {
-                  cw.mostrarToast("Correo reenviado a "+data.email,top);
+                  cw.mostrarToast("Correo reenviado a " + data.email, top);
                 },
                 error: function (xhr, textStatus, errorThrown) {
                   console.log("Status: " + textStatus);
@@ -175,11 +194,23 @@ function ClienteRest() {
     });
   };
 
-  this.crearPartida = function (email, nombrePartida, cantidadJugadores, duracion, numGoles) {
+  this.crearPartida = function (
+    email,
+    nombrePartida,
+    cantidadJugadores,
+    duracion,
+    numGoles
+  ) {
     $.ajax({
       type: "POST",
       url: "/crearPartida",
-      data: JSON.stringify({ email:email, nombrePartida: nombrePartida, cantidadJugadores: cantidadJugadores, duracion: duracion, numGoles: numGoles }),
+      data: JSON.stringify({
+        email: email,
+        nombrePartida: nombrePartida,
+        cantidadJugadores: cantidadJugadores,
+        duracion: duracion,
+        numGoles: numGoles,
+      }),
       success: function (data) {
         console.log("DATA", data);
         if (data.error) {
@@ -188,7 +219,10 @@ function ClienteRest() {
         if (data.nombrePartida) {
           console.log("Partida " + data.nombrePartida + " ha sido creada");
           cw.limpiar();
-          cw.mostrarToast("Partida " + data.nombrePartida + " ha sido creada", top);
+          cw.mostrarToast(
+            "Partida " + data.nombrePartida + " ha sido creada",
+            top
+          );
           cw.mostrarInicio();
         }
       },
@@ -198,5 +232,5 @@ function ClienteRest() {
       },
       contentType: "application/json",
     });
-  }
+  };
 }

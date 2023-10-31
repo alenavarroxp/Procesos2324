@@ -161,17 +161,59 @@ function ControlWeb() {
     $("#mOP").remove();
   };
 
+  this.validarEmail = function (email) {
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    console.log("VALIDACION", emailPattern.test(email));
+    return emailPattern.test(email);
+  };
+
+  let captchaValidado = false;
   this.mostrarRegistro = function () {
     $("#fmInicioSesion").remove();
     $("#registro").load("./cliente/registro.html", function () {
       $("#btnRegistro").on("click", function () {
+        let email = $("#email").val();
+
+        if (!cw.validarEmail(email)) {
+          cw.mostrarMsg("Introduce un email válido");
+          return;
+        }
+        var recaptchaContainer = document.getElementById("recaptchaContainer");
+        if (recaptchaContainer.innerHTML.trim() === "") {
+          grecaptcha.ready(function () {
+            grecaptcha.render("recaptchaContainer", {
+              sitekey: "6LeD_OMoAAAAAJpglLq5dNlNdabIHSrCJW-E5Dar",
+              callback: function (token) {
+                rest.verificacionRecaptcha(token, function (validado) {
+                  captchaValidado = validado;
+                }); // Enviar el token a la función de verificación
+                console.log("captcha", captchaValidado);
+              },
+              theme: "light",
+            });
+          });
+        }
+
+        console.log("REGISTRO");
         event.preventDefault();
         let nick = $("#nick").val();
-        let email = $("#email").val();
+
         let pwd = $("#pwd").val();
+
         if (nick && email && pwd) {
-          rest.registrarUsuario(nick, email, pwd);
-          console.log(nick, email, pwd);
+          $("#mensajeError").empty();
+          try {
+            // Llama a la función para verificar el reCAPTCHA
+            // await rest.verificacionRecaptcha(this);
+            // Si la verificación de reCAPTCHA tiene éxito, procede con el registro del usuario
+            if (captchaValidado) {
+              rest.registrarUsuario(nick, email, pwd);
+              captchaValidado = false;
+            }
+            console.log(nick, email, pwd);
+          } catch (error) {
+            cw.mostrarMsg("Error en la verificación reCAPTCHA");
+          }
         } else {
           cw.mostrarMsg("Introduce los campos obligatorios");
         }
@@ -253,11 +295,23 @@ function ControlWeb() {
         let cantidadJugadores = $("#cantidadJugadores").val();
         let duracion = $("#duracionPartida").val();
         let numGoles = $("#numGoles").val();
-        if(email && nombrePartida && cantidadJugadores && duracion && numGoles){
-          rest.crearPartida(email, nombrePartida, cantidadJugadores, duracion, numGoles);
+        if (
+          email &&
+          nombrePartida &&
+          cantidadJugadores &&
+          duracion &&
+          numGoles
+        ) {
+          rest.crearPartida(
+            email,
+            nombrePartida,
+            cantidadJugadores,
+            duracion,
+            numGoles
+          );
           $("#mensajeError").remove();
         } else {
-          cw.mostrarMsg("Introduce los campos obligatorios")
+          cw.mostrarMsg("Introduce los campos obligatorios");
         }
       });
     });

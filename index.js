@@ -6,6 +6,7 @@ const passport = require("passport");
 const cookieSession = require("cookie-session");
 const passportSetup = require("./servidor/passport-setup.js");
 const modelo = require("./servidor/modelo.js");
+const axios = require("axios");
 const PORT = process.env.PORT || 3000;
 
 const args = process.argv.slice(2);
@@ -137,6 +138,28 @@ app.post("/enviarJwt", function (request, response) {
   sistema.usuarioOAuth({ email: email }, function (obj) {
     response.send({ nick: obj.email });
   });
+});
+
+app.post("/verificacionRecaptcha", async function (req, res) {
+  const token = req.body.token;
+
+  try {
+    const response = await axios.post('https://www.google.com/recaptcha/api/siteverify', null, {
+      params: {
+        secret: '6LeD_OMoAAAAAE8MF2ZAI3iQdqJ3TTKPJXZBL6au', // Tu clave secreta de reCAPTCHA
+        response: token
+      }
+    });
+
+    if (response.data.success) {
+      res.status(200).json({ success: true, message: 'reCAPTCHA válido' });
+    } else {
+      res.status(400).json({ success: false, message: 'reCAPTCHA inválido' });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: 'Error en la verificación de reCAPTCHA' });
+  }
 });
 
 app.post("/registrarUsuario", function (request, response) {
