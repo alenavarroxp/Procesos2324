@@ -1,5 +1,6 @@
 var mongo = require("mongodb").MongoClient;
 var ObjectId = require("mongodb").ObjectId;
+const bcrypt = require("bcrypt");
 
 function CAD() {
   this.usuarios;
@@ -14,7 +15,7 @@ function CAD() {
   //   });
   // };
   this.buscarUsuario = function (obj, callback) {
-    buscar(this.usuarios, { email: obj.email }, callback);
+    buscar(this.usuarios, { email: obj.email, password: obj.password }, callback);
   };
 
   this.insertarUsuario = function (usuario, callback) {
@@ -24,23 +25,33 @@ function CAD() {
 
   function buscar(coleccion, criterio, callback) {
     let col = coleccion;
-    coleccion.find(criterio).toArray(function (error, coleccion) {
+    coleccion.find({email:criterio.email}).toArray(async function (error, coleccion) {
       if (coleccion.length == 0) {
         callback(undefined);
       } else {
-        callback(coleccion[0]);
+        const isPassowrdCorrect = await bcrypt.compare(criterio.password, coleccion[0].password)
+        if (isPassowrdCorrect) {
+          callback(coleccion[0]);
+        } else {
+          callback({ error: -1 });
+        }
       }
     });
   }
 
   function insertar(coleccion, elemento, callback) {
-    coleccion.insertOne(elemento, function (err, result) {
-      if (err) {
-        console.log("error");
-      } else {
-        console.log("Nuevo elemento creado");
-        callback(elemento);
-      }
+    bcrypt.genSalt(10, (err, salt) => {
+      bcrypt.hash(elemento.password, salt, (err, hash) => {
+        elemento.password = hash;
+        coleccion.insertOne(elemento, function (err, result) {
+          if (err) {
+            console.log("error");
+          } else {
+            console.log("Nuevo elemento creado");
+            callback(elemento);
+          }
+        });
+      });
     });
   }
 
@@ -87,9 +98,8 @@ function CAD() {
   }
 
   this.buscarPartida = function (partida, callback) {
-    buscar(this.partidas, {nombrePartida:partida.nombrePartida}, callback);
+    buscar(this.partidas, { nombrePartida: partida.nombrePartida }, callback);
   };
- 
 
   this.insertarPartida = function (partida, callback) {
     console.log("INSERTARPARTIDA");

@@ -96,10 +96,14 @@ function Sistema(test) {
       if (!usr) {
         callback({ error: "Usuario no registrado" });
       } else {
-        if (obj.password != usr.password) {
-          callback({ error: "Contraseña incorrecta" });
-          return;
+        if(usr.error == -1){
+          callback({ error: "Contraseña incorrecta"});
+          return
         }
+        // if (obj.password != usr.password) {
+        //   callback({ error: "Contraseña incorrecta" });
+        //   return;
+        // }
         callback(usr);
       }
     });
