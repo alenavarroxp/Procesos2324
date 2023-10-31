@@ -9,7 +9,7 @@
             <h3 class="text-3xl mb-6 font-bold text-blue-600">¡Crea tu cuenta ahora!</h3>
             <form>
                 <div class="mb-4 text-left relative">
-                    <label for="nick" class="text-sm font-semibold">Nombre de usuario:</label>
+                    <label for="nick" class="text-sm font-semibold">Nombre de usuario (*):</label>
                     <div class="flex items-center border-2 rounded-lg focus-within:border-blue-500">
                         <span class="absolute left-3">
                             <i class="fas fa-at text-blue-600"></i>
@@ -19,9 +19,8 @@
                     </div>
                 </div>
 
-
                 <div class="mb-4 text-left relative">
-                    <label for="email" class="text-sm font-semibold">Correo electrónico:</label>
+                    <label for="email" class="text-sm font-semibold">Correo electrónico (*):</label>
                     <div class="flex items-center border-2 rounded-lg focus-within:border-blue-500">
                         <span class="absolute left-3">
                             <i class="fas fa-envelope text-blue-600"></i>
@@ -32,7 +31,7 @@
                 </div>
 
                 <div class="mb-6 text-left relative">
-                    <label for="pwd" class="text-sm font-semibold">Contraseña:</label>
+                    <label for="pwd" class="text-sm font-semibold">Contraseña (*):</label>
                     <div class="flex items-center border-2 rounded-lg focus-within:border-blue-500">
                         <span class="absolute left-3">
                             <i class="fas fa-lock text-blue-600"></i>
@@ -51,10 +50,13 @@
                     <span>Mensaje de error</span>
                 </div>
 
-                <button type="submit" id="btnRegistro"
-                    class="bg-blue-500 text-white py-2 px-4 rounded-full hover:bg-blue-600">
+                <div id="recaptchaContainer" data-sitekey="6LeD_OMoAAAAAJpglLq5dNlNdabIHSrCJW-E5Dar"></div>
+
+                <button type="button" id="btnRegistro"
+                    class="bg-blue-500 text-white py-2 px-4 rounded-full hover:bg-blue-600 g-recaptcha">
                     Registrar
                 </button>
+
             </form>
         </div>
 
@@ -63,6 +65,8 @@
         <img src="./cliente/img/login.jpeg" class="w-full h-full" draggable="false" alt="Imagen de registro">
     </div>
 </div>
+
+
 <script>
     function togglePassword(inputId) {
         const pwdInput = document.getElementById(inputId);

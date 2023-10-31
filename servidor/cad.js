@@ -3,6 +3,7 @@ var ObjectId = require("mongodb").ObjectId;
 
 function CAD() {
   this.usuarios;
+  this.partidas;
 
   // this.obtenerUsuarios = function (callback) {
   //   // tengo que hacer un fetch a la base de datos para que me devuelvan todos los usuarios
@@ -23,11 +24,11 @@ function CAD() {
 
   function buscar(coleccion, criterio, callback) {
     let col = coleccion;
-    coleccion.find(criterio).toArray(function (error, usuarios) {
-      if (usuarios.length == 0) {
+    coleccion.find(criterio).toArray(function (error, coleccion) {
+      if (coleccion.length == 0) {
         callback(undefined);
       } else {
-        callback(usuarios[0]);
+        callback(coleccion[0]);
       }
     });
   }
@@ -85,6 +86,16 @@ function CAD() {
     );
   }
 
+  this.buscarPartida = function (partida, callback) {
+    buscar(this.partidas, {nombrePartida:partida.nombrePartida}, callback);
+  };
+ 
+
+  this.insertarPartida = function (partida, callback) {
+    console.log("INSERTARPARTIDA");
+    insertar(this.partidas, partida, callback);
+  };
+
   this.conectar = async function (callback) {
     let cad = this;
     let client = new mongo(
@@ -93,6 +104,7 @@ function CAD() {
     await client.connect();
     const database = client.db("sistema");
     cad.usuarios = database.collection("usuarios");
+    cad.partidas = database.collection("partidas");
     callback(database);
   };
 }
