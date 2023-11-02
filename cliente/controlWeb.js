@@ -132,7 +132,7 @@ function ControlWeb() {
       cw.init();
     }
   };
-
+  
   this.init = function () {
     let cw = this;
     google.accounts.id.initialize({
@@ -168,6 +168,7 @@ function ControlWeb() {
   };
 
   let captchaValidado = false;
+  
   this.mostrarRegistro = function () {
     $("#fmInicioSesion").remove();
     $("#registro").load("./cliente/registro.html", function () {
