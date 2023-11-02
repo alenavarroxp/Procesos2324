@@ -137,8 +137,8 @@ function ControlWeb() {
     let cw = this;
     google.accounts.id.initialize({
       client_id:
-        // "726975145917-reol4tr88j6m8a0mqehb0k6sop45mto2.apps.googleusercontent.com", //local
-      "726975145917-rae33a02hgmi3pjid1dh2dq334igsvqr.apps.googleusercontent.com", //prod
+        "726975145917-reol4tr88j6m8a0mqehb0k6sop45mto2.apps.googleusercontent.com", //local
+      // "726975145917-rae33a02hgmi3pjid1dh2dq334igsvqr.apps.googleusercontent.com", //prod
       auto_select: false,
       callback: cw.handleCredentialsResponse,
     });
@@ -168,7 +168,7 @@ function ControlWeb() {
   };
 
   let captchaValidado = false;
-  
+
   this.mostrarRegistro = function () {
     $("#fmInicioSesion").remove();
     $("#registro").load("./cliente/registro.html", function () {
@@ -204,9 +204,6 @@ function ControlWeb() {
         if (nick && email && pwd) {
           $("#mensajeError").empty();
           try {
-            // Llama a la función para verificar el reCAPTCHA
-            // await rest.verificacionRecaptcha(this);
-            // Si la verificación de reCAPTCHA tiene éxito, procede con el registro del usuario
             if (captchaValidado) {
               rest.registrarUsuario(nick, email, pwd);
               captchaValidado = false;
