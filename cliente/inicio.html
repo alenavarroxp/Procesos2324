@@ -1,17 +1,18 @@
 <div class="flex h-screen overflow-hidden" id="home">
 
     <div id="navbar"
-        class="flex border-r border-gray-200 bg-gray-50 flex-col justify-between w-60 h-screen bg-base-200 transition-all duration-500 ease-in-out transform -translate-x-full lg:translate-x-0">
+        class="animate__animated animate__slideInLeft flex border-r border-gray-200 bg-gray-50 flex-col justify-between w-60 h-screen bg-base-200 transition-all duration-500 ease-in-out transform -translate-x-full lg:translate-x-0">
 
         <nav class="navegacion mt-1 space-y-1">
             <div>
                 <div class="items-center justify-center flex mt-3 flex-col">
                     <div
                         class="relative mb-1 inline-flex items-center justify-center w-20 h-20 overflow-hidden bg-gray-200 rounded-full dark:bg-gray-800">
-                        <span class="font-medium text-lg text-gray-600 dark:text-gray-300">AN</span>
+                        <i class="fas fa-user text-3xl"></i>
+
                     </div>
                     <span class="text-md font-bold">Nombre de usuario</span>
-                    <span class="text-xs text-gray-600 dark:text-gray-400">Correo electrónico</span>
+                    <span id="emailValue" class="text-xs text-gray-600 dark:text-gray-400"></span>
                 </div>
             </div>
             <div class="h-full px-3 py-4 overflow-y-auto bg-gray-50 dark:bg-gray-800">
@@ -44,7 +45,7 @@
                                 </a>
                             </li>
                             <li>
-                                <a
+                                <a id="crearPartida"
                                     class="cursor-pointer flex items-center px-4 py-2 text-sm text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group no-underline hover:no-underline">
                                     <i
                                         class="fas fa-plus-circle text-gray-500 mr-2 group-hover:text-blue-600 dark:group-hover:text-white"></i>
@@ -68,7 +69,8 @@
             </div>
 
         </nav>
-        
+
+
         <div class="absolute bottom-2 w-full flex items-center justify-center mb-4">
             <button type="button" onclick="cw.salir()"
                 class="py-2 px-5 mt-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-xl border border-gray-200 hover:bg-gray-100 hover:text-red-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700 flex items-center justify-center">
@@ -80,39 +82,78 @@
             <div class="border-t border-gray-200 w-full" />
         </div>
 
+
+
     </div>
+
+
 </div>
 
+<div id="navBarBtn" class="absolute flex items-center justify-center transform transition duration-700 ease-in-out mx-52 my-4 cursor-pointer">
+    <button id="ocultarNavbar" class="w-14 h-14 bg-blue-300 border border-b-cyan-600 rounded-full text-white flex items-center justify-center">
+        <ion-icon id="arrow" class="transition duration-700 text-xl transform rotate-180" name="chevron-forward-outline"></ion-icon>
+    </button>
+</div>
+
+
+<div id="crearPartida"></div>
+
+
 <script>
+    function getCookiesValue(cookieName){
+        const name = cookieName + "=";
+            const decodedCookie = decodeURIComponent(document.cookie);
+            const cookieArray = decodedCookie.split(';');
+
+            for (let i = 0; i < cookieArray.length; i++) {
+                let cookie = cookieArray[i];
+                while (cookie.charAt(0) == ' ') {
+                    cookie = cookie.substring(1);
+                }
+                if (cookie.indexOf(name) == 0) {
+                    return cookie.substring(name.length, cookie.length);
+                }
+            }
+            return "";
+    }
+
+    const emailValue = getCookiesValue("nick")
+    document.getElementById("emailValue").innerHTML = emailValue
+    
+    $(document).ready(function () {
+        let visible = true
+        
+        $("#ocultarNavbar").on("click", function () {
+            console.log("PULSADO")
+            const navBar = document.querySelector('#navbar');
+            const button = document.querySelector('#navBarBtn');
+            const arrow = document.querySelector('#arrow');
+        
+            if (visible) {
+                navBar.classList.remove('animate__slideInLeft')
+                navBar.classList.add('animate__slideOutLeft')
+                button.classList.add('-translate-x-56')
+                arrow.classList.add('rotate-0')
+                
+
+
+            } else {
+                navBar.classList.remove('animate__slideOutLeft')
+                navBar.classList.add('animate__slideInLeft')
+                button.classList.remove('-translate-x-56')
+                arrow.classList.remove('rotate-0')
+                
+            }
+            visible = !visible
+
+        });
+    });
 
     function toggleSubMenu() {
         const subMenu = document.querySelector('.sub-menu');
         subMenu.classList.toggle('hidden');
     }
 
-    const visibleNav = document.getElementById('visibleNav');
-    const themeSwitch = document.getElementById('themeSwitch');
-    const navbar = document.getElementById('navbar');
-
-    visibleNav.addEventListener('change', function () {
-        if (this.checked) {
-            navbar.classList.remove('-translate-x-full');
-        } else {
-            navbar.classList.add('-translate-x-full');
-        }
-    });
-
-    themeSwitch.addEventListener('change', function () {
-        if (this.checked) {
-            // Cambiar al tema oscuro
-            navbar.classList.remove('bg-gray-200'); // Quita el color de fondo claro
-            navbar.classList.add('bg-gray-900'); // Añade el color de fondo oscuro
-        } else {
-            // Cambiar al tema claro
-            navbar.classList.remove('bg-gray-900'); // Quita el color de fondo oscuro
-            navbar.classList.add('bg-gray-200'); // Añade el color de fondo claro
-        }
-    });
 </script>
 
 
