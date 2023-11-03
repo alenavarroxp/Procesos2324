@@ -168,7 +168,7 @@ function ControlWeb() {
   };
 
   let captchaValidado = false;
-  
+
   this.mostrarRegistro = function () {
     $("#fmInicioSesion").remove();
     $("#registro").load("./cliente/registro.html", function () {
@@ -204,9 +204,6 @@ function ControlWeb() {
         if (nick && email && pwd) {
           $("#mensajeError").empty();
           try {
-            // Llama a la función para verificar el reCAPTCHA
-            // await rest.verificacionRecaptcha(this);
-            // Si la verificación de reCAPTCHA tiene éxito, procede con el registro del usuario
             if (captchaValidado) {
               rest.registrarUsuario(nick, email, pwd);
               captchaValidado = false;
