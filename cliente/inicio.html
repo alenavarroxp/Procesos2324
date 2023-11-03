@@ -120,13 +120,11 @@
         }
         return "";
     }
-
     const emailValue = getCookiesValue("nick")
     document.getElementById("emailValue").innerHTML = emailValue
 
     $(document).ready(function () {
         let visible = true
-
         $("#ocultarNavbar").on("click", function () {
             const navBar = document.querySelector('#navbar');
             const button = document.querySelector('#navBarBtn');
