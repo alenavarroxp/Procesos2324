@@ -187,7 +187,7 @@ function ControlWeb() {
               callback: function (token) {
                 rest.verificacionRecaptcha(token, function (validado) {
                   captchaValidado = validado;
-                }); // Enviar el token a la función de verificación
+                });
                 console.log("captcha", captchaValidado);
               },
               theme: "light",
