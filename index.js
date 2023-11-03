@@ -4,6 +4,7 @@ const express = require("express");
 const app = express();
 const passport = require("passport");
 const cookieSession = require("cookie-session");
+const LocalStrategy = require("passport-local").Strategy;
 const passportSetup = require("./servidor/passport-setup.js");
 const modelo = require("./servidor/modelo.js");
 const axios = require("axios");
@@ -26,6 +27,39 @@ app.use(bodyParser.json());
 
 app.use(passport.initialize());
 app.use(passport.session());
+
+passport.use(
+  new LocalStrategy(
+    { usernameField: "email", passwordField: "password" },
+    function (email, password, done) {
+      sistema.iniciarSesion(
+        { email: email, password: password },
+        function (err, usr) {
+          console.log("usr", usr);
+          console.log("err", err);
+          if (err) {
+            if (err.error == "Contraseña incorrecta") {
+              console.log("Contraseña incorrecta");
+              return done(null, { error: "Contraseña incorrecta" });
+            }
+            if (err.error == "Usuario no registrado") {
+              console.log("Usuario no registrado");
+              return done(null, { error: "Usuario no registrado" });
+            }
+          }
+
+          if (!usr)
+            return done(null, { error: "Usuario no encontrado" });
+          if (usr.email != -1) {
+            return done(null, usr);
+          } else {
+            return done(-1);
+          }
+        }
+      );
+    }
+  )
+);
 
 app.get(
   "/auth/google",
@@ -144,21 +178,28 @@ app.post("/verificacionRecaptcha", async function (req, res) {
   const token = req.body.token;
 
   try {
-    const response = await axios.post('https://www.google.com/recaptcha/api/siteverify', null, {
-      params: {
-        secret: '6LeD_OMoAAAAAE8MF2ZAI3iQdqJ3TTKPJXZBL6au', // Tu clave secreta de reCAPTCHA
-        response: token
+    const response = await axios.post(
+      "https://www.google.com/recaptcha/api/siteverify",
+      null,
+      {
+        params: {
+          secret: "6LeD_OMoAAAAAE8MF2ZAI3iQdqJ3TTKPJXZBL6au", // Tu clave secreta de reCAPTCHA
+          response: token,
+        },
       }
-    });
+    );
 
     if (response.data.success) {
-      res.status(200).json({ success: true, message: 'reCAPTCHA válido' });
+      res.status(200).json({ success: true, message: "reCAPTCHA válido" });
     } else {
-      res.status(400).json({ success: false, message: 'reCAPTCHA inválido' });
+      res.status(400).json({ success: false, message: "reCAPTCHA inválido" });
     }
   } catch (error) {
     console.error(error);
-    res.status(500).json({ success: false, message: 'Error en la verificación de reCAPTCHA' });
+    res.status(500).json({
+      success: false,
+      message: "Error en la verificación de reCAPTCHA",
+    });
   }
 });
 
@@ -168,10 +209,16 @@ app.post("/registrarUsuario", function (request, response) {
   });
 });
 
-app.post("/iniciarSesion", function (request, response) {
-  sistema.iniciarSesion(request.body, function (obj) {
-    response.send(obj);
-  });
+app.post(
+  "/iniciarSesion",
+  passport.authenticate("local", {
+    failureRedirect: "/fallo",
+    successRedirect: "/ok",
+  })
+);
+
+app.get("/ok", function (request, response) {
+  response.send({ usr: request.user });
 });
 
 app.post("/reenviarCorreo", function (request, response) {

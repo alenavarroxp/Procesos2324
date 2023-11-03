@@ -93,18 +93,15 @@ function Sistema(test) {
     }
 
     this.cad.buscarUsuario(obj, function (usr) {
+      console.log("Usuario encontrado:", usr); // Agregar esta línea para depuración
       if (!usr) {
-        callback({ error: "Usuario no registrado" });
+        callback({ error: "Usuario no registrado" }, null);
       } else {
-        if(usr.error == -1){
-          callback({ error: "Contraseña incorrecta"});
-          return
+        if (usr.error == -1) {
+          callback({ error: "Contraseña incorrecta" }, null);
+          return;
         }
-        // if (obj.password != usr.password) {
-        //   callback({ error: "Contraseña incorrecta" });
-        //   return;
-        // }
-        callback(usr);
+        callback(null, usr);
       }
     });
   };
@@ -124,19 +121,18 @@ function Sistema(test) {
   this.crearPartida = function (obj, callback) {
     let modelo = this;
     this.cad.buscarPartida(obj, function (partida) {
-      if(!partida){
+      if (!partida) {
         obj.id = Date.now().toString();
         obj.estado = "esperando";
         console.log("OBJPPARTIDA", obj);
         modelo.cad.insertarPartida(obj, function (res) {
-          console.log("RES", res)
+          console.log("RES", res);
           callback(res);
         });
-      }else{
+      } else {
         console.log("PARTIDA", partida);
         callback(partida);
       }
-      
     });
   };
 }

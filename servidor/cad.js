@@ -29,8 +29,8 @@ function CAD() {
       if (coleccion.length == 0) {
         callback(undefined);
       } else {
-        const isPassowrdCorrect = await bcrypt.compare(criterio.password, coleccion[0].password)
-        if (isPassowrdCorrect) {
+        const isPasswordCorrect = await bcrypt.compare(criterio.password, coleccion[0].password)
+        if (isPasswordCorrect) {
           callback(coleccion[0]);
         } else {
           callback({ error: -1 });

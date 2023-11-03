@@ -152,8 +152,8 @@ function ClienteRest() {
       url: "/iniciarSesion",
       data: JSON.stringify({ email: email, password: password }),
       success: function (data) {
-        console.log("DATA", data);
-        if (data.confirmada == false) {
+        console.log("DATA", data.usr);
+        if (data.usr.confirmada == false) {
           cw.mostrarMsg(
             "Tienes que confirmar tu cuenta para acceder",
             "Reenviar correo de confirmación",
@@ -161,7 +161,7 @@ function ClienteRest() {
               $.ajax({
                 type: "POST",
                 url: "/reenviarCorreo",
-                data: JSON.stringify({ email: data.email, key: data.key }),
+                data: JSON.stringify({ email: data.usr.email, key: data.usr.key }),
                 success: function (data) {
                   cw.mostrarToast("Correo reenviado a " + data.email, top);
                 },
@@ -175,14 +175,14 @@ function ClienteRest() {
           );
           return;
         }
-        if (data.error) {
-          cw.mostrarMsg(data.error);
+        if (data.usr.error) {
+          cw.mostrarMsg(data.usr.error);
         }
-        if (data.email) {
-          console.log("Usuario " + data.email + " ha iniciado sesion");
+        if (data.usr.email) {
+          console.log("Usuario " + data.usr.email + " ha iniciado sesion");
           cw.limpiar();
-          $.cookie("nick", data.email);
-          cw.mostrarToast("Bienvenido al sistema, " + data.email, top);
+          $.cookie("nick", data.usr.email);
+          cw.mostrarToast("Bienvenido al sistema, " + data.usr.email, top);
           cw.mostrarInicio();
         }
       },
