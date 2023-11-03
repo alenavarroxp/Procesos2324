@@ -37,8 +37,9 @@ function Sistema(test) {
   };
 
   this.eliminarUsuario = function (nick) {
+    console.log("Eliminar usuario: " + nick);
     if (this.usuarios[nick] == null) {
-      console.log("El usuario no existe: " + nick);
+      // console.log("El usuario no existe: " + nick);
       return { nick: -1 };
     }
     delete this.usuarios[nick];
@@ -79,6 +80,9 @@ function Sistema(test) {
         modelo.cad.insertarUsuario(obj, function (res) {
           callback(res);
         });
+        if(!this.usuarios) this.usuarios = {};
+        this.usuarios[obj.nick] = new Usuario(obj.email, obj.password);
+        console.log("USUARIOS", this.usuarios);
         correo.enviarEmail(obj.email, obj.key, "Confirmar cuenta");
       } else {
         callback({ email: -1 });

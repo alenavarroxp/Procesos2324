@@ -327,5 +327,6 @@ function ControlWeb() {
   this.salir = function () {
     $.removeCookie("nick");
     location.reload();
+    rest.cerrarSesion();
   };
 }

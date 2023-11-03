@@ -97,7 +97,7 @@ function ClienteRest() {
     });
   };
 
-  this.verificacionRecaptcha = function (token,callback) {
+  this.verificacionRecaptcha = function (token, callback) {
     $.ajax({
       type: "POST",
       url: "/verificacionRecaptcha",
@@ -105,10 +105,10 @@ function ClienteRest() {
       success: function (data) {
         if (data.success) {
           console.log("Captcha correcto");
-          callback(true)
+          callback(true);
         } else {
           console.log("Captcha incorrecto");
-          callback(false)
+          callback(false);
         }
       },
       error: function (xhr, textStatus, errorThrown) {
@@ -161,7 +161,10 @@ function ClienteRest() {
               $.ajax({
                 type: "POST",
                 url: "/reenviarCorreo",
-                data: JSON.stringify({ email: data.usr.email, key: data.usr.key }),
+                data: JSON.stringify({
+                  email: data.usr.email,
+                  key: data.usr.key,
+                }),
                 success: function (data) {
                   cw.mostrarToast("Correo reenviado a " + data.email, top);
                 },
@@ -231,6 +234,13 @@ function ClienteRest() {
         console.log("Error: " + errorThrown);
       },
       contentType: "application/json",
+    });
+  };
+
+  this.cerrarSesion = function () {
+    $.getJSON("/cerrarSesion", function () {
+      console.log("Sesion cerrada");
+      $.removeCookie("nick");
     });
   };
 }

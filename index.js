@@ -10,6 +10,11 @@ const modelo = require("./servidor/modelo.js");
 const axios = require("axios");
 const PORT = process.env.PORT || 3000;
 
+const haIniciado = function(request,response,next){
+  if(request.user) next();
+  else response.redirect("/");
+}
+
 const args = process.argv.slice(2);
 let test = false;
 test = eval(args[0]); //test=true
@@ -111,6 +116,10 @@ app.get("/good", function (req, res) {
   }
 });
 
+app.get("/ok", function (request, response) {
+  response.send({ usr: request.user });
+});
+
 app.get("/fallo", function (req, res) {
   res.send({ nick: "NoOK" });
 });
@@ -130,7 +139,7 @@ app.get("/agregarUsuario/:nick", function (request, response) {
   response.send(res);
 });
 
-app.get("/obtenerUsuarios", function (request, response) {
+app.get("/obtenerUsuarios", haIniciado,function (request, response) {
   let usuarios = sistema.obtenerUsuarios();
   response.send(usuarios);
 });
@@ -164,6 +173,14 @@ app.get("/confirmarUsuario/:email/:key", function (request, response) {
     }
   });
 });
+
+app.get("/cerrarSesion",haIniciado, function (request, response){
+  let nick = request.user.nick;
+  console.log("REQUEST",request.user)
+  request.logOut();
+  response.redirect("/");
+  if(nick) sistema.eliminarUsuario(nick);
+})
 
 app.post("/enviarJwt", function (request, response) {
   let jwt = request.body.jwt;
@@ -217,9 +234,7 @@ app.post(
   })
 );
 
-app.get("/ok", function (request, response) {
-  response.send({ usr: request.user });
-});
+
 
 app.post("/reenviarCorreo", function (request, response) {
   sistema.reenviarCorreo(request.body, function (obj) {
@@ -237,3 +252,5 @@ app.listen(PORT, () => {
   console.log(`App está escuchando en el puerto ${PORT}`);
   console.log("Ctrl+C para salir");
 });
+
+
