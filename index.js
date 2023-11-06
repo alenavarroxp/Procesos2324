@@ -11,6 +11,7 @@ const axios = require("axios");
 const PORT = process.env.PORT || 3000;
 
 const haIniciado = function(request,response,next){
+  console.log("REQUEST",request.user)
   if(request.user) next();
   else response.redirect("/");
 }

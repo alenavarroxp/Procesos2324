@@ -80,8 +80,9 @@ function Sistema(test) {
         modelo.cad.insertarUsuario(obj, function (res) {
           callback(res);
         });
-        if(!this.usuarios) this.usuarios = {};
-        this.usuarios[obj.nick] = new Usuario(obj.email, obj.password);
+        
+        modelo.usuarios[obj.nick] = new Usuario(obj.email, obj.password);
+        this.usuarios = modelo.usuarios;
         console.log("USUARIOS", this.usuarios);
         correo.enviarEmail(obj.email, obj.key, "Confirmar cuenta");
       } else {
