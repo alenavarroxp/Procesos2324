@@ -132,7 +132,7 @@ function ControlWeb() {
       cw.init();
     }
   };
-  
+
   this.init = function () {
     let cw = this;
     google.accounts.id.initialize({
@@ -238,87 +238,124 @@ function ControlWeb() {
   };
 
   this.mostrarInicio = function () {
-    $("#crearPartidaForm").remove();
+    cw.limpiarInicio();
     $("#inicio").load("./cliente/inicio.html", function () {
-      $("#btnSalir").on("click", function () {
-        cw.salir();
-      });
+      cw.mostrarHome();
+      $("#navbar").load("./cliente/navbar.html", function () {
+        $("#btnSalir").on("click", function () {
+          cw.salir();
+        });
 
-      $("#btnCrearPartida").on("click", function () {
-        cw.mostrarCrearPartida();
-      });
+        $("#homeVisible").on("click", function () {
+          console.log("HOME");
+          cw.mostrarHome();
+        });
 
-      $("#btnUnirsePartida").on("click", function () {
-        cw.mostrarUnirsePartida();
+        $("#crearPartidaVisible").on("click", function () {
+          console.log("CREAR PARTIDA");
+          cw.mostrarCrearPartida();
+        });
+
+        $("#explorarPartidosVisible").on("click", function () {
+          console.log("EXPLORAR PARTIDOS")
+          cw.mostrarExplorarPartida();
+        });
       });
     });
   };
 
-  this.animarInicio = function () {
-    return new Promise((resolve) => {
-      const crearPartida = document.getElementById("crearPartida");
-      const unirsePartida = document.getElementById("unirsePartida");
+  // this.animarInicio = function () {
+  //   return new Promise((resolve) => {
+  //     const crearPartida = document.getElementById("crearPartida");
+  //     const unirsePartida = document.getElementById("unirsePartida");
 
-      crearPartida.classList.add("animate__animated", "animate__slideOutLeft");
-      unirsePartida.classList.add(
-        "animate__animated",
-        "animate__slideOutRight"
-      );
+  //     crearPartida.classList.add("animate__animated", "animate__slideOutLeft");
+  //     unirsePartida.classList.add(
+  //       "animate__animated",
+  //       "animate__slideOutRight"
+  //     );
 
-      setTimeout(function () {
-        crearPartida.style.display = "none";
-        unirsePartida.style.display = "none";
+  //     setTimeout(function () {
+  //       crearPartida.style.display = "none";
+  //       unirsePartida.style.display = "none";
 
-        setTimeout(function () {
-          crearPartida.classList.remove("animate__fadeOutLeft");
-          unirsePartida.classList.remove("animate__fadeOutRight");
+  //       setTimeout(function () {
+  //         crearPartida.classList.remove("animate__fadeOutLeft");
+  //         unirsePartida.classList.remove("animate__fadeOutRight");
 
-          crearPartida.style.display = "block";
-          unirsePartida.style.display = "block";
+  //         crearPartida.style.display = "block";
+  //         unirsePartida.style.display = "block";
 
-          resolve();
-        }, 50); // Ajusta este tiempo para permitir que los elementos se muestren antes de retirar las clases de animación
-      }, 1000); // Ajusta el tiempo según la duración de la animación
+  //         resolve();
+  //       }, 50); // Ajusta este tiempo para permitir que los elementos se muestren antes de retirar las clases de animación
+  //     }, 1000); // Ajusta el tiempo según la duración de la animación
+  //   });
+  // };
+
+  this.mostrarHome = function () {
+    cw.limpiarInicio();
+    $("#home").load("./cliente/home.html", function () {
+      //add a esta clase esto:class="w-full"
+      $("#home").removeClass("hidden");
     });
   };
 
   this.mostrarCrearPartida = async function () {
-    await cw.animarInicio();
-    $("#home").remove();
-    $("#crearPartida").load("./cliente/crearPartida.html", function () {
-      $("#btnCrearPartida").on("click", function () {
-        event.preventDefault();
-        let email = $.cookie("nick");
-        let nombrePartida = $("#nombrePartida").val();
-        let cantidadJugadores = $("#cantidadJugadores").val();
-        let duracion = $("#duracionPartida").val();
-        let numGoles = $("#numGoles").val();
-        if (
-          email &&
-          nombrePartida &&
-          cantidadJugadores &&
-          duracion &&
-          numGoles
-        ) {
-          rest.crearPartida(
-            email,
-            nombrePartida,
-            cantidadJugadores,
-            duracion,
+    cw.limpiarInicio();
+
+    console.log("MOSTRAR CREAR PARTIDA");
+    let crearPartidaDiv = document.getElementById("crearPartida");
+
+    if (crearPartidaDiv.innerHTML === "") {
+      $("#crearPartida").load("./cliente/crearPartida.html", function () {
+        $("#crearPartida").removeClass("hidden");
+        $("#btnCrearPartida").on("click", function () {
+          event.preventDefault();
+          let email = $.cookie("nick");
+          let nombrePartida = $("#nombrePartida").val();
+          let cantidadJugadores = $("#cantidadJugadores").val();
+          let duracion = $("#duracionPartida").val();
+          let numGoles = $("#numGoles").val();
+          if (
+            email &&
+            nombrePartida &&
+            cantidadJugadores &&
+            duracion &&
             numGoles
-          );
-          $("#mensajeError").remove();
-        } else {
-          cw.mostrarMsg("Introduce los campos obligatorios");
-        }
+          ) {
+            rest.crearPartida(
+              email,
+              nombrePartida,
+              cantidadJugadores,
+              duracion,
+              numGoles
+            );
+            $("#mensajeError").remove();
+          } else {
+            cw.mostrarMsg("Introduce los campos obligatorios");
+          }
+        });
       });
+    }
+  };
+
+  this.mostrarExplorarPartida = async function () {
+    cw.limpiarInicio();
+    console.log("MOSTRAR EXPLORAR PARTIDA")
+    $("#explorarPartidas").load("./cliente/explorarPartidos.html", function () {
+      console.log("MOSTRAR EXPLORAR PARTIDA")
+      $("#explorarPartidas").removeClass("hidden");
     });
   };
 
-  this.mostrarUnirsePartida = async function () {
-    await cw.animarInicio();
-    $("#home").remove();
-    $("#unirsePartida").load("./cliente/unirsePartida.html", function () {});
+  this.limpiarInicio = function () {
+    $("#explorarPartidas").empty();
+    $("#crearPartida").empty();
+    $("#home").empty();
+    $("#home").addClass("hidden")
+    $("#crearPartida").addClass("hidden")
+    $("#explorarPartidas").addClass("hidden")
+
   };
 
   this.salir = function () {

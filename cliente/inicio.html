@@ -1,164 +1,20 @@
-<div class="flex h-screen overflow-hidden">
-
-    <div id="navbar"
-        class="animate__animated animate__slideInLeft flex border-r border-gray-200 bg-gray-50 flex-col justify-between w-60 h-screen bg-base-200 transition-all duration-500 ease-in-out transform -translate-x-full lg:translate-x-0">
-
-        <nav class="navegacion mt-1 space-y-1">
-            <div>
-                <div class="items-center justify-center flex mt-3 flex-col">
-                    <div
-                        class="relative mb-1 inline-flex items-center justify-center w-20 h-20 overflow-hidden bg-gray-200 rounded-full dark:bg-gray-800">
-                        <i class="fas fa-user text-3xl"></i>
-
-                    </div>
-                    <span class="text-md font-bold">Nombre de usuario</span>
-                    <span id="emailValue" class="text-xs text-gray-600 dark:text-gray-400"></span>
-                </div>
-            </div>
-            <div class="h-full px-3 py-4 overflow-y-auto bg-gray-50 dark:bg-gray-800">
-                <ul class="pt-5 mt-5 space-y-2 border-t border-gray-200 dark:border-gray-700">
-                    <li>
-                        <a
-                            class="cursor-pointer flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group no-underline hover:no-underline">
-
-                            <i
-                                class="fas fa-home text-xl w-10 h-10 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-white flex items-center"></i>
-                            <span>Inicio</span>
-                        </a>
-                    </li>
-
-                    <li>
-                        <a onclick="toggleSubMenu()"
-                            class="cursor-pointer flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group no-underline hover:no-underline">
-
-                            <i
-                                class="fas fa-futbol text-xl w-10 h-10 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-white flex items-center"></i>
-                            Partidos
-                        </a>
-                        <ul class="sub-menu hidden">
-                            <li>
-                                <a
-                                    class="cursor-pointer flex items-center px-4 py-2 text-sm text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group no-underline hover:no-underline">
-                                    <i
-                                        class="fas fa-search text-gray-500 mr-2 group-hover:text-blue-600 dark:group-hover:text-white"></i>
-                                    Explorar partidos
-                                </a>
-                            </li>
-                            <li>
-                                <a id="crearPartida"
-                                    class="cursor-pointer flex items-center px-4 py-2 text-sm text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group no-underline hover:no-underline">
-                                    <i
-                                        class="fas fa-plus-circle text-gray-500 mr-2 group-hover:text-blue-600 dark:group-hover:text-white"></i>
-                                    Crear partido
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-
-                    <li>
-                        <a
-                            class="cursor-pointer flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group no-underline hover:no-underline">
-
-                            <i
-                                class="fas fa-chart-bar text-xl w-10 h-10 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-white flex items-center"></i>
-                            <span>Estadísticas</span>
-                        </a>
-                    </li>
-                </ul>
-
-            </div>
-
-        </nav>
-
-
-        <div class="absolute bottom-2 w-full flex items-center justify-center mb-4">
-            <button type="button" onclick="cw.salir()"
-                class="py-2 px-5 mt-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-xl border border-gray-200 hover:bg-gray-100 hover:text-red-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700 flex items-center justify-center">
-                <span class="mr-1">Salir</span>
-                <ion-icon name="exit-outline" class="text-lg"></ion-icon>
-            </button>
-        </div>
-        <div class="absolute bottom-24 w-full flex items-center justify-center mb-4 px-3">
-            <div class="border-t border-gray-200 w-full" />
-        </div>
-
-
-
+<div class="w-full flex overflow-hidden">
+    <div id="navbar"></div>
+    <div id="container" class="w-full bg-green-200 transform transition duration-700 ease-in-out">
+        <div id="home" class="w-full"></div>
+        <div id="crearPartida" class="w-full"></div>
+        <div id="explorarPartidas" class="w-full"></div>
     </div>
-
-
 </div>
 
-<div id="navBarBtn"
-    class="absolute flex items-center justify-center transform transition duration-700 ease-in-out mx-52 my-4 cursor-pointer">
+
+<div id="navBarBtn" class="fixed top-4 left-52 z-10 transform transition duration-700 ease-in-out">
     <button id="ocultarNavbar"
         class="w-14 h-14 bg-blue-300 border border-b-cyan-600 rounded-full text-white flex items-center justify-center">
         <ion-icon id="arrow" class="transition duration-700 text-xl transform rotate-180"
             name="chevron-forward-outline"></ion-icon>
     </button>
 </div>
-
-
-¡Hola mundo!
-<div id="crearPartida"></div>
-
-
-<script>
-    function getCookiesValue(cookieName) {
-        const name = cookieName + "=";
-        const decodedCookie = decodeURIComponent(document.cookie);
-        const cookieArray = decodedCookie.split(';');
-
-        for (let i = 0; i < cookieArray.length; i++) {
-            let cookie = cookieArray[i];
-            while (cookie.charAt(0) == ' ') {
-                cookie = cookie.substring(1);
-            }
-            if (cookie.indexOf(name) == 0) {
-                return cookie.substring(name.length, cookie.length);
-            }
-        }
-        return "";
-    }
-    const emailValue = getCookiesValue("nick")
-    document.getElementById("emailValue").innerHTML = emailValue
-
-    $(document).ready(function () {
-        let visible = true
-        $("#ocultarNavbar").on("click", function () {
-            const navBar = document.querySelector('#navbar');
-            const button = document.querySelector('#navBarBtn');
-            const arrow = document.querySelector('#arrow');
-
-            if (visible) {
-                navBar.classList.remove('animate__slideInLeft')
-                navBar.classList.add('animate__slideOutLeft')
-                button.classList.add('-translate-x-56')
-                arrow.classList.add('rotate-0')
-
-
-
-            } else {
-                navBar.classList.remove('animate__slideOutLeft')
-                navBar.classList.add('animate__slideInLeft')
-                button.classList.remove('-translate-x-56')
-                arrow.classList.remove('rotate-0')
-
-            }
-            visible = !visible
-
-        });
-    });
-
-    function toggleSubMenu() {
-        const subMenu = document.querySelector('.sub-menu');
-        subMenu.classList.toggle('hidden');
-    }
-
-</script>
-
-
-
 
 <!-- <div class="w-full flex flex-row justify-center items-stretch">
         <div id="crearPartida" class="w-1/2 bg-gray-700 flex flex-col items-center justify-center h-screen relative">
@@ -219,4 +75,3 @@
         <i class="fas fa-door-open text-xl"></i>
         <p class="ml-2 font-semibold">Salir</p>
     </div> -->
-</div>

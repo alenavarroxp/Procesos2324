@@ -1,5 +1,5 @@
-<div id="crearPartidaForm">
-    <div class="animate__animated relative animate__fast animate__slideInDown overflow-hidden mt-16">
+<div id="crearPartidaForm" class=" h-screen w-full">
+    <div class="animate__animated relative animate__fast animate__slideInDown overflow-hidden">
         <h1 class="text-3xl text-center font-bold py-8">Crear una Partida</h1>
         <form class="mx-auto max-w-md">
             <div class="mb-4 text-left">
@@ -45,73 +45,77 @@
                 Crear Partida
             </button>
         </form>
+
+        <div class="absolute overflow-hidden top-4 right-4  animate__animated animate__jackInTheBox ">
+            <lottie-player src="./cliente/img/lottie/crearPartida.json" background="transparent" speed="1"
+                class="w-80 h-80" loop autoplay></lottie-player>
+        </div>
     </div>
 
-    <div class="absolute overflow-hidden top-4 right-4  animate__animated animate__jackInTheBox ">
-        <lottie-player src="./cliente/img/lottie/crearPartida.json" background="transparent" speed="1"
-            class="w-80 h-80" loop autoplay></lottie-player>
-    </div>
-
-    <div class="absolute top-4 left-4 cursor-pointer flex items-center text-black overflow-hidden" onclick="cw.mostrarInicio();">
+    
+    <!-- <div class="absolute top-4 left-4 cursor-pointer flex items-center text-black overflow-hidden" onclick="cw.mostrarInicio();">
         <i class="fas fa-arrow-left text-xl"></i>
         <p class="ml-2 font-bold">Volver</p>
-    </div>
+    </div> -->
 
-    <script>
-        function changeFontWeight(id) {
-            const labelTiempo = document.getElementById('duracion');
-            const labelGoles = document.getElementById('goles');
+    
+</div>
+
+
+<script>
+    function changeFontWeight(id) {
+        const labelTiempo = document.getElementById('duracion');
+        const labelGoles = document.getElementById('goles');
+        const checkboxTiempo = document.getElementById('duracion');
+        const checkboxGoles = document.getElementById('goles');
+
+        if (id === 'tiempo') {
+            labelTiempo.classList.toggle('font-semibold', checkboxTiempo.checked);
+            const duracionContainer = document.getElementById('duracionContainer');
+            duracionContainer.style.display = checkboxTiempo.checked ? 'block' : 'none';
+        }
+        if (id === 'goles') {
+            labelGoles.classList.toggle('font-semibold', checkboxGoles.checked);
+            const golesContainer = document.getElementById('golesContainer');
+            golesContainer.style.display = checkboxGoles.checked ? 'block' : 'none';
+        }
+    }
+</script>
+
+<script>
+    document.querySelectorAll('input[type=checkbox][name=tipoPartida]').forEach((checkbox) => {
+        checkbox.addEventListener('change', function () {
+            const duracionContainer = document.getElementById('duracionContainer');
+            const golesContainer = document.getElementById('golesContainer');
             const checkboxTiempo = document.getElementById('duracion');
             const checkboxGoles = document.getElementById('goles');
-    
-            if (id === 'tiempo') {
-                labelTiempo.classList.toggle('font-semibold', checkboxTiempo.checked);
-                const duracionContainer = document.getElementById('duracionContainer');
-                duracionContainer.style.display = checkboxTiempo.checked ? 'block' : 'none';
+
+            if (checkboxTiempo.checked) {
+                duracionContainer.style.display = 'block';
+            } else {
+                duracionContainer.style.display = 'none';
             }
-            if (id === 'goles') {
-                labelGoles.classList.toggle('font-semibold', checkboxGoles.checked);
-                const golesContainer = document.getElementById('golesContainer');
-                golesContainer.style.display = checkboxGoles.checked ? 'block' : 'none';
+
+            if (checkboxGoles.checked) {
+                golesContainer.style.display = 'block';
+            } else {
+                golesContainer.style.display = 'none';
             }
-        }
-    </script>
-    
-    <script>
-        document.querySelectorAll('input[type=checkbox][name=tipoPartida]').forEach((checkbox) => {
-            checkbox.addEventListener('change', function () {
-                const duracionContainer = document.getElementById('duracionContainer');
-                const golesContainer = document.getElementById('golesContainer');
-                const checkboxTiempo = document.getElementById('duracion');
-                const checkboxGoles = document.getElementById('goles');
-    
-                if (checkboxTiempo.checked) {
-                    duracionContainer.style.display = 'block';
-                } else {
-                    duracionContainer.style.display = 'none';
-                }
-    
-                if (checkboxGoles.checked) {
-                    golesContainer.style.display = 'block';
-                } else {
-                    golesContainer.style.display = 'none';
-                }
-            });
         });
-    </script>
-    
-    
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const animationContainer = document.getElementById("animation");
-            const animData = {
-                container: animationContainer,
-                renderer: "canvas",
-                loop: true,
-                autoplay: true,
-                path: "./cliente/img/lottie/crearPartida.json" // Reemplaza con la ruta de tu animación Lottie
-            };
-            const anim = lottie.loadAnimation(animData);
-        });
-    </script>
-</div>
+    });
+</script>
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const animationContainer = document.getElementById("animation");
+        const animData = {
+            container: animationContainer,
+            renderer: "canvas",
+            loop: true,
+            autoplay: true,
+            path: "./cliente/img/lottie/crearPartida.json" // Reemplaza con la ruta de tu animación Lottie
+        };
+        const anim = lottie.loadAnimation(animData);
+    });
+</script>
