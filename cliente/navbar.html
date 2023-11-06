@@ -107,35 +107,44 @@
 
     $(document).ready(function () {
         let visible = true
+
         $("#ocultarNavbar").on("click", async function () {
             const container = document.querySelector('#container');
             const navBar = document.querySelector('#navbarV');
             const button = document.querySelector('#navBarBtn');
             const arrow = document.querySelector('#arrow');
+            const navbarWidth = navBar.style.width;
 
             if (visible) {
-
-                container.classList.add('-translate-x-60')
-                container.classList.add('max-w-full')
-                navBar.classList.remove('animate__slideInLeft')
-                navBar.classList.add('animate__slideOutLeft')
-                button.classList.add('-translate-x-52')
+                container.classList.add('left-0');
+                navBar.classList.remove('animate__slideInLeft');
+                navBar.classList.add('animate__slideOutLeft');
+                button.classList.add('-translate-x-52');
                 arrow.classList.add('rotate-0');
-                
-                
 
+                
+                await new Promise(r => setTimeout(r,800));
+                container.classList.add('-translate-x-0');
+                navBar.classList.toggle('hidden');
+                
 
 
             } else {
-                container.classList.remove('-translate-x-60')
-                container.classList.remove('max-w-full')
-                navBar.classList.remove('animate__slideOutLeft')
-                navBar.classList.add('animate__slideInLeft')
-                button.classList.remove('-translate-x-52')
-                arrow.classList.remove('rotate-0')
-
-
+                container.classList.remove('-translate-x-60');
+                navBar.classList.remove('animate__slideOutLeft');
+                navBar.classList.add('animate__slideInLeft');
+                button.classList.remove('-translate-x-52');
+                arrow.classList.remove('rotate-0');
+                container.classList.add('w-full');
+                navBar.classList.toggle('hidden');
             }
+
+
+            let windowWidth = $(window).width();
+            let adjustedWidth = visible ? windowWidth : windowWidth + navbarWidth;
+            console.log(adjustedWidth)
+            container.style.width = adjustedWidth + 'px';
+
             visible = !visible
 
         });
