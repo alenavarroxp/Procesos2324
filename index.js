@@ -80,6 +80,14 @@ app.get(
   }
 );
 
+app.post(
+  "/oneTap/callback",
+  passport.authenticate("google-one-tap", { failureRedirect: "/fallo" }),
+  function (req, res) {
+    res.redirect("/good");
+  }
+);
+
 app.get(
   "/auth/github",
   passport.authenticate("github", { scope: ["user:email"] })
@@ -94,8 +102,11 @@ app.get(
 );
 
 app.get("/good", function (req, res) {
+  console.log("REQ", req.user.provider)
+  console.log("EMAIL", req.user.emails[0].value)
   switch (req.user.provider) {
     case "google":
+    case "google-one-tap":  
       let email = req.user.emails[0].value;
       sistema.usuarioOAuth({ email: email }, function (obj) {
         res.cookie("nick", obj.email);
