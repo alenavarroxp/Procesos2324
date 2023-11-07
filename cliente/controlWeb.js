@@ -257,7 +257,7 @@ function ControlWeb() {
         });
 
         $("#explorarPartidosVisible").on("click", function () {
-          console.log("EXPLORAR PARTIDOS")
+          console.log("EXPLORAR PARTIDOS");
           cw.mostrarExplorarPartida();
         });
       });
@@ -293,69 +293,77 @@ function ControlWeb() {
   // };
 
   this.mostrarHome = function () {
-    cw.limpiarInicio();
-    $("#home").load("./cliente/home.html", function () {
-      //add a esta clase esto:class="w-full"
-      $("#home").removeClass("hidden");
-    });
-  };
-
-  this.mostrarCrearPartida = async function () {
-    cw.limpiarInicio();
-
-    console.log("MOSTRAR CREAR PARTIDA");
-    let crearPartidaDiv = document.getElementById("crearPartida");
-
-    if (crearPartidaDiv.innerHTML === "") {
-      $("#crearPartida").load("./cliente/crearPartida.html", function () {
-        $("#crearPartida").removeClass("hidden");
-        $("#btnCrearPartida").on("click", function () {
-          event.preventDefault();
-          let email = $.cookie("nick");
-          let nombrePartida = $("#nombrePartida").val();
-          let cantidadJugadores = $("#cantidadJugadores").val();
-          let duracion = $("#duracionPartida").val();
-          let numGoles = $("#numGoles").val();
-          if (
-            email &&
-            nombrePartida &&
-            cantidadJugadores &&
-            duracion &&
-            numGoles
-          ) {
-            rest.crearPartida(
-              email,
-              nombrePartida,
-              cantidadJugadores,
-              duracion,
-              numGoles
-            );
-            $("#mensajeError").remove();
-          } else {
-            cw.mostrarMsg("Introduce los campos obligatorios");
-          }
-        });
+    if ($("#home").is(":empty")) {
+      cw.limpiarInicio();
+      $("#home").load("./cliente/home.html", function () {
+        // Agregar esta clase: class="w-full"
+        $("#home").removeClass("hidden");
       });
     }
   };
 
+  this.mostrarCrearPartida = async function () {
+    if ($("#crearPartida").is(":empty")) {
+      cw.limpiarInicio();
+
+      console.log("MOSTRAR CREAR PARTIDA");
+      let crearPartidaDiv = document.getElementById("crearPartida");
+
+      if (crearPartidaDiv.innerHTML === "") {
+        $("#crearPartida").load("./cliente/crearPartida.html", function () {
+          $("#crearPartida").removeClass("hidden");
+          $("#btnCrearPartida").on("click", function () {
+            event.preventDefault();
+            let email = $.cookie("nick");
+            let nombrePartida = $("#nombrePartida").val();
+            let cantidadJugadores = $("#cantidadJugadores").val();
+            let duracion = $("#duracionPartida").val();
+            let numGoles = $("#numGoles").val();
+            if (
+              email &&
+              nombrePartida &&
+              cantidadJugadores &&
+              duracion &&
+              numGoles
+            ) {
+              rest.crearPartida(
+                email,
+                nombrePartida,
+                cantidadJugadores,
+                duracion,
+                numGoles
+              );
+              $("#mensajeError").remove();
+            } else {
+              cw.mostrarMsg("Introduce los campos obligatorios");
+            }
+          });
+        });
+      }
+    }
+  };
+
   this.mostrarExplorarPartida = async function () {
-    cw.limpiarInicio();
-    console.log("MOSTRAR EXPLORAR PARTIDA")
-    $("#explorarPartidas").load("./cliente/explorarPartidos.html", function () {
-      console.log("MOSTRAR EXPLORAR PARTIDA")
-      $("#explorarPartidas").removeClass("hidden");
-    });
+    if ($("#explorarPartidas").is(":empty")) {
+      cw.limpiarInicio();
+      console.log("MOSTRAR EXPLORAR PARTIDA");
+      $("#explorarPartidas").load(
+        "./cliente/explorarPartidos.html",
+        function () {
+          console.log("MOSTRAR EXPLORAR PARTIDA");
+          $("#explorarPartidas").removeClass("hidden");
+        }
+      );
+    }
   };
 
   this.limpiarInicio = function () {
     $("#explorarPartidas").empty();
     $("#crearPartida").empty();
     $("#home").empty();
-    $("#home").addClass("hidden")
-    $("#crearPartida").addClass("hidden")
-    $("#explorarPartidas").addClass("hidden")
-
+    $("#home").addClass("hidden");
+    $("#crearPartida").addClass("hidden");
+    $("#explorarPartidas").addClass("hidden");
   };
 
   this.salir = function () {

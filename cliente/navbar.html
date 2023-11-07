@@ -1,5 +1,5 @@
 <div id="navbarV"
-    class="animate__animated animate__slideInLeft w-60 flex border-r border-gray-200 bg-gray-50 flex-col justify-between h-screen bg-base-200 transition-all duration-500 ease-in-out transform -translate-x-full lg:translate-x-0">
+    class="animate__animated animate__slideInLeft select-none w-60 flex border-r border-gray-200 bg-gray-50 flex-col justify-between h-screen bg-base-200 transition-all duration-500 ease-in-out transform -translate-x-full lg:translate-x-0">
     <nav class="navegacion mt-1 space-y-1">
         <div>
             <div class="items-center justify-center flex mt-3 flex-col">
@@ -142,7 +142,6 @@
 
             let windowWidth = $(window).width();
             let adjustedWidth = visible ? windowWidth : windowWidth + navbarWidth;
-            console.log(adjustedWidth)
             container.style.width = adjustedWidth + 'px';
 
             visible = !visible
