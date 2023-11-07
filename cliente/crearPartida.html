@@ -1,10 +1,10 @@
-<div id="crearPartidaForm" class=" h-screen w-full">
-    <div class="animate__animated relative animate__fast animate__slideInDown overflow-hidden">
-        <h1 class="text-3xl text-center font-bold py-8">Crear una Partida</h1>
+<div id="crearPartidaForm" class=" h-screen w-full overflow-hidden">
+    <div class="animate__animated relative animate__fast animate__slideInDown mt-16">
+        <h1 class="text-3xl text-center font-bold py-8">Crear un partido</h1>
         <form class="mx-auto max-w-md">
             <div class="mb-4 text-left">
-                <label for="nombrePartida" class="block font-semibold mb-2">Nombre de la Partida (*):</label>
-                <input type="text" id="nombrePartida" class="w-full px-3 py-2 border rounded-lg border-none focus:outline-none focus:border-blue-600 focus:ring-2 ring-blue-600" placeholder="Introduce el nombre de la partida">
+                <label for="nombrePartida" class="block font-semibold mb-2">Nombre del Partido (*):</label>
+                <input type="text" id="nombrePartida" class="w-full px-3 py-2 border rounded-lg border-none focus:outline-none focus:border-blue-600 focus:ring-2 ring-blue-600" placeholder="Introduce el nombre del partido">
             </div>
 
             <div class="mb-4 text-left">
@@ -13,7 +13,7 @@
             </div>
 
             <div class="mb-4 text-left">
-                <label class="block font-semibold mb-2">Tipo de Partida (*):</label>
+                <label class="block font-semibold mb-2">Tipo de Partido (*):</label>
                 <div class="grid grid-cols-2 gap-4">
                     <label class="cursor-pointer label">
                         <input type="checkbox" id="duracion" name="tipoPartida" value="tiempo" class="checkbox checkbox-info" onclick="changeFontWeight('tiempo')" />
@@ -42,7 +42,7 @@
             </div>
 
             <button type="submit" id="btnCrearPartida" class="bg-blue-500 font-bold text-white py-2 px-4 rounded-full hover:bg-blue-600 w-full">
-                Crear Partida
+                Crear Partido
             </button>
         </form>
 
