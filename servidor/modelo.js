@@ -148,4 +148,6 @@ function Usuario(email, pwd) {
   this.clave = pwd;
 }
 
+// function Partida(id,ni)
+
 module.exports.Sistema = Sistema;
