@@ -55,7 +55,7 @@
 
     <!-- Sección para visualizar partidas en espera -->
     <div class="game-list bg-white p-4 rounded-md">
-        <h2 class="text-lg font-semibold mb-4">Partidas en disponibles</h2>
+        <h2 class="text-lg font-semibold mb-4">Partidas disponibles</h2>
         <div class="game mb-4 p-2 border rounded-md">
             <h3 class="font-semibold">Nombre de la Partida</h3>
             <p class="text-sm">Jugadores: 3/6</p>
@@ -81,7 +81,7 @@
         input.maxLength = 1;
         input.pattern = '[0-9]';
         input.placeholder = '_';
-        input.className = 'w-12 h-12 items-center justify-center flex text-2xl border border-gray-300 rounded focus:outline-none focus:border-blue-600';
+        input.className = 'w-12 h-12 text-center font-semibold justify-center flex text-2xl border-none rounded';
 
         input.addEventListener('keydown', function (e) {
             const key = e.key;
@@ -96,14 +96,18 @@
                     e.target.value = '';
                 }
             } else {
-                const actualInput = e.target
+                
+                const actualInput = e.target;
+                if(key.length>1){
+                    e.preventDefault();
+                    return;
+                }
                 actualInput.value = key;
                 const nextInput = e.target.nextElementSibling;
 
-
                 if (nextInput) {
                     if (!nextInput.value) {
-                        nextInput.value = ' ';
+                        nextInput.value = " ";
                     }
                     nextInput.focus();
                 }
