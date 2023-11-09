@@ -128,7 +128,8 @@ function Sistema(test) {
     let modelo = this;
     console.log("PARTIDAMODELOCREAR", obj);
     const id = Date.now().toString();
-    modelo.partidas[id] = new Partida(obj.email, obj.nombrePartida, obj.cantidadJugadores, obj.duracion, obj.numGoles);
+    const estado = "esperando";
+    modelo.partidas[id] = new Partida(obj.email, obj.nombrePartida, obj.cantidadJugadores, obj.duracion, obj.numGoles, estado);
     this.partidas = modelo.partidas;
     callback({ id: id });
     // let modelo = this;
@@ -160,12 +161,13 @@ function Usuario(email, pwd) {
   this.clave = pwd;
 }
 
-function Partida(creador,nombrePartida,cantidadJugadores,duracion,numGoles) {
+function Partida(creador,nombrePartida,cantidadJugadores,duracion,numGoles,estado) {
   this.creador = creador;
   this.nombrePartida = nombrePartida;
   this.cantidadJugadores = cantidadJugadores;
   this.duracion = duracion;
   this.numGoles = numGoles;
+  this.estado = estado;
 }
 
 module.exports.Sistema = Sistema;

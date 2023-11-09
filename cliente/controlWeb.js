@@ -371,13 +371,15 @@ function ControlWeb() {
 
           await rest.obtenerPartidas(function (partidas) {
             const partidasPadre = document.getElementById("partidas");
-            console.log("PartidasPadre", partidasPadre)
+            const noPartidas = document.getElementById("no-partidas");
+            console.log("PartidasPadre", partidasPadre);
             console.log("PARTIDASWEb", partidas);
             const cantidadPartidas = Object.keys(partidas).length;
-            console.log("CANTIDAD PARTIDAS", cantidadPartidas)
+            console.log("CANTIDAD PARTIDAS", cantidadPartidas);
 
             if (cantidadPartidas === 0) {
               console.log("NO HAY PARTIDAS");
+
               const noPartidasDiv = document.createElement("div");
               noPartidasDiv.classList.add(
                 "flex",
@@ -386,41 +388,84 @@ function ControlWeb() {
                 "items-center",
                 "h-full"
               );
-              noPartidasDiv.innerHTML = `No hay partidas disponibles :(`;
-              partidasPadre.appendChild(noPartidasDiv);
+              noPartidasDiv.innerHTML = `
+              <div class="flex flex-col items-center justify-center w-full h-full">
+                <div class="text-center">
+                  <p class="text-lg text-gray-700 mb-4">En este momento, no hay ninguna partida disponible para poder unirte</p>
+                  <div class=" w-full  items-center justify-center mb-4 px-32">
+                  <div class="border-t border-gray-200 w-full" />
+                </div>
+                  <p class="m-3">¿Por qué no creas una?</p>
+                  <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full transition duration-300">Crear Partida</button>
+                </div>
+              </div>
+          
+              `;
+
+              noPartidasDiv.addEventListener("click", () => {
+                // Aquí puedes agregar la lógica para redirigir al usuario a la página de creación de partidas
+                // Por ejemplo:
+                // window.location.href = "ruta de la página para crear partidas";
+                cw.mostrarCrearPartida();
+              });
+
+              noPartidas.appendChild(noPartidasDiv);
               return;
             }
+
             for (let clave in partidas) {
-              let partida = partidas[clave];const nuevaPartidaDiv = document.createElement("div");
-              nuevaPartidaDiv.className = "border rounded-xl p-2 m-2 flex-col flex cursor-pointer shadow-md min-w-max h-40";
-          
-              nuevaPartidaDiv.innerHTML = `
-                  <div class="flex-1">
-                      <h3 class="font-semibold text-xl">${partida.nombrePartida}</h3>
-                      <p class="text-sm">${partida.creador}</p>
-                  </div>
-                  <div class="flex items-center bottom-0 justify-between">
-                      <div class="items-center justify-center flex-row">
-                          <div class="flex flex-rol items-center justify-center p-2 bg-neutral rounded-box text-neutral-content">
-                              <!-- Icono de tiempo-->
-                              <span class="relative flex h-3 w-3 m-2">
-                                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                                  <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
-                              </span>
-                              <span class="countdown font-mono text-2xl">
-                                  <span style="--value:${partida.duracion};"></span> :
-                                  <span style="--value:00;"></span>
-                              </span>
-                          </div>
-                      </div>
-                      <div class="flex items-center justify-center">
-                          <!-- Icono de jugadores-->
-                          <i class="fas fa-users text-xl mr-2"></i>
-                          <p class="text-xl font-bold">${partida.cantidadJugadores}/6</p>
-                      </div>
-                  </div>
-              `;
-          
+              let partida = partidas[clave];
+              const nuevaPartidaDiv = document.createElement("div");
+              nuevaPartidaDiv.className =
+                "border rounded-xl p-2 m-2 flex-col flex cursor-pointer shadow-md min-w-max h-40";
+
+              if (partida.estado != "esperando") {
+                nuevaPartidaDiv.innerHTML = `
+                    <div class="flex-1">
+                        <h3 class="font-semibold text-xl">${partida.nombrePartida}</h3>
+                        <p class="text-sm">${partida.creador}</p>
+                    </div>
+                    <div class="flex items-center bottom-0 justify-between">
+                        <div class="items-center justify-center flex flex-row bg-neutral rounded-box text-neutral-content w-40">
+                          <span class="relative flex h-3 w-3 m-2">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-3 w-3 bg-blue-500"></span>
+                          </span>
+                          <p class="text-xl text-white font-bold">Esperando...</p>
+                        </div>
+                        <div class="flex items-center justify-center">
+                            <i class="fas fa-users text-xl mr-2"></i>
+                            <p class="text-xl font-bold">TODO/${partida.cantidadJugadores}</p>
+                        </div>
+                    </div>
+                `;
+              } else if (partida.estado === "esperando") {
+                nuevaPartidaDiv.innerHTML = `
+                    <div class="flex-1">
+                        <h3 class="font-semibold text-xl">${partida.nombrePartida}</h3>
+                        <p class="text-sm">${partida.creador}</p>
+                    </div>
+                    <div class="flex items-center bottom-0 justify-between">
+                        <div class="items-center justify-center flex-row">
+                            <div class="flex flex-rol items-center justify-center p-2 bg-neutral rounded-box text-neutral-content">
+                                <span class="relative flex h-3 w-3 m-2">
+                                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                                    <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                                </span>
+                                <span class="countdown font-mono text-2xl">
+                                    <span style="--value:${partida.duracion};"></span> :
+                                    <span style="--value:00;"></span>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-center">
+                            <i class="fas fa-users text-xl mr-2"></i>
+                            <p class="text-xl font-bold">TODO/${partida.cantidadJugadores}</p>
+                        </div>
+                    </div>
+                `;
+              }
+
               // Agregar el nuevo div al contenedor de partidas
               partidasPadre.appendChild(nuevaPartidaDiv);
             }
