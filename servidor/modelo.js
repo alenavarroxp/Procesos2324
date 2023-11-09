@@ -3,6 +3,7 @@ const correo = require("./email.js");
 
 function Sistema(test) {
   this.usuarios = {};
+  this.partidas = {};
   this.test = test;
   this.cad = new datos.CAD();
   this.agregarUsuario = function (nick) {
@@ -125,21 +126,32 @@ function Sistema(test) {
 
   this.crearPartida = function (obj, callback) {
     let modelo = this;
-    this.cad.buscarPartida(obj, function (partida) {
-      if (!partida) {
-        obj.id = Date.now().toString();
-        obj.estado = "esperando";
-        console.log("OBJPPARTIDA", obj);
-        modelo.cad.insertarPartida(obj, function (res) {
-          console.log("RES", res);
-          callback(res);
-        });
-      } else {
-        console.log("PARTIDA", partida);
-        callback(partida);
-      }
-    });
+    console.log("PARTIDAMODELOCREAR", obj);
+    const id = Date.now().toString();
+    modelo.partidas[id] = new Partida(obj.email, obj.nombrePartida, obj.cantidadJugadores, obj.duracion, obj.numGoles);
+    this.partidas = modelo.partidas;
+    callback({ id: id });
+    // let modelo = this;
+    // this.cad.buscarPartida(obj, function (partida) {
+    //   if (!partida) {
+    //     obj.id = Date.now().toString();
+    //     obj.estado = "esperando";
+    //     console.log("OBJPPARTIDA", obj);
+    //     modelo.cad.insertarPartida(obj, function (res) {
+    //       console.log("RES", res);
+    //       callback(res);
+    //     });
+    //   } else {
+    //     console.log("PARTIDA", partida);
+    //     callback(partida);
+    //   }
+    // });
   };
+
+  this.obtenerPartidas = function (callback) {
+    console.log(this.partidas);
+    callback(this.partidas);
+  }
 }
 
 function Usuario(email, pwd) {
@@ -148,6 +160,12 @@ function Usuario(email, pwd) {
   this.clave = pwd;
 }
 
-// function Partida(id,ni)
+function Partida(creador,nombrePartida,cantidadJugadores,duracion,numGoles) {
+  this.creador = creador;
+  this.nombrePartida = nombrePartida;
+  this.cantidadJugadores = cantidadJugadores;
+  this.duracion = duracion;
+  this.numGoles = numGoles;
+}
 
 module.exports.Sistema = Sistema;

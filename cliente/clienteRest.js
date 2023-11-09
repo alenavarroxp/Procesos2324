@@ -237,6 +237,14 @@ function ClienteRest() {
     });
   };
 
+  this.obtenerPartidas = function(callback) {
+    $.getJSON("/obtenerPartidas", function (data) {
+      console.log(data);
+      callback(data);
+
+    });
+  }
+
   this.cerrarSesion = function () {
     $.getJSON("/cerrarSesion", function () {
       console.log("Sesion cerrada");

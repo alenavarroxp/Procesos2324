@@ -264,34 +264,6 @@ function ControlWeb() {
     });
   };
 
-  // this.animarInicio = function () {
-  //   return new Promise((resolve) => {
-  //     const crearPartida = document.getElementById("crearPartida");
-  //     const unirsePartida = document.getElementById("unirsePartida");
-
-  //     crearPartida.classList.add("animate__animated", "animate__slideOutLeft");
-  //     unirsePartida.classList.add(
-  //       "animate__animated",
-  //       "animate__slideOutRight"
-  //     );
-
-  //     setTimeout(function () {
-  //       crearPartida.style.display = "none";
-  //       unirsePartida.style.display = "none";
-
-  //       setTimeout(function () {
-  //         crearPartida.classList.remove("animate__fadeOutLeft");
-  //         unirsePartida.classList.remove("animate__fadeOutRight");
-
-  //         crearPartida.style.display = "block";
-  //         unirsePartida.style.display = "block";
-
-  //         resolve();
-  //       }, 50); // Ajusta este tiempo para permitir que los elementos se muestren antes de retirar las clases de animación
-  //     }, 1000); // Ajusta el tiempo según la duración de la animación
-  //   });
-  // };
-
   this.mostrarHome = function () {
     if ($("#home").is(":empty")) {
       cw.limpiarInicio();
@@ -349,9 +321,110 @@ function ControlWeb() {
       console.log("MOSTRAR EXPLORAR PARTIDA");
       $("#explorarPartidas").load(
         "./cliente/explorarPartidos.html",
-        function () {
+        async function () {
           console.log("MOSTRAR EXPLORAR PARTIDA");
           $("#explorarPartidas").removeClass("hidden");
+          if (document.getElementById("otp-input").innerHTML == "") {
+            const otpContainer = document.getElementById("otp-input");
+
+            for (let i = 0; i < 8; i++) {
+              const input = document.createElement("input");
+              input.type = "text";
+              input.maxLength = 1;
+              input.placeholder = "_";
+              input.className =
+                "w-12 h-12 text-center font-semibold justify-center flex text-2xl border-none rounded";
+
+              input.addEventListener("keydown", function (e) {
+                const key = e.key;
+
+                if (key === "Backspace") {
+                  if (!e.target.value) {
+                    const prevInput = e.target.previousElementSibling;
+                    if (prevInput) {
+                      prevInput.focus();
+                    }
+                  } else {
+                    e.target.value = "";
+                  }
+                } else {
+                  const actualInput = e.target;
+                  if (key.length > 1) {
+                    e.preventDefault();
+                    return;
+                  }
+                  actualInput.value = key;
+                  const nextInput = e.target.nextElementSibling;
+
+                  if (nextInput) {
+                    if (!nextInput.value) {
+                      nextInput.value = " ";
+                    }
+                    nextInput.focus();
+                  }
+                }
+              });
+
+              otpContainer.appendChild(input);
+            }
+          }
+
+          await rest.obtenerPartidas(function (partidas) {
+            const partidasPadre = document.getElementById("partidas");
+            console.log("PartidasPadre", partidasPadre)
+            console.log("PARTIDASWEb", partidas);
+            const cantidadPartidas = Object.keys(partidas).length;
+            console.log("CANTIDAD PARTIDAS", cantidadPartidas)
+
+            if (cantidadPartidas === 0) {
+              console.log("NO HAY PARTIDAS");
+              const noPartidasDiv = document.createElement("div");
+              noPartidasDiv.classList.add(
+                "flex",
+                "flex-col",
+                "justify-center",
+                "items-center",
+                "h-full"
+              );
+              noPartidasDiv.innerHTML = `No hay partidas disponibles :(`;
+              partidasPadre.appendChild(noPartidasDiv);
+              return;
+            }
+            for (let clave in partidas) {
+              let partida = partidas[clave];const nuevaPartidaDiv = document.createElement("div");
+              nuevaPartidaDiv.className = "border rounded-xl p-2 m-2 flex-col flex cursor-pointer shadow-md min-w-max h-40";
+          
+              nuevaPartidaDiv.innerHTML = `
+                  <div class="flex-1">
+                      <h3 class="font-semibold text-xl">${partida.nombrePartida}</h3>
+                      <p class="text-sm">${partida.creador}</p>
+                  </div>
+                  <div class="flex items-center bottom-0 justify-between">
+                      <div class="items-center justify-center flex-row">
+                          <div class="flex flex-rol items-center justify-center p-2 bg-neutral rounded-box text-neutral-content">
+                              <!-- Icono de tiempo-->
+                              <span class="relative flex h-3 w-3 m-2">
+                                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                                  <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                              </span>
+                              <span class="countdown font-mono text-2xl">
+                                  <span style="--value:${partida.duracion};"></span> :
+                                  <span style="--value:00;"></span>
+                              </span>
+                          </div>
+                      </div>
+                      <div class="flex items-center justify-center">
+                          <!-- Icono de jugadores-->
+                          <i class="fas fa-users text-xl mr-2"></i>
+                          <p class="text-xl font-bold">${partida.cantidadJugadores}/6</p>
+                      </div>
+                  </div>
+              `;
+          
+              // Agregar el nuevo div al contenedor de partidas
+              partidasPadre.appendChild(nuevaPartidaDiv);
+            }
+          });
         }
       );
     }

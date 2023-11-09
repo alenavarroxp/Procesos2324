@@ -19,10 +19,6 @@
                 Únete a una Partida</h1>
             <form class="mx-auto max-w-lg">
                 <div class="mb-4 text-left relative">
-                    <label for="claveAcceso" class="block font-semibold text-gray-700 mb-2">
-                        Clave de Acceso
-                        <span class="text-red-500">*</span>:
-                    </label>
                     <div id="otp-input" class="flex justify-center space-x-2"></div>
 
                 </div>
@@ -56,65 +52,18 @@
     <!-- Sección para visualizar partidas en espera -->
     <div class="game-list bg-white p-4 rounded-md">
         <h2 class="text-lg font-semibold mb-4">Partidas disponibles</h2>
-        <div class="game mb-4 p-2 border rounded-md">
-            <h3 class="font-semibold">Nombre de la Partida</h3>
-            <p class="text-sm">Jugadores: 3/6</p>
-            <p class="text-sm">Tiempo restante: 10 minutos</p>
+        <div id="partidas" class="grid grid-cols-4 grid-mb-4 p-2">
+            
+            
         </div>
 
-        <div class="game mb-4 p-2 border rounded-md">
-            <h3 class="font-semibold">Otra Partida</h3>
-            <p class="text-sm">Jugadores: 2/4</p>
-            <p class="text-sm">Tiempo restante: 15 minutos</p>
-        </div>
+
         <!-- Puedes agregar más bloques 'game' para mostrar más partidas en espera -->
     </div>
 </div>
 
-
 <script>
-    const otpContainer = document.getElementById('otp-input');
+    //funcion para decrementar el tiempo del countdown
+    
 
-    for (let i = 0; i < 8; i++) {
-        const input = document.createElement('input');
-        input.type = 'text';
-        input.maxLength = 1;
-        input.pattern = '[0-9]';
-        input.placeholder = '_';
-        input.className = 'w-12 h-12 text-center font-semibold justify-center flex text-2xl border-none rounded';
-
-        input.addEventListener('keydown', function (e) {
-            const key = e.key;
-
-            if (key === 'Backspace') {
-                if (!e.target.value) {
-                    const prevInput = e.target.previousElementSibling;
-                    if (prevInput) {
-                        prevInput.focus();
-                    }
-                } else {
-                    e.target.value = '';
-                }
-            } else {
-                
-                const actualInput = e.target;
-                if(key.length>1){
-                    e.preventDefault();
-                    return;
-                }
-                actualInput.value = key;
-                const nextInput = e.target.nextElementSibling;
-
-                if (nextInput) {
-                    if (!nextInput.value) {
-                        nextInput.value = " ";
-                    }
-                    nextInput.focus();
-                }
-            }
-        });
-
-
-        otpContainer.appendChild(input);
-    }
 </script>

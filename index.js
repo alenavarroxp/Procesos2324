@@ -249,6 +249,13 @@ app.post("/crearPartida", function (request, response) {
   });
 });
 
+
+app.get("/obtenerPartidas", function (request, response) {
+  sistema.obtenerPartidas(function (obj) {
+    response.send(obj);
+  });
+});
+
 app.listen(PORT, () => {
   console.log(`App está escuchando en el puerto ${PORT}`);
   console.log("Ctrl+C para salir");
