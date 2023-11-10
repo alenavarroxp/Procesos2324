@@ -131,6 +131,7 @@ function Sistema(test) {
     const estado = "esperando";
     modelo.partidas[id] = new Partida(obj.email, obj.nombrePartida, obj.cantidadJugadores, obj.duracion, obj.numGoles, estado);
     this.partidas = modelo.partidas;
+    console.log("PARTIDAS", this.partidas);
     callback({ id: id });
     // let modelo = this;
     // this.cad.buscarPartida(obj, function (partida) {
@@ -165,9 +166,14 @@ function Partida(creador,nombrePartida,cantidadJugadores,duracion,numGoles,estad
   this.creador = creador;
   this.nombrePartida = nombrePartida;
   this.cantidadJugadores = cantidadJugadores;
+  this.jugadoresConectados = 1;
+  if(duracion == ''){
+    duracion = 5;
+  }
   this.duracion = duracion;
   this.numGoles = numGoles;
   this.estado = estado;
+  //this.jugadoresConectados = [];
 }
 
 module.exports.Sistema = Sistema;

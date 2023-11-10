@@ -284,7 +284,7 @@ function ControlWeb() {
       if (crearPartidaDiv.innerHTML === "") {
         $("#crearPartida").load("./cliente/crearPartida.html", function () {
           $("#crearPartida").removeClass("hidden");
-          $("#btnCrearPartida").on("click", function () {
+          $("#btnInfoPartida").on("click", function () {
             event.preventDefault();
             let email = $.cookie("nick");
             let nombrePartida = $("#nombrePartida").val();
@@ -295,17 +295,17 @@ function ControlWeb() {
               email &&
               nombrePartida &&
               cantidadJugadores &&
-              duracion &&
-              numGoles
+              (duracion || numGoles)
             ) {
-              rest.crearPartida(
+              $("#mensajeError").empty();
+              cw.mostrarInfoPartida(
                 email,
                 nombrePartida,
                 cantidadJugadores,
                 duracion,
                 numGoles
               );
-              $("#mensajeError").remove();
+              
             } else {
               cw.mostrarMsg("Introduce los campos obligatorios");
             }
@@ -313,6 +313,91 @@ function ControlWeb() {
         });
       }
     }
+  };
+
+  this.mostrarInfoPartida = function (
+    email,
+    nombrePartida,
+    cantidadJugadores,
+    duracion,
+    numGoles
+  ) {
+    infoPartida = document.getElementById("infoPartida");
+    infoPartida.classList.remove("hidden");
+    $("#infoPartida").load("./cliente/infoPartida.html", function () {
+      let iPartidaElement = document.getElementById("iPartida");
+      comunDiv = document.createElement("div");
+      comunDiv.className = "flex flex-col w-full mb-2";
+      comunDiv.innerHTML = `<div class="flex flex-col w-full mb-2">
+                <div class="mb-2">
+                    <p class="text-xl text-gray-800 font-bold">· Nombre de la partida:</p>
+                    <p class="text-lg text-gray-600 font-semibold tracking-tighter">${nombrePartida}</p>
+                </div>
+            </div>
+
+            <div class="flex flex-col w-full mb-2">
+                <div class="mb-2">
+                    <p class="text-xl text-gray-800 font-bold tracking-tight">· Cantidad de jugadores:</p>
+                    <p class="text-lg text-gray-600 font-semibold tracking-tighter">${cantidadJugadores} jugadores</p>
+                </div>
+            </div>
+            <div class="flex flex-col w-full">
+                <p class="text-xl text-gray-800 font-bold tracking-tight">· Tipo de Partido:</p>
+                `
+
+      if (numGoles != "" && duracion != "") {
+        comunDiv.innerHTML += `<div class="flex flex-row justify-between p-1">
+                    <div class="flex flex-col ml-4 text-center">
+                        <p class="text-xl text-gray-800 font-bold tracking-tight">Duración</p>
+                        <p class="text-lg text-gray-600 font-semibold tracking-tighter">${duracion} minutos</p>
+                    </div>
+                    <div class="flex flex-col ml-4 text-center">
+                        <p class="text-xl text-gray-800 font-bold tracking-tight">Número de goles</p>
+                        <p class="text-lg text-gray-600 font-semibold tracking-tighter">${numGoles} goles</p>
+                    </div>
+                </div>
+            </div>`;
+      }else if (numGoles != "" && duracion == "") {
+        comunDiv.innerHTML += `<div class="flex flex-row justify-between p-1">
+                    <div class="flex flex-col ml-4 text-center">
+                        <p class="text-xl text-gray-800 font-bold tracking-tight">Duración</p>
+                        <p class="text-lg text-gray-600 font-semibold tracking-tighter">Por defecto: 5 minutos</p>
+                    </div>
+                    <div class="flex flex-col ml-4 text-center">
+                        <p class="text-xl text-gray-800 font-bold tracking-tight">Número de goles</p>
+                        <p class="text-lg text-gray-600 font-semibold tracking-tighter">${numGoles} goles</p>
+                    </div>
+                </div>
+            </div>`;
+      }else if (duracion != "" && numGoles == "") {
+        comunDiv.innerHTML += `<div class="flex flex-row justify-between p-1">
+            <div class="flex flex-col ml-4 text-center">
+              <p class="text-xl text-gray-800 font-bold tracking-tight">Duración</p>
+              <p class="text-lg text-gray-600 font-semibold tracking-tighter">${duracion} minutos</p>
+            </div>
+          </div>
+        </div>`;
+      }
+
+
+      iPartidaElement.appendChild(comunDiv);
+
+      $("#cancelarPartida").on("click", function () {
+        $("#infoPartida").addClass("hidden");
+      });
+
+      $("#crearPartidaBtn").on("click", function () {
+        rest.crearPartida(
+          email,
+          nombrePartida,
+          cantidadJugadores,
+          duracion,
+          numGoles
+        );
+        //Redirigir al juego PROXIMAMENTE
+        cw.mostrarInicio();
+      });
+    });
   };
 
   this.mostrarExplorarPartida = async function () {
@@ -393,10 +478,13 @@ function ControlWeb() {
                 <div class="text-center">
                   <p class="text-lg text-gray-700 mb-4">En este momento, no hay ninguna partida disponible para poder unirte</p>
                   <div class=" w-full  items-center justify-center mb-4 px-32">
-                  <div class="border-t border-gray-200 w-full" />
-                </div>
+                  <div class="border-t border-gray-200 w-full" /></div>
                   <p class="m-3">¿Por qué no creas una?</p>
                   <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full transition duration-300">Crear Partida</button>
+                </div>
+                <div class=" overflow-hidden animate__animated animate__slideInRight">
+                  <lottie-player src="./cliente/img/lottie/triste.json" background="transparent" speed="1"
+                  class="w-32 h-32" loop autoplay></lottie-player>
                 </div>
               </div>
           
@@ -414,12 +502,13 @@ function ControlWeb() {
             }
 
             for (let clave in partidas) {
+              noPartidas.style.display = "none";
               let partida = partidas[clave];
               const nuevaPartidaDiv = document.createElement("div");
               nuevaPartidaDiv.className =
                 "border rounded-xl p-2 m-2 flex-col flex cursor-pointer shadow-md min-w-max h-40";
 
-              if (partida.estado != "esperando") {
+              if (partida.estado === "esperando") {
                 nuevaPartidaDiv.innerHTML = `
                     <div class="flex-1">
                         <h3 class="font-semibold text-xl">${partida.nombrePartida}</h3>
@@ -435,11 +524,11 @@ function ControlWeb() {
                         </div>
                         <div class="flex items-center justify-center">
                             <i class="fas fa-users text-xl mr-2"></i>
-                            <p class="text-xl font-bold">TODO/${partida.cantidadJugadores}</p>
+                            <p class="text-xl font-bold">${partida.jugadoresConectados}/${partida.cantidadJugadores}</p>
                         </div>
                     </div>
                 `;
-              } else if (partida.estado === "esperando") {
+              } else if (partida.estado === "empezada") {
                 nuevaPartidaDiv.innerHTML = `
                     <div class="flex-1">
                         <h3 class="font-semibold text-xl">${partida.nombrePartida}</h3>
@@ -460,7 +549,7 @@ function ControlWeb() {
                         </div>
                         <div class="flex items-center justify-center">
                             <i class="fas fa-users text-xl mr-2"></i>
-                            <p class="text-xl font-bold">TODO/${partida.cantidadJugadores}</p>
+                            <p class="text-xl font-bold">${partida.jugadoresConectados}/${partida.cantidadJugadores}</p>
                         </div>
                     </div>
                 `;
