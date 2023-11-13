@@ -80,6 +80,14 @@ app.get(
   }
 );
 
+app.post(
+  "/oneTap/callback",
+  passport.authenticate("google-one-tap", { failureRedirect: "/fallo" }),
+  function (req, res) {
+    res.redirect("/good");
+  }
+);
+
 app.get(
   "/auth/github",
   passport.authenticate("github", { scope: ["user:email"] })
@@ -94,8 +102,11 @@ app.get(
 );
 
 app.get("/good", function (req, res) {
+  console.log("REQ", req.user.provider);
+  console.log("EMAIL", req.user.emails[0].value);
   switch (req.user.provider) {
     case "google":
+    case "google-one-tap":
       let email = req.user.emails[0].value;
       sistema.usuarioOAuth({ email: email }, function (obj) {
         res.cookie("nick", obj.email);
@@ -140,7 +151,7 @@ app.get("/agregarUsuario/:nick", function (request, response) {
   response.send(res);
 });
 
-app.get("/obtenerUsuarios", haIniciado,function (request, response) {
+app.get("/obtenerUsuarios", haIniciado, function (request, response) {
   let usuarios = sistema.obtenerUsuarios();
   response.send(usuarios);
 });
@@ -175,13 +186,13 @@ app.get("/confirmarUsuario/:email/:key", function (request, response) {
   });
 });
 
-app.get("/cerrarSesion",haIniciado, function (request, response){
+app.get("/cerrarSesion", haIniciado, function (request, response) {
   let nick = request.user.nick;
-  console.log("REQUEST",request.user)
+  console.log("REQUEST", request.user);
   request.logOut();
   response.redirect("/");
-  if(nick) sistema.eliminarUsuario(nick);
-})
+  if (nick) sistema.eliminarUsuario(nick);
+});
 
 app.post("/enviarJwt", function (request, response) {
   let jwt = request.body.jwt;
@@ -235,8 +246,6 @@ app.post(
   })
 );
 
-
-
 app.post("/reenviarCorreo", function (request, response) {
   sistema.reenviarCorreo(request.body, function (obj) {
     response.send(obj);
@@ -260,5 +269,3 @@ app.listen(PORT, () => {
   console.log(`App está escuchando en el puerto ${PORT}`);
   console.log("Ctrl+C para salir");
 });
-
-

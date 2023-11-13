@@ -240,25 +240,51 @@ function ControlWeb() {
   this.mostrarInicio = function () {
     cw.limpiarInicio();
     $("#inicio").load("./cliente/inicio.html", function () {
-      cw.mostrarHome();
+      // cw.mostrarHome();
+      cw.mostrarPartido();
       $("#navbar").load("./cliente/navbar.html", function () {
+        partido = document.getElementById("partido");
         $("#btnSalir").on("click", function () {
-          cw.salir();
+          if ($("#partido").is(":empty")) {
+            cw.salir();
+          } else {
+            cw.mostrarToast(
+              "No puedes salir de la partida mientras estás jugando",
+              top
+            );
+          }
         });
-
         $("#homeVisible").on("click", function () {
-          console.log("HOME");
-          cw.mostrarHome();
+          if ($("#partido").is(":empty")) {
+            cw.mostrarHome();
+          } else {
+            cw.mostrarToast(
+              "No puedes salir de la partida mientras estás jugando",
+              top
+            );
+          }
         });
 
         $("#crearPartidaVisible").on("click", function () {
-          console.log("CREAR PARTIDA");
-          cw.mostrarCrearPartida();
+          if ($("#partido").is(":empty")) {
+            cw.mostrarCrearPartida();
+          } else {
+            cw.mostrarToast(
+              "No puedes salir de la partida mientras estás jugando",
+              top
+            );
+          }
         });
 
         $("#explorarPartidosVisible").on("click", function () {
-          console.log("EXPLORAR PARTIDOS");
-          cw.mostrarExplorarPartida();
+          if ($("#partido").is(":empty")) {
+            cw.mostrarExplorarPartida();
+          } else {
+            cw.mostrarToast(
+              "No puedes salir de la partida mientras estás jugando",
+              top
+            );
+          }
         });
       });
     });
@@ -305,7 +331,6 @@ function ControlWeb() {
                 duracion,
                 numGoles
               );
-              
             } else {
               cw.mostrarMsg("Introduce los campos obligatorios");
             }
@@ -343,7 +368,7 @@ function ControlWeb() {
             </div>
             <div class="flex flex-col w-full">
                 <p class="text-xl text-gray-800 font-bold tracking-tight">· Tipo de Partido:</p>
-                `
+                `;
 
       if (numGoles != "" && duracion != "") {
         comunDiv.innerHTML += `<div class="flex flex-row justify-between p-1">
@@ -357,7 +382,7 @@ function ControlWeb() {
                     </div>
                 </div>
             </div>`;
-      }else if (numGoles != "" && duracion == "") {
+      } else if (numGoles != "" && duracion == "") {
         comunDiv.innerHTML += `<div class="flex flex-row justify-between p-1">
                     <div class="flex flex-col ml-4 text-center">
                         <p class="text-xl text-gray-800 font-bold tracking-tight">Duración</p>
@@ -369,7 +394,7 @@ function ControlWeb() {
                     </div>
                 </div>
             </div>`;
-      }else if (duracion != "" && numGoles == "") {
+      } else if (duracion != "" && numGoles == "") {
         comunDiv.innerHTML += `<div class="flex flex-row justify-between p-1">
             <div class="flex flex-col ml-4 text-center">
               <p class="text-xl text-gray-800 font-bold tracking-tight">Duración</p>
@@ -378,7 +403,6 @@ function ControlWeb() {
           </div>
         </div>`;
       }
-
 
       iPartidaElement.appendChild(comunDiv);
 
@@ -395,7 +419,7 @@ function ControlWeb() {
           numGoles
         );
         //Redirigir al juego PROXIMAMENTE
-        cw.mostrarInicio();
+        cw.mostrarPartido();
       });
     });
   };
@@ -562,6 +586,16 @@ function ControlWeb() {
         }
       );
     }
+  };
+
+  this.mostrarPartido = function () {
+    $("#partido").load("./cliente/partido.html", function () {
+      $("#partido").removeClass("hidden");
+      $("#navbar").addClass("hidden");
+      $("#navBarBtn").addClass("hidden");
+      $("#infoPartida").addClass("hidden");
+      $("#crearPartida").addClass("hidden");
+    });
   };
 
   this.limpiarInicio = function () {
