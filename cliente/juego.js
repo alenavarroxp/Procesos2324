@@ -1,5 +1,5 @@
 //MIRAR COMO UTILIZAR EL THREE JS   
-import * as THREE from 'three'
+import * as THREE from './three'
 //CREAR UNA SCENE CON THREEJS
 const scene = new THREE.Scene();
 //CREAR UNA CAMARA CON THREEJS
