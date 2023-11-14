@@ -1,18 +1,28 @@
+const gv = require("./gestorVariables");
 const nodemailer = require("nodemailer");
 const url = "http://localhost:3000/";
 // const url = "https://arquitectura-base-github-5rfb3lj4yq-ew.a.run.app/";
 
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: "alejandronavarro.software@gmail.com",
-    pass: "raqf wnfv canx oppq",
-  },
+let options = {
+  user: "",
+  pass: "",
+};
+
+gv.accessCORREO(function (correo) {
+  options.user = correo;
+  gv.accessCLAVECORREO(function (clave) {
+    options.pass = clave;
+  });
 });
 
 //send();
 
 module.exports.enviarEmail = async function (direccion, key, men) {
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: options,
+  });
+
   const correoHTML = `<!DOCTYPE html>
   <html lang="en">
   <head>
@@ -79,14 +89,14 @@ module.exports.enviarEmail = async function (direccion, key, men) {
               <p>¡Nos vemos en el campo!</p>
           </div>
           <div class="footer">
-              <p>No responda a este correo. Para asistencia, contáctenos a alejandronavarro.software@gmail.com</p>
+              <p>No responda a este correo. Para asistencia, contáctenos a ${options.user}</p>
           </div>
       </div>
   </body>
   </html>
 `;
   const result = await transporter.sendMail({
-    from: "alejandronavarro.software@gmail.com",
+    from: "SISTEMA DE FÚTBOL ONLINE",
     to: direccion,
     subject: men,
     text: "Pulsa aquí para confirmar cuenta",
