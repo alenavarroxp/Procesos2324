@@ -10,11 +10,10 @@ const modelo = require("./servidor/modelo.js");
 const axios = require("axios");
 const PORT = process.env.PORT || 3000;
 
-const haIniciado = function(request,response,next){
-  console.log("REQUEST",request.user)
-  if(request.user) next();
+const haIniciado = function (request, response, next) {
+  if (request.user) next();
   else response.redirect("/");
-}
+};
 
 const args = process.argv.slice(2);
 let test = false;
@@ -52,10 +51,13 @@ passport.use(
               console.log("Usuario no registrado");
               return done(null, { error: "Usuario no registrado" });
             }
+            if (err.error == "Usuario no registrado en local") {
+              console.log("Usuario no registrado en local");
+              return done(null, { error: "Usuario no registrado en local" });
+            }
           }
 
-          if (!usr)
-            return done(null, { error: "Usuario no encontrado" });
+          if (!usr) return done(null, { error: "Usuario no encontrado" });
           if (usr.email != -1) {
             return done(null, usr);
           } else {
@@ -102,21 +104,22 @@ app.get(
 );
 
 app.get("/good", function (req, res) {
-  console.log("REQ", req.user.provider)
-  console.log("EMAIL", req.user.emails[0].value)
   switch (req.user.provider) {
     case "google":
-    case "google-one-tap":  
+    case "google-one-tap":
+      // console.log(req.user);
+      let nick = req.user.displayName;
       let email = req.user.emails[0].value;
-      sistema.usuarioOAuth({ email: email }, function (obj) {
+      sistema.usuarioOAuth({ nick: nick, email: email }, function (obj) {
         res.cookie("nick", obj.email);
         res.redirect("/");
       });
       break;
     case "github":
-      console.log(req.user);
+      // console.log(req.user);
+      let nick2 = req.user.displayName;
       let email2 = req.user.username;
-      sistema.usuarioOAuth({ email: email2 }, function (obj) {
+      sistema.usuarioOAuth({ nick: nick2, email: email2 }, function (obj) {
         console.log("obj", obj);
         res.cookie("nick", obj.email);
         res.redirect("/");
@@ -151,7 +154,7 @@ app.get("/", function (request, response) {
 //   response.send(res);
 // });
 
-app.get("/obtenerUsuarios", haIniciado,function (request, response) {
+app.get("/obtenerUsuarios", haIniciado, function (request, response) {
   let usuarios = sistema.obtenerUsuarios();
   response.send(usuarios);
 });
@@ -186,13 +189,12 @@ app.get("/confirmarUsuario/:email/:key", function (request, response) {
   });
 });
 
-app.get("/cerrarSesion",haIniciado, function (request, response){
+app.get("/cerrarSesion", haIniciado, function (request, response) {
   let nick = request.user.nick;
-  console.log("REQUEST",request.user)
   request.logOut();
   response.redirect("/");
-  if(nick) sistema.eliminarUsuario(nick);
-})
+  if (nick) sistema.eliminarUsuario(nick);
+});
 
 app.post("/enviarJwt", function (request, response) {
   let jwt = request.body.jwt;
@@ -246,8 +248,6 @@ app.post(
   })
 );
 
-
-
 app.post("/reenviarCorreo", function (request, response) {
   sistema.reenviarCorreo(request.body, function (obj) {
     response.send(obj);
@@ -264,5 +264,3 @@ app.listen(PORT, () => {
   console.log(`App está escuchando en el puerto ${PORT}`);
   console.log("Ctrl+C para salir");
 });
-
-

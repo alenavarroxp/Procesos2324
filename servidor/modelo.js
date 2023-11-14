@@ -5,20 +5,22 @@ function Sistema(test) {
   this.usuarios = {};
   this.test = test;
   this.cad = new datos.CAD();
-  this.agregarUsuario = function (nick) {
+
+  this.agregarUsuario = function (usr) {
     let res = { nick: -1 };
-    if (!this.usuarios[nick]) {
-      this.usuarios[nick] = new Usuario(nick);
-      res.nick = nick;
-      if (!this.test) {
-        this.usuarioOAuth({ email: nick }, function (obj) {
-          console.log("Usuario agregado: " + obj.email);
-        });
-      } else {
-        console.log("Usuario agregado: " + nick);
-      }
+    if (!this.usuarios[usr.nick]) {
+      this.usuarios[usr.nick] = new Usuario(usr);
+      res.nick = usr.nick;
+
+      // if (!this.test) {
+      //   this.usuarioOAuth({ email: usr.nick }, function (obj) {
+      //     console.log("Usuario agregado: " + obj.email);
+      //   });
+      // } else {
+      //   console.log("Usuario agregado: " + usr.nick);
+      // }
     } else {
-      console.log("El usuario ya existe: " + nick);
+      console.log("El usuario ya existe: " + usr.nick);
     }
     return res;
   };
@@ -58,14 +60,22 @@ function Sistema(test) {
   }
 
   this.usuarioOAuth = function (usr, callback) {
-    let copia = usr;
+    let copiaN = usr.nick;
+    let copiaE = usr.email;
     usr.confirmada = true;
-    this.cad.buscarOCrearUsuario(usr, function (obj) {
+    this.cad.buscarOCrearUsuario(usr, (obj) => {
+      let modelo = this;
       if (obj.email == null) {
         console.log("El usuario " + usr.email + " ya estaba registrado");
-        obj.email = copia;
+        obj.email = copiaE;
+        const user = { nick: copiaN, email: obj.email };
+        modelo.agregarUsuario(user);
+        callback(user);
+      } else {
+        const user = { nick: copiaN, email: copiaE };
+        modelo.agregarUsuario(user);
+        callback(user);
       }
-      callback(obj);
     });
   };
 
@@ -74,16 +84,16 @@ function Sistema(test) {
 
     this.cad.buscarUsuario(obj, function (usr) {
       console.log("usr", usr);
-      if (!usr) {
+      if (!usr || usr.error == -2) {
         obj.key = Date.now().toString();
         obj.confirmada = false;
         modelo.cad.insertarUsuario(obj, function (res) {
           callback(res);
         });
-        
-        modelo.usuarios[obj.nick] = new Usuario(obj.email, obj.password);
-        this.usuarios = modelo.usuarios;
-        console.log("USUARIOS", this.usuarios);
+
+        // modelo.usuarios[obj.nick] = new Usuario({email:obj.email, password: obj.password});
+        // this.usuarios = modelo.usuarios;
+        // console.log("USUARIOS", this.usuarios);
         correo.enviarEmail(obj.email, obj.key, "Confirmar cuenta");
       } else {
         callback({ email: -1 });
@@ -97,7 +107,10 @@ function Sistema(test) {
       obj.nick = obj.email;
     }
 
-    this.cad.buscarUsuario(obj, function (usr) {
+    console.log("OBJ!", obj);
+
+    this.cad.buscarUsuario(obj, (usr) => {
+      let modelo = this;
       console.log("Usuario encontrado:", usr); // Agregar esta línea para depuración
       if (!usr) {
         callback({ error: "Usuario no registrado" }, null);
@@ -105,7 +118,12 @@ function Sistema(test) {
         if (usr.error == -1) {
           callback({ error: "Contraseña incorrecta" }, null);
           return;
+        } else if (usr.error == -2) {
+          callback({ error: "Usuario no registrado en local" },null);
+          return;
         }
+        console.log("USUARIO LOGIN", usr);
+        modelo.agregarUsuario(usr);
         callback(null, usr);
       }
     });
@@ -142,10 +160,10 @@ function Sistema(test) {
   };
 }
 
-function Usuario(email, pwd) {
-  this.nick = email;
-  this.email = email;
-  this.clave = pwd;
+function Usuario(usr) {
+  this.nick = usr.email;
+  this.email = usr.email;
+  this.clave = usr.password;
 }
 
 module.exports.Sistema = Sistema;
