@@ -190,7 +190,10 @@ app.get("/confirmarUsuario/:email/:key", function (request, response) {
 });
 
 app.get("/cerrarSesion", haIniciado, function (request, response) {
-  let nick = request.user.nick;
+  console.log("CERRAR SESION", request.user);
+  let nick =
+    request.user.displayName || request.user.username || request.user.nick;
+  console.log("CERRAR SESION NICK", nick);
   request.logOut();
   response.redirect("/");
   if (nick) sistema.eliminarUsuario(nick);

@@ -11,6 +11,8 @@ function Sistema(test) {
     if (!this.usuarios[usr.nick]) {
       this.usuarios[usr.nick] = new Usuario(usr);
       res.nick = usr.nick;
+      console.log("Usuario agregado varible local: " + usr.nick);
+      console.log("USUARIOS", this.usuarios)
 
       // if (!this.test) {
       //   this.usuarioOAuth({ email: usr.nick }, function (obj) {
@@ -40,12 +42,14 @@ function Sistema(test) {
 
   this.eliminarUsuario = function (nick) {
     console.log("Eliminar usuario: " + nick);
+    console.log("USUARIOS ANTES DE ELIMINAR", this.usuarios)
     if (this.usuarios[nick] == null) {
       // console.log("El usuario no existe: " + nick);
       return { nick: -1 };
     }
     delete this.usuarios[nick];
     console.log("Usuario eliminado: " + nick);
+    console.log("USUARIOS DESPUES DE ELIMINAR", this.usuarios)
     return { nick: nick };
   };
 
@@ -161,7 +165,7 @@ function Sistema(test) {
 }
 
 function Usuario(usr) {
-  this.nick = usr.email;
+  this.nick = usr.nick;
   this.email = usr.email;
   this.clave = usr.password;
 }
