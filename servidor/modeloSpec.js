@@ -13,24 +13,31 @@ describe("El sistema", function () {
 
   it("agrega un usuario", function () {
     expect(sistema.numeroUsuarios()).toEqual({ num: 0 });
-    sistema.agregarUsuario("pepe");
+    sistema.agregarUsuario({nick:"pepe"});
     expect(sistema.numeroUsuarios()).toEqual({ num: 1 });
     expect(sistema.obtenerTodosNicks()).toEqual(["pepe"]);
     expect(sistema.usuarioActivo("pepe")).toEqual({ activo: true });
     expect(sistema.usuarios["pepe"].nick).toEqual("pepe");
+    sistema.eliminarUsuario("pepe");
+    expect(sistema.numeroUsuarios()).toEqual({ num: 0 });
+    expect(sistema.obtenerTodosNicks()).toEqual([]);
   });
 
   it("obtener todos usuarios", function () {
     expect(sistema.numeroUsuarios()).toEqual({ num: 0 });
     expect(sistema.obtenerTodosNicks()).toEqual([]);
-    sistema.agregarUsuario("pepe");
-    sistema.agregarUsuario("juan");
+    sistema.agregarUsuario({nick:"pepe"});
+    sistema.agregarUsuario({nick:"juan"});
     expect(sistema.numeroUsuarios()).toEqual({ num: 2 });
     expect(sistema.obtenerTodosNicks()).toEqual(["pepe", "juan"]);
+    sistema.eliminarUsuario("pepe");
+    sistema.eliminarUsuario("juan");
+    expect(sistema.numeroUsuarios()).toEqual({ num: 0 });
+    expect(sistema.obtenerTodosNicks()).toEqual([]);
   });
 
   it("usuario activo", function () {
-    sistema.agregarUsuario("pepe");
+    sistema.agregarUsuario({nick:"pepe"});
     expect(sistema.usuarioActivo("pepe")).toEqual({ activo: true });
     expect(sistema.obtenerTodosNicks()).toEqual(["pepe"]);
     expect(sistema.numeroUsuarios()).toEqual({ num: 1 });
@@ -42,7 +49,7 @@ describe("El sistema", function () {
 
   it("eliminar usuario", function () {
     expect(sistema.numeroUsuarios()).toEqual({ num: 0 });
-    sistema.agregarUsuario("pepe");
+    sistema.agregarUsuario({nick:"pepe"});
     expect(sistema.numeroUsuarios()).toEqual({ num: 1 });
     sistema.eliminarUsuario("pepe");
     expect(sistema.numeroUsuarios()).toEqual({ num: 0 });
@@ -51,9 +58,9 @@ describe("El sistema", function () {
   it("numero usuarios", function () {
     expect(sistema.usuarios).toEqual({});
     expect(sistema.numeroUsuarios()).toEqual({ num: 0 });
-    sistema.agregarUsuario("pepe");
+    sistema.agregarUsuario({nick:"pepe"});
     expect(sistema.numeroUsuarios()).toEqual({ num: 1 });
-    sistema.agregarUsuario("juan");
+    sistema.agregarUsuario({nick:"juan" });
     expect(sistema.numeroUsuarios()).toEqual({ num: 2 });
   });
 
