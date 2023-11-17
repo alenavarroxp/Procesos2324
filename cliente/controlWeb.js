@@ -240,8 +240,8 @@ function ControlWeb() {
   this.mostrarInicio = function () {
     cw.limpiarInicio();
     $("#inicio").load("./cliente/inicio.html", function () {
-      // cw.mostrarHome();
-      cw.mostrarPartido();
+      cw.mostrarHome();
+      // cw.mostrarPartido();
       $("#navbar").load("./cliente/navbar.html", function () {
         partido = document.getElementById("partido");
         $("#btnSalir").on("click", function () {
@@ -300,6 +300,20 @@ function ControlWeb() {
     }
   };
 
+  this.generarPassCode = function (longitud) {
+    const caracteres =
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    let passCode = "";
+
+    for (let i = 0; i < longitud; i++) {
+      const indiceRandom = Math.floor(Math.random() * caracteres.length);
+      passCode += caracteres.charAt(indiceRandom);
+    }
+    console.log("PASSCODE GENERADO", passCode);
+
+    return passCode;
+  };
+
   this.mostrarCrearPartida = async function () {
     if ($("#crearPartida").is(":empty")) {
       cw.limpiarInicio();
@@ -317,11 +331,13 @@ function ControlWeb() {
             let cantidadJugadores = $("#cantidadJugadores").val();
             let duracion = $("#duracionPartida").val();
             let numGoles = $("#numGoles").val();
+            let passCode = cw.generarPassCode(8);
             if (
               email &&
               nombrePartida &&
               cantidadJugadores &&
-              (duracion || numGoles)
+              (duracion || numGoles) &&
+              passCode
             ) {
               $("#mensajeError").empty();
               cw.mostrarInfoPartida(
@@ -329,7 +345,8 @@ function ControlWeb() {
                 nombrePartida,
                 cantidadJugadores,
                 duracion,
-                numGoles
+                numGoles,
+                passCode
               );
             } else {
               cw.mostrarMsg("Introduce los campos obligatorios");
@@ -345,7 +362,8 @@ function ControlWeb() {
     nombrePartida,
     cantidadJugadores,
     duracion,
-    numGoles
+    numGoles,
+    passCode
   ) {
     infoPartida = document.getElementById("infoPartida");
     infoPartida.classList.remove("hidden");
@@ -416,11 +434,16 @@ function ControlWeb() {
           nombrePartida,
           cantidadJugadores,
           duracion,
-          numGoles
+          numGoles,
+          passCode
         );
-        //Redirigir al juego PROXIMAMENTE
-        cw.mostrarPartido();
       });
+    });
+  };
+
+  this.obtenerPartida = function (IDPartida) {
+    rest.obtenerPartida(IDPartida, function (partida) {
+      cw.mostrarPartido(partida);
     });
   };
 
@@ -488,7 +511,7 @@ function ControlWeb() {
 
             if (cantidadPartidas === 0) {
               console.log("NO HAY PARTIDAS");
-
+              partidasPadre.classList.add("hidden");
               const noPartidasDiv = document.createElement("div");
               noPartidasDiv.classList.add(
                 "flex",
@@ -502,14 +525,15 @@ function ControlWeb() {
                 <div class="text-center">
                   <p class="text-lg text-gray-700 mb-4">En este momento, no hay ninguna partida disponible para poder unirte</p>
                   <div class=" w-full  items-center justify-center mb-4 px-32">
-                  <div class="border-t border-gray-200 w-full" /></div>
+                  <div class=" overflow-hidden animate__animated animate__slideInRight justify-center items-center flex">
+                  <lottie-player src="./cliente/img/lottie/triste.json" background="transparent" speed="1"
+                  class="w-24 h-24" loop autoplay></lottie-player>
+                </div>
+                  <div class="border-t border-gray-200 w-full mt-4" /></div>
                   <p class="m-3">¿Por qué no creas una?</p>
                   <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full transition duration-300">Crear Partida</button>
                 </div>
-                <div class=" overflow-hidden animate__animated animate__slideInRight">
-                  <lottie-player src="./cliente/img/lottie/triste.json" background="transparent" speed="1"
-                  class="w-32 h-32" loop autoplay></lottie-player>
-                </div>
+                
               </div>
           
               `;
@@ -588,13 +612,19 @@ function ControlWeb() {
     }
   };
 
-  this.mostrarPartido = function () {
-    $("#partido").load("./cliente/partido.html", function () {
+  this.mostrarPartido = function (partida) {
+    $("#partido").load("./cliente/juego/partido.html", function () {
       $("#partido").removeClass("hidden");
       $("#navbar").addClass("hidden");
       $("#navBarBtn").addClass("hidden");
       $("#infoPartida").addClass("hidden");
       $("#crearPartida").addClass("hidden");
+      $("#GUI").load("./cliente/juego/GUI.html", function () {
+        const passCodeDiv = document.getElementById("passCode");
+        const passCode = `<h1 class="text-white leading-none tracking-tighter justify-end items-center flex font-bold mt-2 text-2xl mr-2">Código de la partida: <span class="inline-block animate__animated animate__zoomInDown ml-2 text-yellow-500 pointer-events-auto hover:text-yellow-700">${partida.passCode}</span>
+        </h1>`;
+        passCodeDiv.innerHTML = passCode;
+      });
     });
   };
 

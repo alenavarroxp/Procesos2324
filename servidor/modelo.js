@@ -129,7 +129,7 @@ function Sistema(test) {
     console.log("PARTIDAMODELOCREAR", obj);
     const id = Date.now().toString();
     const estado = "esperando";
-    modelo.partidas[id] = new Partida(obj.email, obj.nombrePartida, obj.cantidadJugadores, obj.duracion, obj.numGoles, estado);
+    modelo.partidas[id] = new Partida(obj.email, obj.nombrePartida, obj.cantidadJugadores, obj.duracion, obj.numGoles, estado,obj.passCode);
     this.partidas = modelo.partidas;
     console.log("PARTIDAS", this.partidas);
     callback({ id: id });
@@ -150,6 +150,18 @@ function Sistema(test) {
     // });
   };
 
+  this.obtenerPartida = function (id,callback){
+    console.log("ID", id)
+    console.log("PARTIDAS", this.partidas)
+    if(!this.partidas[id]){
+      callback({error: "Partida no encontrada"});
+      return;
+    }else{
+      callback(this.partidas[id]);
+    }
+        
+  }
+
   this.obtenerPartidas = function (callback) {
     console.log(this.partidas);
     callback(this.partidas);
@@ -162,7 +174,7 @@ function Usuario(email, pwd) {
   this.clave = pwd;
 }
 
-function Partida(creador,nombrePartida,cantidadJugadores,duracion,numGoles,estado) {
+function Partida(creador,nombrePartida,cantidadJugadores,duracion,numGoles,estado,passCode) {
   this.creador = creador;
   this.nombrePartida = nombrePartida;
   this.cantidadJugadores = cantidadJugadores;
@@ -173,6 +185,7 @@ function Partida(creador,nombrePartida,cantidadJugadores,duracion,numGoles,estad
   this.duracion = duracion;
   this.numGoles = numGoles;
   this.estado = estado;
+  this.passCode = passCode;
   //this.jugadoresConectados = [];
 }
 

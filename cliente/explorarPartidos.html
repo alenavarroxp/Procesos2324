@@ -50,12 +50,12 @@
 
 
     <!-- Sección para visualizar partidas en espera -->
-    <div class="game-list bg-white p-4 rounded-md">
+    <div class="game-list bg-white p-4 rounded-md overflow-hidden flex-shrink-0">
         <h1
             class="text-xl text-start font-bold py-1 leading-none tracking-tighter text-gray-900 md:text-2xl lg:text-3xl dark:text-white">
             Partidas disponibles</h1>
-        <div id="no-partidas" class="h-96"></div>
-        <div id="partidas" class="grid grid-cols-4 grid-mb-4 p-2">
+        <div id="no-partidas" class="h-96 max-h-full overflow-hidden"></div>
+        <div id="partidas" class="grid grid-cols-4 grid-mb-4 p-2 overflow-auto">
 
 
         </div>

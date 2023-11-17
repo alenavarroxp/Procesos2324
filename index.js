@@ -258,6 +258,12 @@ app.post("/crearPartida", function (request, response) {
   });
 });
 
+app.get("/obtenerPartida/:id", function (request, response) {
+  let id = request.params.id;
+  sistema.obtenerPartida(id, function (obj) {
+    response.send(obj);
+  });
+});
 
 app.get("/obtenerPartidas", function (request, response) {
   sistema.obtenerPartidas(function (obj) {

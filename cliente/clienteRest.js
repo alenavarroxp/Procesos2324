@@ -202,7 +202,8 @@ function ClienteRest() {
     nombrePartida,
     cantidadJugadores,
     duracion,
-    numGoles
+    numGoles,
+    passCode
   ) {
     $.ajax({
       type: "POST",
@@ -213,20 +214,14 @@ function ClienteRest() {
         cantidadJugadores: cantidadJugadores,
         duracion: duracion,
         numGoles: numGoles,
+        passCode: passCode,
       }),
       success: function (data) {
-        console.log("DATA", data);
         if (data.error) {
           cw.mostrarMsg(data.error);
         }
-        if (data.nombrePartida) {
-          console.log("Partida " + data.nombrePartida + " ha sido creada");
-          cw.limpiar();
-          cw.mostrarToast(
-            "Partida " + data.nombrePartida + " ha sido creada",
-            top
-          );
-          cw.mostrarInicio();
+        if (data) {
+          cw.obtenerPartida(data.id);
         }
       },
       error: function (xhr, textStatus, errorThrown) {
@@ -237,13 +232,22 @@ function ClienteRest() {
     });
   };
 
-  this.obtenerPartidas = function(callback) {
+  this.obtenerPartida = function (IDPartida, callback) {
+    $.getJSON("/obtenerPartida/" + IDPartida, function (data) {
+      if(data.error){
+        cw.mostrarToast(data.error,top);
+      }else{
+        callback(data);
+      }
+    });
+  };
+
+  this.obtenerPartidas = function (callback) {
     $.getJSON("/obtenerPartidas", function (data) {
       console.log(data);
       callback(data);
-
     });
-  }
+  };
 
   this.cerrarSesion = function () {
     $.getJSON("/cerrarSesion", function () {
