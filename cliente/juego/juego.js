@@ -1,4 +1,5 @@
 import * as THREE from "https://unpkg.com/three@0.126.1/build/three.module.js";
+import { FBXLoader } from "https://unpkg.com/three@0.126.1/examples/jsm/loaders/FBXLoader.js";
 import { OrbitControls } from "https://unpkg.com/three@0.126.1/examples/jsm/controls/OrbitControls.js";
 import Mapa from "./mapa.js";
 
@@ -9,6 +10,10 @@ function Juego() {
 
   this._orbitControls;
   this._directionalLight;
+
+  this.players = [];
+  this._mixer = new THREE.AnimationMixer();
+  this._clock = new THREE.Clock();
 
   this.initGame = function () {
     this._scene = new THREE.Scene();
@@ -28,17 +33,17 @@ function Juego() {
       this._camera,
       this._renderer.domElement
     );
-    this._orbitControls.enableDamping = true; 
+    this._orbitControls.enableDamping = true;
     this._orbitControls.dampingFactor = 0.25;
     this._orbitControls.screenSpacePanning = false;
-    this._orbitControls.maxPolarAngle = (Math.PI / 2.06);
-   
+    this._orbitControls.maxPolarAngle = Math.PI / 2.06;
 
     document.getElementById("juego").appendChild(this._renderer.domElement);
 
     this._directionalLight = new THREE.AmbientLight(0xffffff, 5.5);
     this._directionalLight.position.set(0, 1, 0);
     this.addToScene(this._directionalLight);
+    this.createCharacter();
   };
 
   this.addToScene = function (object) {
@@ -52,8 +57,29 @@ function Juego() {
     this._renderer.setSize(window.innerWidth, window.innerHeight);
   };
 
+  this.createCharacter = function () {
+    const player = new FBXLoader();
+    console.log(this._mixer);
+    player.load("./cliente/juego/public/models/playerIdle.fbx", (object) => {
+      object.scale.set(0.1, 0.1, 0.1);
+      object.position.set(10, 0, 0);
+      console.log(object);
+      const animation = object.animations.find(
+        (anim) => anim.name === "mixamo.com"
+      );
+      console.log(animation)
+      this._mixer = new THREE.AnimationMixer(object);
+      const action = this._mixer.clipAction(animation);
+      action.play();
+      // const action = this._mixer.clipAction(animation);
+      // action.play();
+      this.addToScene(object);
+    });
+  };
+
   this.animate = function () {
     this._orbitControls.update();
+    this._mixer.update(this._clock.getDelta());
     this.onWindowResize();
     requestAnimationFrame(this.animate.bind(this));
     this._renderer.render(this._scene, this._camera);
@@ -66,7 +92,7 @@ juego.initGame();
 const mapa = new Mapa();
 mapa.initMap(juego._scene);
 
-juego.animate()
+juego.animate();
 
 window.addEventListener("resize", function () {
   juego.onWindowResize();
