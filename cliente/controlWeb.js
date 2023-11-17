@@ -123,6 +123,7 @@ function ControlWeb() {
   this.comprobarSesion = function () {
     let nick = $.cookie("nick");
     if (nick) {
+      rest.recuperarUsuario(nick);
       cw.mostrarToast("Bienvenido al sistema, " + nick, top);
       cw.mostrarInicio();
     } else {
@@ -606,6 +607,18 @@ function ControlWeb() {
               // Agregar el nuevo div al contenedor de partidas
               partidasPadre.appendChild(nuevaPartidaDiv);
             }
+          });
+
+          $("#unirsePartidaPassCode").on("click", function () {
+            event.preventDefault();
+            let passCode = "";
+            const inputs = document.querySelectorAll("#otp-input > input");
+            inputs.forEach((input) => {
+              passCode += input.value;
+            });
+            rest.obtenerUsuario($.cookie("nick"), function (usr) {
+              rest.unirsePartida(usr,passCode);
+            });
           });
         }
       );

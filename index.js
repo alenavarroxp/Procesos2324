@@ -151,6 +151,14 @@ app.get("/agregarUsuario/:nick", function (request, response) {
   response.send(res);
 });
 
+app.get("/obtenerUsuario/:email", function (request, response) {
+  let email = request.params.email;
+  sistema.obtenerUsuario(email, function (obj) {
+    
+    response.send(obj);
+  });
+});
+
 app.get("/obtenerUsuarios", haIniciado, function (request, response) {
   let usuarios = sistema.obtenerUsuarios();
   response.send(usuarios);
@@ -170,6 +178,12 @@ app.get("/numeroUsuarios", function (request, response) {
 app.get("/eliminarUsuario/:nick", function (request, response) {
   let nick = request.params.nick;
   let res = sistema.eliminarUsuario(nick);
+  response.send(res);
+});
+
+app.get("/recuperarUsuario/:nick", function (request, response) {
+  let nick = request.params.nick;
+  let res = sistema.recuperarUsuario(nick);
   response.send(res);
 });
 
@@ -267,6 +281,13 @@ app.get("/obtenerPartida/:id", function (request, response) {
 
 app.get("/obtenerPartidas", function (request, response) {
   sistema.obtenerPartidas(function (obj) {
+    response.send(obj);
+  });
+});
+
+app.post("/unirsePartida", function (request, response) {
+  sistema.unirsePartida(request.body, function (obj) {
+    console.log("OBJE",obj);
     response.send(obj);
   });
 });
