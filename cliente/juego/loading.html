@@ -1,0 +1,53 @@
+<div class="bg-black flex flex-col items-center justify-center w-full h-full">
+    <div id="loadingContainer" class="text-center whitespace-nowrap relative">
+        <div class="flex">
+            <h1 id="loadingText" class="text-5xl font-semibold text-white relative">CARGANDO</h1>
+            <span id="dots" class="text-white text-5xl absolute left-6"></span>
+        </div>
+        <div class="flex flex-col items-center mt-4">
+            <span id="progressPercentage" class="text-white"></span>
+            <div id="progressBar" class="w-72 h-2 rounded-full bg-white overflow-hidden relative">
+                <div id="progressBarFill" class="h-full bg-blue-500 absolute left-0"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Simulación de carga con JavaScript
+    const progressBar = document.getElementById('progressBarFill');
+        const dotsElement = document.getElementById('dots');
+        const progressPercentage = document.getElementById('progressPercentage');
+        let progress = 0;
+        let dots = '';
+
+        function updateProgressBar() {
+            progress += 1;
+            progressBar.style.width = `${progress}%`;
+
+            // Actualiza el texto de carga y el porcentaje
+            progressPercentage.textContent = `${progress}%`;
+
+            if (progress < 100) {
+                // Si no ha alcanzado el 100%, sigue actualizando la barra
+                setTimeout(updateProgressBar, 25);
+            }
+        }
+
+        function animateDots() {
+            dots += '.';
+            dotsElement.textContent = dots;
+
+            if (dots.length > 2) {
+                dots = '';
+            }
+
+            setTimeout(animateDots, 500); // Intervalo más lento para la animación de puntos (500 ms)
+        }
+
+        // Inicia la animación de puntos
+        animateDots();
+
+        // Inicia la actualización de la barra de progreso después de un breve retraso
+        updateProgressBar();
+    </script>

@@ -444,7 +444,16 @@ function ControlWeb() {
 
   this.obtenerPartida = function (IDPartida) {
     rest.obtenerPartida(IDPartida, function (partida) {
+      socket.emit("obtenerPartidas")
       cw.mostrarPartido(partida);
+      const obj = {
+        user: $.cookie("nick"),
+        partida: partida,
+      };
+      socket.emit("cantidadJugadores", partida);
+      setTimeout(() => {
+        socket.emit("mensajeBienvenida", obj);
+      }, 5001);
     });
   };
 
@@ -502,6 +511,9 @@ function ControlWeb() {
             }
           }
 
+          socket.emit("obtenerPartidas")
+          
+
           await rest.obtenerPartidas(function (partidas) {
             const partidasPadre = document.getElementById("partidas");
             const noPartidas = document.getElementById("no-partidas");
@@ -550,8 +562,29 @@ function ControlWeb() {
               return;
             }
 
+            
+          });
+
+          $("#unirsePartidaPassCode").on("click", function () {
+            event.preventDefault();
+            let passCode = "";
+            const inputs = document.querySelectorAll("#otp-input > input");
+            inputs.forEach((input) => {
+              passCode += input.value;
+            });
+            rest.obtenerUsuario($.cookie("nick"), function (usr) {
+              rest.unirsePartida(usr, passCode);
+            });
+          });
+
+          socket.on("obtenerPartidas", function (partidas) {
+            console.log("HA LLEGADOOOOO")
+            const partidasPadre = document.getElementById("partidas");
+            const noPartidas = document.getElementById("no-partidas");
+            if(partidasPadre) partidasPadre.innerHTML = "";
             for (let clave in partidas) {
               noPartidas.style.display = "none";
+              partidasPadre.classList.remove("hidden");
               let partida = partidas[clave];
               const nuevaPartidaDiv = document.createElement("div");
               nuevaPartidaDiv.className =
@@ -577,7 +610,7 @@ function ControlWeb() {
                         </div>
                     </div>
                 `;
-              } else if (partida.estado === "empezada") {
+              } else if (partida.estado === "completa") {
                 nuevaPartidaDiv.innerHTML = `
                     <div class="flex-1">
                         <h3 class="font-semibold text-xl">${partida.nombrePartida}</h3>
@@ -585,7 +618,7 @@ function ControlWeb() {
                     </div>
                     <div class="flex items-center bottom-0 justify-between">
                         <div class="items-center justify-center flex-row">
-                            <div class="flex flex-rol items-center justify-center p-2 bg-neutral rounded-box text-neutral-content">
+                            <div class="flex flex-rol items-center justify-center px-2 py-1 bg-neutral rounded-box text-neutral-content">
                                 <span class="relative flex h-3 w-3 m-2">
                                     <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
                                     <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
@@ -608,18 +641,6 @@ function ControlWeb() {
               partidasPadre.appendChild(nuevaPartidaDiv);
             }
           });
-
-          $("#unirsePartidaPassCode").on("click", function () {
-            event.preventDefault();
-            let passCode = "";
-            const inputs = document.querySelectorAll("#otp-input > input");
-            inputs.forEach((input) => {
-              passCode += input.value;
-            });
-            rest.obtenerUsuario($.cookie("nick"), function (usr) {
-              rest.unirsePartida(usr, passCode);
-            });
-          });
         }
       );
     }
@@ -627,40 +648,67 @@ function ControlWeb() {
 
   this.mostrarPartido = function (partida) {
     console.log("MOSTRAR PARTIDO", partida);
+    $("#navbar").addClass("hidden");
+    $("#navBarBtn").addClass("hidden");
+    $("#container").addClass("hidden");
+    $("#partido").removeClass("hidden");
+
     $("#partido").load("./cliente/juego/partido.html", function () {
+      cw.mostrarLoadingGame(partida);
       socket.emit("joinRoom", partida.passCode);
       $("#partido").removeClass("hidden");
-      $("#navbar").addClass("hidden");
-      $("#navBarBtn").addClass("hidden");
-      $("#infoPartida").addClass("hidden");
-      $("#crearPartida").addClass("hidden");
-      $("#explorarPartidas").addClass("hidden");
       $("#GUI").load("./cliente/juego/GUI.html", function () {
+        //PASSCODE
         const passCodeDiv = document.getElementById("passCode");
         const passCode = `<h1 class="text-white leading-none tracking-tighter justify-end items-center flex font-bold mt-2 text-2xl mr-2">Código de la partida: <span class="inline-block animate__animated animate__zoomInDown ml-2 text-yellow-500 pointer-events-auto hover:text-yellow-700">${partida.passCode}</span>
         </h1>`;
         passCodeDiv.innerHTML = passCode;
 
+        //ESPERANDO JUGADORES
+        socket.on("cantidadJugadores", (partida) => {
+        const waitingDiv = document.getElementById("waitingDiv");
+        const waiting = `<h1 class="text-white">Esperando jugadores... ${partida.jugadoresConectados} / ${partida.cantidadJugadores}</h1>`;
+        waitingDiv.innerHTML = waiting;
+        });
+
+        const waitingDiv = document.getElementById("waitingDiv");
+        const waiting = `<h1 class="text-white">Esperando jugadores... ${partida.jugadoresConectados} / ${partida.cantidadJugadores}</h1>`;
+        waitingDiv.innerHTML = waiting;
+
+        //CHAT
         const chatPadre = document.getElementById("chat");
 
         // Evento que maneja la recepción de mensajes de chat desde el servidor
         socket.on("chatMessage", (message) => {
           const chatMessages = document.getElementById("chatMessages");
           const newMessage = document.createElement("div");
-          newMessage.textContent = `${message.username}: ${message.message}`;
-          newMessage.classList.add(
-            "text-white",
-            "p-2",
-            "rounded-md",
-            "mb-2",
-            "mr-2"
-          );
-          newMessage.style.wordWrap = "break-word";
+          if (!message.username) {
+            newMessage.textContent = `${message}`;
+            newMessage.classList.add(
+              "text-yellow-500",
+              "p-1",
+              "rounded-md",
+              "mb-1",
+              "text-sm"
+            );
+            newMessage.style.wordWrap = "break-word";
+          } else {
+            newMessage.textContent = `${message.username}: ${message.message}`;
+            newMessage.classList.add(
+              "text-white",
+              "p-2",
+              "rounded-md",
+              "mb-1",
+              "mr-2",
+              "text-sm"
+            );
+            newMessage.style.wordWrap = "break-word";
+          }
 
           chatMessages.appendChild(newMessage);
 
           // Scroll hacia abajo para enfocar el último mensaje
-          
+
           // Mostrar el chat cuando se recibe un nuevo mensaje
           chatPadre.classList.remove("hidden");
           chatMessagesContainer.classList.remove("hidden");
@@ -677,7 +725,6 @@ function ControlWeb() {
               chatPadre.classList.add("hidden");
             }, 1000);
           }, 5000);
-
         });
         // Evento que maneja el envío de mensajes desde el cliente al servidor
         document
@@ -780,6 +827,18 @@ function ControlWeb() {
             }
           });
       });
+    });
+  };
+
+  this.mostrarLoadingGame = function (partida) {
+    console.log("MOSTARARLOADING");
+    $("#loading").load("./cliente/juego/loading.html", function () {
+      setTimeout(function () {
+        $("#loading").addClass("animate__fadeOut");
+        setTimeout(function () {
+          $("#loading").addClass("hidden");
+        }, 1000);
+      }, 5000);
     });
   };
 

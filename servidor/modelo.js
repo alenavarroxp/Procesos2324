@@ -246,6 +246,9 @@ function Partida(
     ) {
       this.jugadores[usr.nick] = usr;
       this.jugadoresConectados = Object.keys(this.jugadores).length;
+      if(this.jugadoresConectados == this.cantidadJugadores){
+        this.estado = "completa";
+      }
       console.log("Jugador agregado: " + usr.nick);
       return true;
     } else {
