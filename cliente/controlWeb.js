@@ -444,7 +444,7 @@ function ControlWeb() {
 
   this.obtenerPartida = function (IDPartida) {
     rest.obtenerPartida(IDPartida, function (partida) {
-      socket.emit("obtenerPartidas")
+      socket.emit("obtenerPartidas");
       cw.mostrarPartido(partida);
       const obj = {
         user: $.cookie("nick"),
@@ -464,6 +464,7 @@ function ControlWeb() {
       $("#explorarPartidas").load(
         "./cliente/explorarPartidos.html",
         async function () {
+          socket.emit("obtenerPartidas");
           console.log("MOSTRAR EXPLORAR PARTIDA");
           $("#explorarPartidas").removeClass("hidden");
           if (document.getElementById("otp-input").innerHTML == "") {
@@ -510,9 +511,6 @@ function ControlWeb() {
               otpContainer.appendChild(input);
             }
           }
-
-          socket.emit("obtenerPartidas")
-          
 
           await rest.obtenerPartidas(function (partidas) {
             const partidasPadre = document.getElementById("partidas");
@@ -562,7 +560,8 @@ function ControlWeb() {
               return;
             }
 
-            
+            partidas = cw.ordenarPartidas(partidas);
+            cw.renderizarPartidasOrdenadas(partidas);
           });
 
           $("#unirsePartidaPassCode").on("click", function () {
@@ -578,71 +577,95 @@ function ControlWeb() {
           });
 
           socket.on("obtenerPartidas", function (partidas) {
-            console.log("HA LLEGADOOOOO")
-            const partidasPadre = document.getElementById("partidas");
-            const noPartidas = document.getElementById("no-partidas");
-            if(partidasPadre) partidasPadre.innerHTML = "";
-            for (let clave in partidas) {
-              noPartidas.style.display = "none";
-              partidasPadre.classList.remove("hidden");
-              let partida = partidas[clave];
-              const nuevaPartidaDiv = document.createElement("div");
-              nuevaPartidaDiv.className =
-                "border rounded-xl p-2 m-2 flex-col flex cursor-pointer shadow-md min-w-max h-40";
-
-              if (partida.estado === "esperando") {
-                nuevaPartidaDiv.innerHTML = `
-                    <div class="flex-1">
-                        <h3 class="font-semibold text-xl">${partida.nombrePartida}</h3>
-                        <p class="text-sm">${partida.creador}</p>
-                    </div>
-                    <div class="flex items-center bottom-0 justify-between">
-                        <div class="items-center justify-center flex flex-row bg-neutral rounded-box text-neutral-content w-40">
-                          <span class="relative flex h-3 w-3 m-2">
-                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-                            <span class="relative inline-flex rounded-full h-3 w-3 bg-blue-500"></span>
-                          </span>
-                          <p class="text-xl text-white font-bold">Esperando...</p>
-                        </div>
-                        <div class="flex items-center justify-center">
-                            <i class="fas fa-users text-xl mr-2"></i>
-                            <p class="text-xl font-bold">${partida.jugadoresConectados}/${partida.cantidadJugadores}</p>
-                        </div>
-                    </div>
-                `;
-              } else if (partida.estado === "completa") {
-                nuevaPartidaDiv.innerHTML = `
-                    <div class="flex-1">
-                        <h3 class="font-semibold text-xl">${partida.nombrePartida}</h3>
-                        <p class="text-sm">${partida.creador}</p>
-                    </div>
-                    <div class="flex items-center bottom-0 justify-between">
-                        <div class="items-center justify-center flex-row">
-                            <div class="flex flex-rol items-center justify-center px-2 py-1 bg-neutral rounded-box text-neutral-content">
-                                <span class="relative flex h-3 w-3 m-2">
-                                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                                    <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
-                                </span>
-                                <span class="countdown font-mono text-2xl">
-                                    <span style="--value:${partida.duracion};"></span> :
-                                    <span style="--value:00;"></span>
-                                </span>
-                            </div>
-                        </div>
-                        <div class="flex items-center justify-center">
-                            <i class="fas fa-users text-xl mr-2"></i>
-                            <p class="text-xl font-bold">${partida.jugadoresConectados}/${partida.cantidadJugadores}</p>
-                        </div>
-                    </div>
-                `;
-              }
-
-              // Agregar el nuevo div al contenedor de partidas
-              partidasPadre.appendChild(nuevaPartidaDiv);
-            }
+            const partidasOrdenadas = cw.ordenarPartidas(partidas);
+            cw.renderizarPartidasOrdenadas(partidasOrdenadas);
           });
         }
       );
+    }
+  };
+
+  this.ordenarPartidas = function (partidas) {
+    const ordenEstado = {
+      completa: 1,
+      esperando: 2,
+      //AÑADIR JUGANDO
+    };
+    const partidasOrdenadas = Object.values(partidas).sort((a, b) => {
+      const estadoA = a.estado;
+      const estadoB = b.estado;
+
+      const ordena = ordenEstado[estadoA] || Number.MAX_SAFE_INTEGER;
+      const ordenb = ordenEstado[estadoB] || Number.MAX_SAFE_INTEGER;
+
+      return ordena - ordenb;
+    });
+    return partidasOrdenadas;
+  };
+
+  this.renderizarPartidasOrdenadas = function (partidas) {
+    const partidasPadre = document.getElementById("partidas");
+    const noPartidas = document.getElementById("no-partidas");
+    if (partidasPadre) partidasPadre.innerHTML = "";
+    if (!noPartidas) return
+    for (let clave in partidas) {
+      noPartidas.style.display = "none";
+      partidasPadre.classList.remove("hidden");
+      let partida = partidas[clave];
+      console.log("PARTIDA", partida);
+      const nuevaPartidaDiv = document.createElement("div");
+      nuevaPartidaDiv.className =
+        "border rounded-xl p-2 m-2 flex-col flex cursor-pointer shadow-md min-w-max h-40";
+
+      if (partida.estado === "esperando") {
+        nuevaPartidaDiv.innerHTML = `
+            <div class="flex-1">
+                <h3 class="font-semibold text-xl">${partida.nombrePartida}</h3>
+                <p class="text-sm">${partida.creador}</p>
+            </div>
+            <div class="flex items-center bottom-0 justify-between">
+                <div class="items-center justify-center flex flex-row bg-neutral rounded-box text-neutral-content w-40">
+                  <span class="relative flex h-3 w-3 m-2">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-3 w-3 bg-blue-500"></span>
+                  </span>
+                  <p class="text-xl text-white font-bold">Esperando...</p>
+                </div>
+                <div class="flex items-center justify-center">
+                    <i class="fas fa-users text-xl mr-2"></i>
+                    <p class="text-xl font-bold">${partida.jugadoresConectados}/${partida.cantidadJugadores}</p>
+                </div>
+            </div>
+        `;
+      } else if (partida.estado === "completa") {
+        nuevaPartidaDiv.innerHTML = `
+            <div class="flex-1">
+                <h3 class="font-semibold text-xl">${partida.nombrePartida}</h3>
+                <p class="text-sm">${partida.creador}</p>
+            </div>
+            <div class="flex items-center bottom-0 justify-between">
+                <div class="items-center justify-center flex-row">
+                    <div class="flex flex-rol items-center justify-center px-2 py-1 bg-neutral rounded-box text-neutral-content">
+                        <span class="relative flex h-3 w-3 m-2">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                        </span>
+                        <span class="countdown font-mono text-2xl">
+                            <span style="--value:${partida.duracion};"></span> :
+                            <span style="--value:00;"></span>
+                        </span>
+                    </div>
+                </div>
+                <div class="flex items-center justify-center">
+                    <i class="fas fa-users text-xl mr-2"></i>
+                    <p class="text-xl font-bold">${partida.jugadoresConectados}/${partida.cantidadJugadores}</p>
+                </div>
+            </div>
+        `;
+      }
+
+      // Agregar el nuevo div al contenedor de partidas
+      partidasPadre.appendChild(nuevaPartidaDiv);
     }
   };
 
@@ -666,9 +689,9 @@ function ControlWeb() {
 
         //ESPERANDO JUGADORES
         socket.on("cantidadJugadores", (partida) => {
-        const waitingDiv = document.getElementById("waitingDiv");
-        const waiting = `<h1 class="text-white">Esperando jugadores... ${partida.jugadoresConectados} / ${partida.cantidadJugadores}</h1>`;
-        waitingDiv.innerHTML = waiting;
+          const waitingDiv = document.getElementById("waitingDiv");
+          const waiting = `<h1 class="text-white">Esperando jugadores... ${partida.jugadoresConectados} / ${partida.cantidadJugadores}</h1>`;
+          waitingDiv.innerHTML = waiting;
         });
 
         const waitingDiv = document.getElementById("waitingDiv");
@@ -796,10 +819,12 @@ function ControlWeb() {
 
         document.addEventListener("keydown", function (event) {
           if (event.key === "t" || event.key === "T") {
-            event.preventDefault();
-            chatPadre.classList.remove("hidden");
-            chatMessagesContainer.classList.remove("hidden");
-            document.getElementById("chatInputText").focus();
+            if (chatPadre.classList.contains("hidden")) {
+              event.preventDefault();
+              chatPadre.classList.remove("hidden");
+              chatMessagesContainer.classList.remove("hidden");
+              document.getElementById("chatInputText").focus();
+            }
           }
         });
 

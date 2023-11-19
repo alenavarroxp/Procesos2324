@@ -69,9 +69,9 @@
 
             <div class="mb-4 text-left" id="duracionContainer" style="display: none;">
                 <label for="duracionPartida" class="block font-semibold mb-2">Duración (minutos):</label>
-                <input type="number" id="duracionPartida"
+                <input type="number" id="duracionPartida" oninput="validarDuracion()"
                     class="w-full px-3 py-2 border rounded-lg border-none focus:outline-none focus:border-blue-600 focus:ring-2 ring-blue-600"
-                    min="2" max="10" placeholder="Duración estimada en minutos (Por defecto: 5 minutos)">
+                    min="1" max="10" placeholder="Duración estimada en minutos (Por defecto: 5 minutos)">
             </div>
 
             <div class="mb-4 text-left" id="golesContainer" style="display: none;">
@@ -149,6 +149,16 @@
         }
         if(input.value > 22){
             input.value = 22;
+        }
+    }
+
+    function validarDuracion() {
+        var input = document.getElementById('duracionPartida');
+        if (input.value < 1) {
+            input.value = 1;
+        }
+        if(input.value > 10){
+            input.value = 10;
         }
     }
 
