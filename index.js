@@ -9,12 +9,16 @@ const passportSetup = require("./servidor/passport-setup.js");
 const modelo = require("./servidor/modelo.js");
 const axios = require("axios");
 const PORT = process.env.PORT || 3000;
+const { createServer } = require("http");
+const { Server } = require("socket.io");
+const httpServer = createServer(app);
+// const socketS = require("./servidor/socket.js");
 
-const haIniciado = function(request,response,next){
-  console.log("REQUEST",request.user)
-  if(request.user) next();
+const haIniciado = function (request, response, next) {
+  console.log("REQUEST", request.user);
+  if (request.user) next();
   else response.redirect("/");
-}
+};
 
 const args = process.argv.slice(2);
 let test = false;
@@ -54,8 +58,7 @@ passport.use(
             }
           }
 
-          if (!usr)
-            return done(null, { error: "Usuario no encontrado" });
+          if (!usr) return done(null, { error: "Usuario no encontrado" });
           if (usr.email != -1) {
             return done(null, usr);
           } else {
@@ -154,7 +157,6 @@ app.get("/agregarUsuario/:nick", function (request, response) {
 app.get("/obtenerUsuario/:email", function (request, response) {
   let email = request.params.email;
   sistema.obtenerUsuario(email, function (obj) {
-    
     response.send(obj);
   });
 });
@@ -269,6 +271,7 @@ app.post("/reenviarCorreo", function (request, response) {
 app.post("/crearPartida", function (request, response) {
   sistema.crearPartida(request.body, function (obj) {
     response.send(obj);
+    
   });
 });
 
@@ -287,12 +290,30 @@ app.get("/obtenerPartidas", function (request, response) {
 
 app.post("/unirsePartida", function (request, response) {
   sistema.unirsePartida(request.body, function (obj) {
-    console.log("OBJE",obj);
+    console.log("OBJE", obj);
     response.send(obj);
   });
 });
 
-app.listen(PORT, () => {
+httpServer.listen(PORT, () => {
   console.log(`App está escuchando en el puerto ${PORT}`);
   console.log("Ctrl+C para salir");
+});
+
+const io = new Server(httpServer);
+
+io.on("connection", (socket) => {
+  console.log("Nuevo cliente conectado", socket.id);
+  socket.on("disconnect", () => {
+    console.log("Cliente desconectado", socket.id);
+  });
+
+  socket.on("joinRoom", (room) => {
+    console.log("Cliente", socket.id, "se unió a la sala", room);
+    socket.join(room);
+  });
+  socket.on("sendMessage", (mensaje) => {
+    console.log("Nuevo mensaje", mensaje);
+    io.to(mensaje.passCode).emit("chatMessage", mensaje);
+  });
 });

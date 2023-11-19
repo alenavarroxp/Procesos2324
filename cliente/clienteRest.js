@@ -276,7 +276,7 @@ function ClienteRest() {
           cw.mostrarToast(data.error, top);
         } else {
           if (data.id) {
-            cw.mostrarToast("Te has unido a la partida", top);
+            cw.obtenerPartida(data.id);
           }
         }
       },

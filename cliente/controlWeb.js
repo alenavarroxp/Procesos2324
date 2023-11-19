@@ -241,8 +241,8 @@ function ControlWeb() {
   this.mostrarInicio = function () {
     cw.limpiarInicio();
     $("#inicio").load("./cliente/inicio.html", function () {
-      // cw.mostrarHome();
-      cw.mostrarPartido();
+      cw.mostrarHome();
+      // cw.mostrarPartido();
       $("#navbar").load("./cliente/navbar.html", function () {
         partido = document.getElementById("partido");
         $("#btnSalir").on("click", function () {
@@ -617,7 +617,7 @@ function ControlWeb() {
               passCode += input.value;
             });
             rest.obtenerUsuario($.cookie("nick"), function (usr) {
-              rest.unirsePartida(usr,passCode);
+              rest.unirsePartida(usr, passCode);
             });
           });
         }
@@ -626,17 +626,159 @@ function ControlWeb() {
   };
 
   this.mostrarPartido = function (partida) {
+    console.log("MOSTRAR PARTIDO", partida);
     $("#partido").load("./cliente/juego/partido.html", function () {
+      socket.emit("joinRoom", partida.passCode);
       $("#partido").removeClass("hidden");
       $("#navbar").addClass("hidden");
       $("#navBarBtn").addClass("hidden");
       $("#infoPartida").addClass("hidden");
       $("#crearPartida").addClass("hidden");
+      $("#explorarPartidas").addClass("hidden");
       $("#GUI").load("./cliente/juego/GUI.html", function () {
         const passCodeDiv = document.getElementById("passCode");
         const passCode = `<h1 class="text-white leading-none tracking-tighter justify-end items-center flex font-bold mt-2 text-2xl mr-2">Código de la partida: <span class="inline-block animate__animated animate__zoomInDown ml-2 text-yellow-500 pointer-events-auto hover:text-yellow-700">${partida.passCode}</span>
         </h1>`;
         passCodeDiv.innerHTML = passCode;
+
+        const chatPadre = document.getElementById("chat");
+
+        // Evento que maneja la recepción de mensajes de chat desde el servidor
+        socket.on("chatMessage", (message) => {
+          const chatMessages = document.getElementById("chatMessages");
+          const newMessage = document.createElement("div");
+          newMessage.textContent = `${message.username}: ${message.message}`;
+          newMessage.classList.add(
+            "text-white",
+            "p-2",
+            "rounded-md",
+            "mb-2",
+            "mr-2"
+          );
+          newMessage.style.wordWrap = "break-word";
+
+          chatMessages.appendChild(newMessage);
+
+          // Scroll hacia abajo para enfocar el último mensaje
+          
+          // Mostrar el chat cuando se recibe un nuevo mensaje
+          chatPadre.classList.remove("hidden");
+          chatMessagesContainer.classList.remove("hidden");
+          chatMessages.scrollTop = chatMessages.scrollHeight;
+          // Reiniciar el temporizador para ocultar el chat
+          clearTimeout(timeoutId);
+          // Ocultar el chat después de 5 segundos
+          timeoutId = setTimeout(() => {
+            // chatMessagesContainer.classList.add('animate__fadeOut');
+
+            setTimeout(() => {
+              chatMessagesContainer.classList.add("hidden");
+              // chatMessagesContainer.classList.remove('animate__fadeOut');
+              chatPadre.classList.add("hidden");
+            }, 1000);
+          }, 5000);
+
+        });
+        // Evento que maneja el envío de mensajes desde el cliente al servidor
+        document
+          .getElementById("sendMessageButton")
+          .addEventListener("click", function () {
+            const messageText = document.getElementById("chatInputText").value;
+
+            if (messageText.trim() !== "") {
+              // Envía el mensaje al servidor
+              socket.emit("sendMessage", {
+                passCode: partida.passCode,
+                username: $.cookie("nick"),
+                message: messageText,
+              });
+
+              // Limpiar el campo de entrada después de enviar el mensaje
+              document.getElementById("chatInputText").value = "";
+            }
+          });
+
+        const chatMessagesContainer = document.getElementById("chatMessages");
+        let timeoutId;
+
+        //quiero detectar que el raton esté sobre el chat
+        chatMessagesContainer.addEventListener("mouseenter", function () {
+          clearTimeout(timeoutId);
+        });
+
+        chatMessagesContainer.addEventListener("mouseleave", function () {
+          clearTimeout(timeoutId);
+
+          timeoutId = setTimeout(() => {
+            // chatMessagesContainer.classList.add('animate__fadeOut');
+
+            setTimeout(() => {
+              chatMessagesContainer.classList.add("hidden");
+              // chatMessagesContainer.classList.remove('animate__fadeOut');
+              chatPadre.classList.add("hidden");
+            }, 1000);
+          }, 5000);
+        });
+
+        document
+          .getElementById("chatInputText")
+          .addEventListener("focus", function () {
+            clearTimeout(timeoutId);
+            // chatMessagesContainer.classList.remove('animate__fadeOut');
+            chatMessagesContainer.classList.remove("hidden");
+
+            chatMessagesContainer.scrollTop =
+              chatMessagesContainer.scrollHeight;
+          });
+
+        document
+          .getElementById("chatInputText")
+          .addEventListener("blur", function () {
+            clearTimeout(timeoutId);
+
+            timeoutId = setTimeout(() => {
+              // chatMessagesContainer.classList.add('animate__fadeOut');
+
+              setTimeout(() => {
+                chatMessagesContainer.classList.add("hidden");
+                // chatMessagesContainer.classList.remove('animate__fadeOut');
+                chatPadre.classList.add("hidden");
+              }, 1000);
+            }, 5000);
+          });
+
+        document.addEventListener("keydown", function (event) {
+          if (event.key === "t" || event.key === "T") {
+            event.preventDefault();
+            chatPadre.classList.remove("hidden");
+            chatMessagesContainer.classList.remove("hidden");
+            document.getElementById("chatInputText").focus();
+          }
+        });
+
+        // ...
+
+        document
+          .getElementById("chatInputText")
+          .addEventListener("keydown", function (event) {
+            if (event.key === "Enter") {
+              event.preventDefault(); // Evitar que el Enter realice un salto de línea en el campo de entrada
+
+              const messageText = this.value.trim();
+
+              if (messageText.trim() !== "") {
+                // Envía el mensaje al servidor
+                socket.emit("sendMessage", {
+                  passCode: partida.passCode,
+                  username: $.cookie("nick"),
+                  message: messageText,
+                });
+
+                // Limpiar el campo de entrada después de enviar el mensaje
+                document.getElementById("chatInputText").value = "";
+              }
+            }
+          });
       });
     });
   };
