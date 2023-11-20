@@ -6,8 +6,8 @@
   "scripts": {
     "start": "node index.js test=false",
     "dev": "nodemon index.js test=false",
-    "testW": "node_modules\\.bin\\jasmine-node servidor",
-    "test": "./node_modules/.bin/jasmine-node servidor"
+    "testW": "jasmine ./servidor/modeloSpec.js",
+    "test": "./node_modules/.bin/jasmine servidor"
   },
   "author": "Alejandro Navarro",
   "license": "MIT",
@@ -24,7 +24,7 @@
     "body-parser": "^1.20.2",
     "cookie-session": "^2.0.0",
     "express": "^4.18.2",
-    "jasmine-node": "^3.0.0",
+    "jasmine": "^5.1.0",
     "mongodb": "^4.4.0",
     "nodemailer": "^6.9.7",
     "passport": "0.5.3",

@@ -80,7 +80,7 @@ describe("El sistema", function () {
 
     xit("Inicio de sesión correcto",function(done){
       sistema.iniciarSesion(usrTest,function(res){
-        expect(res.email).toEqual(-1);
+        expect(res.email).not.toEqual(-1);
         done();
       })
     })
