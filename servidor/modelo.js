@@ -63,6 +63,9 @@ function Sistema(test) {
       console.log("Conectado a Mongo Atlas");
     });
   }
+  correo.conectar (function(res){
+    console.log("Variables secretas obtenidas");
+  })
 
   this.usuarioOAuth = function (usr, callback) {
     let copiaN = usr.nick;

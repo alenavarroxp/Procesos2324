@@ -3,26 +3,33 @@ const nodemailer = require("nodemailer");
 const url = "http://localhost:3000/";
 // const url = "https://arquitectura-base-github-5rfb3lj4yq-ew.a.run.app/";
 
+let transporter;
 let options = {
   user: "",
   pass: "",
 };
 
-gv.accessCORREO(function (correo) {
-  options.user = correo;
-  gv.accessCLAVECORREO(function (clave) {
-    options.pass = clave;
-  });
-});
 
-//send();
+
+// gv.accessCORREO(function (correo) {
+//   options.user = correo;
+//   gv.accessCLAVECORREO(function (clave) {
+//     options.pass = clave;
+//   });
+// });
+
+module.exports.conectar = function (callback) {
+  gv.obtenerOptions(function (obj) {
+    options = obj;
+    callback(obj);
+  });
+};
 
 module.exports.enviarEmail = async function (direccion, key, men) {
-  const transporter = nodemailer.createTransport({
+  transporter = nodemailer.createTransport({
     service: "gmail",
     auth: options,
   });
-
   const correoHTML = `<!DOCTYPE html>
   <html lang="en">
   <head>
