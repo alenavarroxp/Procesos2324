@@ -34,7 +34,6 @@ function Juego() {
       this._camera,
       this._renderer.domElement
     );
-    this._orbitControls.enabled=false;
     this._orbitControls.enableDamping = true;
     this._orbitControls.dampingFactor = 0.25;
     this._orbitControls.screenSpacePanning = false;

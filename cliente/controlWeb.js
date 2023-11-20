@@ -241,8 +241,8 @@ function ControlWeb() {
   this.mostrarInicio = function () {
     cw.limpiarInicio();
     $("#inicio").load("./cliente/inicio.html", function () {
-      // cw.mostrarHome();
-      cw.mostrarPartido();
+      cw.mostrarHome();
+      // cw.mostrarPartido();
       $("#navbar").load("./cliente/navbar.html", function () {
         partido = document.getElementById("partido");
         $("#btnSalir").on("click", function () {
