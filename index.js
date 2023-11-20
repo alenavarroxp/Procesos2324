@@ -9,10 +9,13 @@ const passportSetup = require("./servidor/passport-setup.js");
 const modelo = require("./servidor/modelo.js");
 const axios = require("axios");
 const PORT = process.env.PORT || 3000;
-const { createServer } = require("http");
+
+const httpServer = require("http").Server(app);
 const { Server } = require("socket.io");
-const httpServer = createServer(app);
-// const socketS = require("./servidor/socket.js");
+
+const modeloWS = require("./servidor/socket.js");
+
+const ws = new modeloWS.WSServer();
 
 const haIniciado = function (request, response, next) {
   console.log("REQUEST", request.user);
@@ -300,37 +303,7 @@ httpServer.listen(PORT, () => {
   console.log("Ctrl+C para salir");
 });
 
-const io = new Server(httpServer);
+const io = new Server();
+io.listen(httpServer)
 
-io.on("connection", (socket) => {
-  console.log("Nuevo cliente conectado", socket.id);
-  socket.on("disconnect", () => {
-    console.log("Cliente desconectado", socket.id);
-  });
-
-  socket.on("joinRoom", (room) => {
-    console.log("Cliente", socket.id, "se unió a la sala", room);
-    socket.join(room);
-  });
-  socket.on("sendMessage", (mensaje) => {
-    console.log("Nuevo mensaje", mensaje);
-    io.to(mensaje.passCode).emit("chatMessage", mensaje);
-  });
-
-  socket.on("mensajeBienvenida",(obj)=>{
-    console.log("Mensaje de bienvenida",obj);
-    io.to(obj.partida.passCode).emit("chatMessage", 'Se ha unido a la partida '+obj.user)
-  })
-
-  socket.on("cantidadJugadores", (obj) => {
-    console.log("Cantidad de jugadores", obj);
-    io.to(obj.passCode).emit("cantidadJugadores", obj);
-  });
-
-  socket.on("obtenerPartidas",()=>{
-    sistema.obtenerPartidas(function (obj) {
-      console.log("OBJ",obj);
-      socket.broadcast.emit("obtenerPartidas", obj);
-    });
-  })
-});
+ws.lanzarServidor(io,sistema);
