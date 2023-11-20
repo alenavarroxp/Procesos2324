@@ -9,15 +9,6 @@ let options = {
   pass: "",
 };
 
-
-
-// gv.accessCORREO(function (correo) {
-//   options.user = correo;
-//   gv.accessCLAVECORREO(function (clave) {
-//     options.pass = clave;
-//   });
-// });
-
 module.exports.conectar = function (callback) {
   gv.obtenerOptions(function (obj) {
     options = obj;
