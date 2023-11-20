@@ -1,7 +1,7 @@
 const gv = require("./gestorVariables");
 const nodemailer = require("nodemailer");
-const url = "http://localhost:3000/";
-// const url = "https://arquitectura-base-github-5rfb3lj4yq-ew.a.run.app/";
+// const url = "http://localhost:3000/";
+const url = "https://arquitectura-base-github-5rfb3lj4yq-ew.a.run.app/";
 
 let transporter;
 let options = {

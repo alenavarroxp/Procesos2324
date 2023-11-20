@@ -19,9 +19,9 @@ passport.use(
       clientID:
         "726975145917-mjdr25ibj7t7m4sd3bfol0e1jm6mm8lh.apps.googleusercontent.com",
       clientSecret: "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",
-      callbackURL: "http://localhost:3000/google/callback",
-      // callbackURL:
-      //   "https://arquitectura-base-github-5rfb3lj4yq-ew.a.run.app/google/callback", //DESARROLLO
+      // callbackURL: "http://localhost:3000/google/callback",
+      callbackURL:
+        "https://arquitectura-base-github-5rfb3lj4yq-ew.a.run.app/google/callback", //DESARROLLO
     },
     function (_,_,profile, done) {
       return done(null, profile);
@@ -34,14 +34,14 @@ passport.use(
   new GitHubStrategy(
     {
       //LOCAL OAUTH
-      clientID: "8c88b9dee6960a9943c2",
-      clientSecret: "25ee1a62f8aac920eac284c8903e0cdbb24ad4f5",
-      callbackURL: "http://localhost:3000/github/callback",
+      // clientID: "8c88b9dee6960a9943c2",
+      // clientSecret: "25ee1a62f8aac920eac284c8903e0cdbb24ad4f5",
+      // callbackURL: "http://localhost:3000/github/callback",
       //PRODUCIÓN OAUTH
-      // clientID: "8ca5ad36387754bc027c",
-      // clientSecret: "652dfc3e55bb7a0ab35bf6928da67433feecca61",
-      // callbackURL:
-      //   "https://arquitectura-base-github-5rfb3lj4yq-ew.a.run.app/github/callback",
+      clientID: "8ca5ad36387754bc027c",
+      clientSecret: "652dfc3e55bb7a0ab35bf6928da67433feecca61",
+      callbackURL:
+        "https://arquitectura-base-github-5rfb3lj4yq-ew.a.run.app/github/callback",
     },
     function (_, _, profile, done) {
       return done(null, profile);
