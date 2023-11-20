@@ -5,11 +5,12 @@ function WSServer() {
             socket.on("disconnect", () => {
               console.log("Cliente desconectado", socket.id);
             });
-          
+
             socket.on("joinRoom", (room) => {
               console.log("Cliente", socket.id, "se unió a la sala", room);
               socket.join(room);
             });
+            
             socket.on("sendMessage", (mensaje) => {
               console.log("Nuevo mensaje", mensaje);
               io.to(mensaje.passCode).emit("chatMessage", mensaje);
