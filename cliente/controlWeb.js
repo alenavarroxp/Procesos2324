@@ -241,8 +241,8 @@ function ControlWeb() {
   this.mostrarInicio = function () {
     cw.limpiarInicio();
     $("#inicio").load("./cliente/inicio.html", function () {
-      cw.mostrarHome();
-      // cw.mostrarPartido();
+      // cw.mostrarHome();
+      cw.mostrarPartido();
       $("#navbar").load("./cliente/navbar.html", function () {
         partido = document.getElementById("partido");
         $("#btnSalir").on("click", function () {
@@ -607,7 +607,7 @@ function ControlWeb() {
     const partidasPadre = document.getElementById("partidas");
     const noPartidas = document.getElementById("no-partidas");
     if (partidasPadre) partidasPadre.innerHTML = "";
-    if (!noPartidas) return
+    if (!noPartidas) return;
     for (let clave in partidas) {
       noPartidas.style.display = "none";
       partidasPadre.classList.remove("hidden");
@@ -689,14 +689,20 @@ function ControlWeb() {
 
         //ESPERANDO JUGADORES
         socket.on("cantidadJugadores", (partida) => {
+          if (partida.estado === "esperando") {
+            const waitingDiv = document.getElementById("waitingDiv");
+            const waiting = `<h1 class="text-white">Esperando jugadores... ${partida.jugadoresConectados} / ${partida.cantidadJugadores}</h1>`;
+            waitingDiv.innerHTML = waiting;
+          } else if (partida.estado === "completa")
+            if (waitingDiv.innerHTML != "") {
+              waitingDiv.innerHTML = "";
+            }
+        });
+        if (partida.estado === "esperando") {
           const waitingDiv = document.getElementById("waitingDiv");
           const waiting = `<h1 class="text-white">Esperando jugadores... ${partida.jugadoresConectados} / ${partida.cantidadJugadores}</h1>`;
           waitingDiv.innerHTML = waiting;
-        });
-
-        const waitingDiv = document.getElementById("waitingDiv");
-        const waiting = `<h1 class="text-white">Esperando jugadores... ${partida.jugadoresConectados} / ${partida.cantidadJugadores}</h1>`;
-        waitingDiv.innerHTML = waiting;
+        }
 
         //CHAT
         const chatPadre = document.getElementById("chat");

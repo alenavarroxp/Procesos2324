@@ -23,7 +23,8 @@ function Juego() {
       0.1,
       1000
     );
-    this._camera.position.set(342, 207, -202);
+    // this._camera.rotation.set(0, 0, Math.PI / 2);
+    this._camera.position.set(0, 450, 0);
     this._camera.lookAt(this._scene.position);
 
     this._renderer = new THREE.WebGLRenderer();
@@ -33,6 +34,7 @@ function Juego() {
       this._camera,
       this._renderer.domElement
     );
+    this._orbitControls.enabled=false;
     this._orbitControls.enableDamping = true;
     this._orbitControls.dampingFactor = 0.25;
     this._orbitControls.screenSpacePanning = false;
@@ -67,7 +69,7 @@ function Juego() {
       const animation = object.animations.find(
         (anim) => anim.name === "mixamo.com"
       );
-      console.log(animation)
+      console.log(animation);
       this._mixer = new THREE.AnimationMixer(object);
       const action = this._mixer.clipAction(animation);
       action.play();
