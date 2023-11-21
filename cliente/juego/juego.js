@@ -26,7 +26,9 @@ function Juego() {
     );
     // this._camera.rotation.set(0, 0, Math.PI / 2);
     this._camera.position.set(0, 450, 0);
-    this._camera.lookAt(this._scene.position);
+    this._camera.rotation.set(-Math.PI / 2, 0, -Math.PI / 2);
+    console.log("CAMERA",this._camera)
+    
 
     this._renderer = new THREE.WebGLRenderer();
     this._renderer.setSize(window.innerWidth, window.innerHeight);
@@ -35,6 +37,7 @@ function Juego() {
       this._camera,
       this._renderer.domElement
     );
+    this._orbitControls.target.copy(this._camera.rotation)
     this._orbitControls.enableDamping = true;
     this._orbitControls.dampingFactor = 0.25;
     this._orbitControls.screenSpacePanning = false;
@@ -93,7 +96,6 @@ function Juego() {
   this.animate = function () {
     this._orbitControls.update();
     this._mixer.update(this._clock.getDelta());
-    this.onWindowResize();
     requestAnimationFrame(this.animate.bind(this));
     this._renderer.render(this._scene, this._camera);
   };
