@@ -824,6 +824,11 @@ function ControlWeb() {
           });
 
         document.addEventListener("keydown", function (event) {
+          if(event.key ==="Escape"){
+            chatPadre.classList.add("hidden");
+            chatMessagesContainer.classList.add("hidden");
+          }
+
           if (event.key === "t" || event.key === "T") {
             if (chatPadre.classList.contains("hidden")) {
               event.preventDefault();
@@ -856,6 +861,11 @@ function ControlWeb() {
                 document.getElementById("chatInputText").value = "";
               }
             }
+          });
+
+          document.getElementById("closeChat").addEventListener("click", function () {
+            chatPadre.classList.add("hidden");
+            chatMessagesContainer.classList.add("hidden");
           });
       });
     });
