@@ -2,6 +2,7 @@ import * as THREE from "https://unpkg.com/three@0.126.1/build/three.module.js";
 import { FBXLoader } from "https://unpkg.com/three@0.126.1/examples/jsm/loaders/FBXLoader.js";
 import { OrbitControls } from "https://unpkg.com/three@0.126.1/examples/jsm/controls/OrbitControls.js";
 import Mapa from "./mapa.js";
+// import Player from "./player.js"
 
 function Juego() {
   this._scene;
@@ -50,6 +51,17 @@ function Juego() {
   this.addToScene = function (object) {
     this._scene.add(object);
   };
+
+  //AÑADIR AL JUGADOR
+  // this.addPlayer = function (player){
+  //   const playerModel = new Player(); //carga de modelo
+  //   const playerObj = {
+  //     player:player,
+  //     model:playerModel
+  //   }
+  //   this.players.push(playerObj);
+  //   this.addToScene(playerModel);
+  // }
 
   this.onWindowResize = function () {
     this._camera.aspect = window.innerWidth / window.innerHeight;

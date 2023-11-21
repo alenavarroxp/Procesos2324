@@ -54,10 +54,10 @@ function Sistema(test) {
     return { nick: nick };
   };
 
-  this.recuperarUsuario = function (nick) {
+  this.recuperarUsuario = async function (nick) {
     let modelo = this;
     if (!modelo.usuarios[nick]) {
-      modelo.cad.obtenerUsuario(nick, function (usr) {
+      await modelo.cad.obtenerUsuario(nick, function (usr) {
         if (usr.email == null) {
           console.log("El usuario " + nick + " no está registrado");
         } else {

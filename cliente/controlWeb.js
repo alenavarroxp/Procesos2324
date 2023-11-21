@@ -677,6 +677,7 @@ function ControlWeb() {
     $("#partido").removeClass("hidden");
 
     $("#partido").load("./cliente/juego/partido.html", function () {
+
       cw.mostrarLoadingGame(partida);
       socket.emit("joinRoom", partida.passCode);
       $("#partido").removeClass("hidden");
@@ -824,7 +825,7 @@ function ControlWeb() {
           });
 
         document.addEventListener("keydown", function (event) {
-          if(event.key ==="Escape"){
+          if (event.key === "Escape") {
             chatPadre.classList.add("hidden");
             chatMessagesContainer.classList.add("hidden");
           }
@@ -863,7 +864,9 @@ function ControlWeb() {
             }
           });
 
-          document.getElementById("closeChat").addEventListener("click", function () {
+        document
+          .getElementById("closeChat")
+          .addEventListener("click", function () {
             chatPadre.classList.add("hidden");
             chatMessagesContainer.classList.add("hidden");
           });
