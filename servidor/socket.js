@@ -38,7 +38,7 @@ function WSServer() {
 
       socket.on("unirseAEquipo", (obj) => {
         sistema.unirseAEquipo(obj.partida,obj.usr, obj.equipo, function (obj) {
-          console.log("OBJ DEL SOCKET", obj);
+          socket.emit("actualizarContadorEquipo", obj.partida);
         });
       });
     });

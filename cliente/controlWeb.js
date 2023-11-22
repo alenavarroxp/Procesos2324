@@ -886,7 +886,9 @@ function ControlWeb() {
                 usr: usr,
                 equipo: "equipoAzul",
               });
+              
             });
+
             checkboxR.disabled = true;
             veriCheckR.innerHTML = `<ion-icon name="close-outline" class="text-4xl text-gray-500 animate__animated animate__jackInTheBox"></ion-icon>`;
             checkJoinB.classList.remove("hidden");
@@ -917,6 +919,16 @@ function ControlWeb() {
             veriCheckR.innerHTML = ``;
           }
         });
+
+        socket.on("actualizarContadorEquipo", function (obj) {
+          console.log("ACTUALIZAR CONTADOR EQUIPO", obj);
+          if (obj.equipos["equipoAzul"]) {
+            const cantidadBlue = document.getElementById("cantidadBlue");
+            cantidadBlue.innerHTML = "Jugadores: " + Object.values(obj.equipos["equipoAzul"].jugadores).length;
+          }
+        });
+
+        
       });
     });
   };

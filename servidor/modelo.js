@@ -216,9 +216,10 @@ function Sistema(test) {
     if(!this.partidas[partida.id]) return;
     let check = this.partidas[partida.id].unirseAEquipo(usr, equipo);
     console.log("CHECK", check);
+    console.log("PARTIDAS", this.partidas[partida.id])
     switch (check) {
       case true:
-        callback({ id: partida });
+        callback({ partida: this.partidas[partida.id] });
         return;
       case undefined:
         callback({ error: "El jugador ya está en el equipo" });
