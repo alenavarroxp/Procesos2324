@@ -150,6 +150,7 @@ function Sistema(test) {
     const id = Date.now().toString();
     const estado = "esperando";
     modelo.partidas[id] = new Partida(
+      id,
       obj.email,
       obj.nombrePartida,
       obj.cantidadJugadores,
@@ -208,6 +209,28 @@ function Sistema(test) {
     let error = "No se ha encontrado la partida con el código: " + obj.passCode;
     callback({ error: error });
   };
+
+  this.unirseAEquipo = function (partida,usr, equipo, callback) {
+    console.log("UNIRSE A EQUIPO EN SISTEMA");
+    console.log("PARTIDA", partida);
+    if(!this.partidas[partida.id]) return;
+    let check = this.partidas[partida.id].unirseAEquipo(usr, equipo);
+    console.log("CHECK", check);
+    switch (check) {
+      case true:
+        callback({ id: partida });
+        return;
+      case undefined:
+        callback({ error: "El jugador ya está en el equipo" });
+        return;
+      case false:
+        callback({ error: "El jugador no está en la partida" });
+        return;
+      default:
+        callback({ error: "Error" });
+        return;
+    }
+  };
 }
 
 function Usuario(usr) {
@@ -217,6 +240,7 @@ function Usuario(usr) {
 }
 
 function Partida(
+  id,
   creador,
   nombrePartida,
   cantidadJugadores,
@@ -225,6 +249,7 @@ function Partida(
   estado,
   passCode
 ) {
+  this.id = id;
   this.creador = creador;
   this.nombrePartida = nombrePartida;
   this.cantidadJugadores = cantidadJugadores;
@@ -238,6 +263,7 @@ function Partida(
   this.passCode = passCode;
   this.jugadores = {};
   this.jugadoresConectados = 0;
+  this.equipos = { equipoAzul: new Equipo(), equipoRojo: new Equipo() };
 
   this.añadirJugador = function (usr) {
     if (
@@ -246,7 +272,7 @@ function Partida(
     ) {
       this.jugadores[usr.nick] = usr;
       this.jugadoresConectados = Object.keys(this.jugadores).length;
-      if(this.jugadoresConectados == this.cantidadJugadores){
+      if (this.jugadoresConectados == this.cantidadJugadores) {
         this.estado = "completa";
       }
       console.log("Jugador agregado: " + usr.nick);
@@ -261,6 +287,33 @@ function Partida(
           return false;
         }
       }
+    }
+  };
+
+  this.unirseAEquipo = function (usr, equipo) {
+    if (this.jugadores[usr.nick]) {
+      const añadido = this.equipos[equipo].unirseAEquipo(usr);
+      console.log("EQUIPOS EN LA PARTIDA", this.equipos);
+      return añadido;
+    } else {
+      console.log("El jugador no está en la partida: " + usr.nick);
+      return false;
+    }
+  };
+}
+
+function Equipo() {
+  this.jugadores = {};
+  this.goles;
+
+  this.unirseAEquipo = function (usr) {
+    if (!this.jugadores[usr.nick]) {
+      this.jugadores[usr.nick] = usr;
+      console.log("Jugador agregado: " + usr.nick);
+      return true;
+    } else {
+      console.log("El jugador ya está en este equipo: " + usr.nick);
+      return undefined;
     }
   };
 }

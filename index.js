@@ -274,7 +274,6 @@ app.post("/reenviarCorreo", function (request, response) {
 app.post("/crearPartida", function (request, response) {
   sistema.crearPartida(request.body, function (obj) {
     response.send(obj);
-    
   });
 });
 
@@ -304,6 +303,6 @@ httpServer.listen(PORT, () => {
 });
 
 const io = new Server();
-io.listen(httpServer)
+io.listen(httpServer);
 
-ws.lanzarServidor(io,sistema);
+ws.lanzarServidor(io, sistema);

@@ -677,7 +677,6 @@ function ControlWeb() {
     $("#partido").removeClass("hidden");
 
     $("#partido").load("./cliente/juego/partido.html", function () {
-
       cw.mostrarLoadingGame(partida);
       socket.emit("joinRoom", partida.passCode);
       $("#partido").removeClass("hidden");
@@ -870,6 +869,54 @@ function ControlWeb() {
             chatPadre.classList.add("hidden");
             chatMessagesContainer.classList.add("hidden");
           });
+
+        //ELEGIR EQUIPO
+        const checkboxB = document.getElementById("checkbTeam");
+        const checkJoinB = document.getElementById("checkbJoin");
+        const veriCheckB = document.getElementById("veribCheck");
+        const checkboxR = document.getElementById("checkrTeam");
+        const checkJoinR = document.getElementById("checkrJoin");
+        const veriCheckR = document.getElementById("verirCheck");
+
+        checkboxB.addEventListener("change", function () {
+          if (checkboxB.checked) {
+            rest.obtenerUsuario($.cookie("nick"), function (usr) {
+              socket.emit("unirseAEquipo", {
+                partida: partida,
+                usr: usr,
+                equipo: "equipoAzul",
+              });
+            });
+            checkboxR.disabled = true;
+            veriCheckR.innerHTML = `<ion-icon name="close-outline" class="text-4xl text-gray-500 animate__animated animate__jackInTheBox"></ion-icon>`;
+            checkJoinB.classList.remove("hidden");
+            setTimeout(() => {
+              checkJoinB.classList.add("hidden");
+              veriCheckB.innerHTML = `<ion-icon name="checkmark-outline" class="text-4xl text-blue-500 animate__animated animate__jackInTheBox"></ion-icon>`;
+            }, 3500);
+          } else {
+            checkboxR.disabled = false;
+            veriCheckR.innerHTML = ``;
+            veriCheckB.innerHTML = ``;
+          }
+        });
+
+        checkboxR.addEventListener("change", function () {
+          if (checkboxR.checked) {
+            checkboxB.disabled = true;
+            veriCheckB.innerHTML = `<ion-icon name="close-outline" class="text-4xl text-gray-500 animate__animated animate__jackInTheBox"></ion-icon>`;
+            checkJoinR.classList.remove("hidden");
+
+            setTimeout(() => {
+              checkJoinR.classList.add("hidden");
+              veriCheckR.innerHTML = `<ion-icon name="checkmark-outline" class="text-4xl text-red-500 animate__animated animate__jackInTheBox"></ion-icon>`;
+            }, 3500);
+          } else {
+            checkboxB.disabled = false;
+            veriCheckB.innerHTML = ``;
+            veriCheckR.innerHTML = ``;
+          }
+        });
       });
     });
   };
