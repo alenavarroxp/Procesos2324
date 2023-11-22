@@ -1,11 +1,51 @@
 <div id="passCode"></div>
 <div id="waitingDiv" class="bottom-20 fixed text-center justify-center w-full flex items-end"></div>
-<div id="joinDiv"></div>
+<div id="joinDiv" class="w-96 bg-black bg-opacity-50 fixed right-0 top-1/4 text-center p-4">
+    <h1 class="text-xl font-bold mb-4 text-yellow-400">Elige un equipo</h1>
+
+    <!-- Equipo Azul -->
+    <div class="flex items-center mb-4 relative">
+        <label class="cursor-pointer pointer-events-auto items-center flex mt-2">
+            <input type="checkbox" id="checkbTeam" name="checkTeam" class="hidden peer" required="">
+            <label for="checkbTeam"
+                class="select-none items-center p-4 text-gray-500 bg-white border-[2px] border-gray-200 rounded-full cursor-pointer transition-colors duration-400 ease-in-out peer-checked:border-blue-500 hover:text-gray-900 peer-checked:text-blue-500 ">
+            </label>
+            <div id="veribCheck" class="absolute flex top-[17px] left-2 items-center justify-center"></div>
+            <div id="checkbJoin" class="absolute flex top-6 left-[15px] items-center justify-center hidden">
+                <div class="animate-spin rounded-full h-5 w-5 border-t-2 border-blue-500"></div>
+            </div>
+        </label>
+
+        <div id="blueTeam" class="text-left ml-3 mb-2 ">
+            <h2 class="text-lg font-bold text-blue-500">Equipo Azul</h2>
+            <p class="text-white">Jugadores: 0</p>
+        </div>
+    </div>
+
+    <div class="flex items-center mb-4 relative">
+        <label class="cursor-pointer pointer-events-auto items-center flex mt-2">
+            <input type="checkbox" id="checkrTeam" name="checkTeam" class="hidden peer" required="">
+            <label for="checkrTeam"
+                class="select-none items-center p-4 text-gray-500 bg-white border-[2px] border-gray-200 rounded-full cursor-pointer transition-colors duration-400 ease-in-out peer-checked:border-red-500 hover:text-gray-900 peer-checked:text-red-500 ">
+            </label>
+            <div id="verirCheck" class="absolute flex top-[17px] left-2 items-center justify-center"></div>
+            <div id="checkrJoin" class="absolute flex top-6 left-[15px] items-center justify-center hidden">
+                <div class="animate-spin rounded-full h-5 w-5 border-t-2 border-red-500"></div>
+            </div>
+        </label>
+
+        <div id="blueTeam" class="text-left ml-3 mb-2 ">
+            <h2 class="text-lg font-bold text-red-500">Equipo Rojo</h2>
+            <p class="text-white">Jugadores: 0</p>
+        </div>
+    </div>
+</div>
+
 <div id="chat" class="fixed bottom-0 left-0 w-[450px] p-4 bg-black bg-opacity-40 hidden">
     <div id="closeChat" class="absolute right-2 top-2 cursor-pointer pointer-events-auto">
         <ion-icon name="close-outline" class="text-white text-2xl"></ion-icon>
     </div>
-    <div id="chatMessages" class="h-72 mb-4 overflow-auto flex flex-col pointer-events-auto animate__animated">
+    <div id="chatMessages" class="h-72 mb-4 overflow-auto flex  flex-col pointer-events-auto animate__animated">
         <!-- Mensajes irán aquí -->
     </div>
 
@@ -33,3 +73,63 @@
         /* Radio de la esquina del pulgar */
     }
 </style>
+
+<script>
+    // Obtén el checkbox y el div de carga
+    const checkboxB = document.getElementById('checkbTeam');
+    const checkJoinB = document.getElementById('checkbJoin');
+    const veriCheckB = document.getElementById('veribCheck');
+    const checkboxR = document.getElementById('checkrTeam');
+    const checkJoinR = document.getElementById('checkrJoin');
+    const veriCheckR = document.getElementById('verirCheck');
+
+    // Añade un listener para el cambio de estado del checkbox
+    checkboxB.addEventListener('change', function () {
+        // Si el checkbox está marcado, muestra el div de carga
+        if (checkboxB.checked) {
+            checkboxR.disabled = true;
+            //quiero poner una X en el veriCheckR
+            veriCheckR.innerHTML = `<ion-icon name="close-outline" class="text-4xl text-gray-500 animate__animated animate__jackInTheBox"></ion-icon>`;
+
+            checkJoinB.classList.remove('hidden');
+
+            // Simula una carga de 3.5 segundos antes de mostrar el check
+            setTimeout(() => {
+                // Oculta el div de carga
+                checkJoinB.classList.add('hidden');
+
+                // Puedes personalizar este código para mostrar el check de la manera que desees
+                // En este caso, se está utilizando un emoji de check
+                veriCheckB.innerHTML = `<ion-icon name="checkmark-outline" class="text-4xl text-blue-500 animate__animated animate__jackInTheBox"></ion-icon>`;
+            }, 3500);
+        }else{
+            checkboxR.disabled = false;
+            veriCheckR.innerHTML = ``;
+            veriCheckB.innerHTML = ``;
+        }
+    });
+
+    // Añade un listener para el cambio de estado del checkbox
+    checkboxR.addEventListener('change', function () {
+        // Si el checkbox está marcado, muestra el div de carga
+        if (checkboxR.checked) {
+            checkboxB.disabled = true;
+            veriCheckB.innerHTML = `<ion-icon name="close-outline" class="text-4xl text-gray-500 animate__animated animate__jackInTheBox"></ion-icon>`;
+            checkJoinR.classList.remove('hidden');
+
+            // Simula una carga de 3.5 segundos antes de mostrar el check
+            setTimeout(() => {
+                // Oculta el div de carga
+                checkJoinR.classList.add('hidden');
+
+                // Puedes personalizar este código para mostrar el check de la manera que desees
+                // En este caso, se está utilizando un emoji de check
+                veriCheckR.innerHTML = `<ion-icon name="checkmark-outline" class="text-4xl text-red-500 animate__animated animate__jackInTheBox"></ion-icon>`;
+            }, 3500);
+        }else{
+            checkboxB.disabled = false;
+            veriCheckB.innerHTML = ``;
+            veriCheckR.innerHTML = ``;
+        }
+    });
+</script>
