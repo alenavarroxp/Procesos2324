@@ -57,7 +57,16 @@ export default class Juego {
 
   //AÑADIR AL JUGADOR
   addPlayer = function (player, equipo) {
-    const playerModel = new Player(); //carga de modelo
+    const playerModel = null;
+    //FIX
+    for (let clave of this.players) {
+      if (clave.player.email === player.email) {
+        playerModel = new Player(); 
+      }else{
+        playerModel = clave.model;
+      }
+    }
+
     playerModel.initPlayer(this, player, equipo);
     const playerObj = {
       player: player,
@@ -70,8 +79,7 @@ export default class Juego {
   removePlayer = function (player) {
     for (let clave of this.players) {
       if (clave.player.email === player.email) {
-        clave.model.removePlayer(this._scene);
-        delete this.players[clave];
+        clave.model.removeModel(this._scene);
       }
     }
   };

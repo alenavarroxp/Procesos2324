@@ -901,6 +901,7 @@ function ControlWeb() {
             }, 2500);
           } else {
             rest.obtenerUsuario($.cookie("nick"), function (usr) {
+              window.juego.removePlayer(usr);
               socket.emit("salirEquipo", {
                 partida: partida,
                 usr: usr,
@@ -916,7 +917,7 @@ function ControlWeb() {
         checkboxR.addEventListener("change", function () {
           if (checkboxR.checked) {
             rest.obtenerUsuario($.cookie("nick"), function (usr) {
-              
+              window.juego.addPlayer(usr,"equipoRojo");
               socket.emit("unirseAEquipo", {
                 partida: partida,
                 usr: usr,
@@ -934,7 +935,7 @@ function ControlWeb() {
             }, 2500);
           } else {
             rest.obtenerUsuario($.cookie("nick"), function (usr) {
-              console.log("WINDOW",window.juego)
+              window.juego.removePlayer(usr);
               socket.emit("salirEquipo", {
                 partida: partida,
                 usr: usr,
