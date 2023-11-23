@@ -677,6 +677,7 @@ function ControlWeb() {
     $("#partido").removeClass("hidden");
 
     $("#partido").load("./cliente/juego/partido.html", function () {
+      //Inicializar el juego
       cw.mostrarLoadingGame(partida);
       socket.emit("joinRoom", partida.passCode);
       $("#partido").removeClass("hidden");
@@ -881,6 +882,7 @@ function ControlWeb() {
         checkboxB.addEventListener("change", function () {
           if (checkboxB.checked) {
             rest.obtenerUsuario($.cookie("nick"), function (usr) {
+              window.juego.addPlayer(usr,"equipoAzul");
               socket.emit("unirseAEquipo", {
                 partida: partida,
                 usr: usr,
@@ -896,7 +898,7 @@ function ControlWeb() {
               checkJoinB.classList.add("hidden");
               checkboxB.disabled = false;
               veriCheckB.innerHTML = `<ion-icon name="checkmark-outline" class="text-4xl text-blue-500 animate__animated animate__jackInTheBox"></ion-icon>`;
-            }, 3500);
+            }, 2500);
           } else {
             rest.obtenerUsuario($.cookie("nick"), function (usr) {
               socket.emit("salirEquipo", {
@@ -914,6 +916,7 @@ function ControlWeb() {
         checkboxR.addEventListener("change", function () {
           if (checkboxR.checked) {
             rest.obtenerUsuario($.cookie("nick"), function (usr) {
+              
               socket.emit("unirseAEquipo", {
                 partida: partida,
                 usr: usr,
@@ -928,9 +931,10 @@ function ControlWeb() {
               checkJoinR.classList.add("hidden");
               checkboxR.disabled = false;
               veriCheckR.innerHTML = `<ion-icon name="checkmark-outline" class="text-4xl text-red-500 animate__animated animate__jackInTheBox"></ion-icon>`;
-            }, 3500);
+            }, 2500);
           } else {
             rest.obtenerUsuario($.cookie("nick"), function (usr) {
+              console.log("WINDOW",window.juego)
               socket.emit("salirEquipo", {
                 partida: partida,
                 usr: usr,
