@@ -891,8 +891,10 @@ function ControlWeb() {
             checkboxR.disabled = true;
             veriCheckR.innerHTML = `<ion-icon name="close-outline" class="text-4xl text-gray-500 animate__animated animate__jackInTheBox"></ion-icon>`;
             checkJoinB.classList.remove("hidden");
+            checkboxB.disabled = true;
             setTimeout(() => {
               checkJoinB.classList.add("hidden");
+              checkboxB.disabled = false;
               veriCheckB.innerHTML = `<ion-icon name="checkmark-outline" class="text-4xl text-blue-500 animate__animated animate__jackInTheBox"></ion-icon>`;
             }, 3500);
           } else {
@@ -921,9 +923,10 @@ function ControlWeb() {
             checkboxB.disabled = true;
             veriCheckB.innerHTML = `<ion-icon name="close-outline" class="text-4xl text-gray-500 animate__animated animate__jackInTheBox"></ion-icon>`;
             checkJoinR.classList.remove("hidden");
-
+            checkboxR.disabled = true;
             setTimeout(() => {
               checkJoinR.classList.add("hidden");
+              checkboxR.disabled = false;
               veriCheckR.innerHTML = `<ion-icon name="checkmark-outline" class="text-4xl text-red-500 animate__animated animate__jackInTheBox"></ion-icon>`;
             }, 3500);
           } else {
@@ -941,10 +944,7 @@ function ControlWeb() {
         });
 
         socket.on("actualizarContadorEquipo", function (obj) {
-          console.log("PARTIDA ANTES",partida)
-          console.log("ACTUALIZAR CONTADOR EQUIPO", obj);
-          partida = obj
-          console.log("PARTIDA DESPUES",partida)
+          partida = obj;
           if (obj.equipos["equipoAzul"]) {
             const cantidadBlue = document.getElementById("cantidadBlue");
             cantidadBlue.innerHTML =
