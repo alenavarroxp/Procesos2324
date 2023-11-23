@@ -886,7 +886,6 @@ function ControlWeb() {
                 usr: usr,
                 equipo: "equipoAzul",
               });
-              
             });
 
             checkboxR.disabled = true;
@@ -897,6 +896,13 @@ function ControlWeb() {
               veriCheckB.innerHTML = `<ion-icon name="checkmark-outline" class="text-4xl text-blue-500 animate__animated animate__jackInTheBox"></ion-icon>`;
             }, 3500);
           } else {
+            rest.obtenerUsuario($.cookie("nick"), function (usr) {
+              socket.emit("salirEquipo", {
+                partida: partida,
+                usr: usr,
+                equipo: "equipoAzul",
+              });
+            });
             checkboxR.disabled = false;
             veriCheckR.innerHTML = ``;
             veriCheckB.innerHTML = ``;
@@ -905,6 +911,13 @@ function ControlWeb() {
 
         checkboxR.addEventListener("change", function () {
           if (checkboxR.checked) {
+            rest.obtenerUsuario($.cookie("nick"), function (usr) {
+              socket.emit("unirseAEquipo", {
+                partida: partida,
+                usr: usr,
+                equipo: "equipoRojo",
+              });
+            });
             checkboxB.disabled = true;
             veriCheckB.innerHTML = `<ion-icon name="close-outline" class="text-4xl text-gray-500 animate__animated animate__jackInTheBox"></ion-icon>`;
             checkJoinR.classList.remove("hidden");
@@ -914,6 +927,13 @@ function ControlWeb() {
               veriCheckR.innerHTML = `<ion-icon name="checkmark-outline" class="text-4xl text-red-500 animate__animated animate__jackInTheBox"></ion-icon>`;
             }, 3500);
           } else {
+            rest.obtenerUsuario($.cookie("nick"), function (usr) {
+              socket.emit("salirEquipo", {
+                partida: partida,
+                usr: usr,
+                equipo: "equipoRojo",
+              });
+            });
             checkboxB.disabled = false;
             veriCheckB.innerHTML = ``;
             veriCheckR.innerHTML = ``;
@@ -921,14 +941,23 @@ function ControlWeb() {
         });
 
         socket.on("actualizarContadorEquipo", function (obj) {
+          console.log("PARTIDA ANTES",partida)
           console.log("ACTUALIZAR CONTADOR EQUIPO", obj);
+          partida = obj
+          console.log("PARTIDA DESPUES",partida)
           if (obj.equipos["equipoAzul"]) {
             const cantidadBlue = document.getElementById("cantidadBlue");
-            cantidadBlue.innerHTML = "Jugadores: " + Object.values(obj.equipos["equipoAzul"].jugadores).length;
+            cantidadBlue.innerHTML =
+              "Jugadores: " +
+              Object.values(obj.equipos["equipoAzul"].jugadores).length;
+          }
+          if (obj.equipos["equipoRojo"]) {
+            const cantidadRed = document.getElementById("cantidadRed");
+            cantidadRed.innerHTML =
+              "Jugadores: " +
+              Object.values(obj.equipos["equipoRojo"].jugadores).length;
           }
         });
-
-        
       });
     });
   };

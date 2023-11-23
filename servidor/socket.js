@@ -37,7 +37,13 @@ function WSServer() {
       });
 
       socket.on("unirseAEquipo", (obj) => {
-        sistema.unirseAEquipo(obj.partida,obj.usr, obj.equipo, function (obj) {
+        sistema.unirseAEquipo(obj.partida, obj.usr, obj.equipo, function (obj) {
+          socket.emit("actualizarContadorEquipo", obj.partida);
+        });
+      });
+
+      socket.on("salirEquipo", (obj) => {
+        sistema.salirEquipo(obj.partida, obj.usr, obj.equipo, function (obj) {
           socket.emit("actualizarContadorEquipo", obj.partida);
         });
       });

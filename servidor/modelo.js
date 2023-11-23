@@ -232,6 +232,25 @@ function Sistema(test) {
         return;
     }
   };
+  this.salirEquipo = function (partida, usr, equipo, callback) {
+    if(!this.partidas[partida.id]) return;
+    let check = this.partidas[partida.id].salirEquipo(usr, equipo);
+    switch (check) {
+      case true:
+        callback({ partida: this.partidas[partida.id] });
+        return;
+      case undefined:
+        callback({ error: "El jugador no está en el equipo" });
+        return;
+      case false:
+        callback({ error: "El jugador no está en la partida" });
+        return;
+      default:
+        callback({ error: "Error" });
+        return;
+    }
+  }
+    
 }
 
 function Usuario(usr) {
@@ -301,6 +320,16 @@ function Partida(
       return false;
     }
   };
+
+  this.salirEquipo = function (usr, equipo) {
+    if (this.jugadores[usr.nick]) {
+      const eliminado = this.equipos[equipo].salirEquipo(usr);
+      return eliminado;
+    } else {
+      console.log("El jugador no está en la partida: " + usr.nick);
+      return false;
+    }
+  }
 }
 
 function Equipo() {
@@ -317,6 +346,18 @@ function Equipo() {
       return undefined;
     }
   };
+
+  this.salirEquipo = function (usr) {
+    console.log("JUGADORES EN EQUIPO", this.jugadores)
+    if (this.jugadores[usr.nick]) {
+      delete this.jugadores[usr.nick];
+      console.log("Jugador eliminado: " + usr.nick);
+      return true;
+    } else {
+      console.log("El jugador no está en este equipo: " + usr.nick);
+      return undefined;
+    }
+  }
 }
 
 module.exports.Sistema = Sistema;
