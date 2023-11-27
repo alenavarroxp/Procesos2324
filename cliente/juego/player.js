@@ -17,7 +17,9 @@ class Player {
       (object) => {
         object.scale.set(0.1, 0.1, 0.1);
         if (equipo == "equipoAzul") {
-          if (this._savePosition) {
+          console.log("thisSavePosition", this._savePosition)
+          if (this._savePosition.equipoAzul && this._savePosition.equipoAzul[equipo] == equipo) {
+            console.log("thisSaveasddPosition", this._savePosition)
             object.position.set(
               this._position.x,
               this._position.y,
@@ -27,11 +29,11 @@ class Player {
             let x = Math.floor(Math.random() * (-10 - -165) + -165);
             let z = Math.floor(Math.random() * (90 - -90) + -90);
             object.position.set(x, 0, z);
-            const save = {equipo: equipo, position: object.position}
-            this._savePosition.push(save)
+            const saveB = {equipo: equipo, position: object.position}
+            this._savePosition.equipoAzul = saveB
           }
         }else if (equipo == "equipoRojo") {
-          if (this._position) {
+          if (this._savePosition.equipoRojo && this._savePosition.equipoRojo[equipo] == equipo) {
             object.position.set(
               this._position.x,
               this._position.y,
@@ -43,6 +45,8 @@ class Player {
             let x = Math.floor(Math.random() * (165 - 10) + 10);
             let z = Math.floor(Math.random() * (90 - -90) + -90);
             object.position.set(x, 0, z);
+            const saveR = {equipo: equipo, position: object.position}
+            this._savePosition.equipoRojo = saveR
           }
         }
         console.log(object);
@@ -63,8 +67,11 @@ class Player {
   removeModel = function (scene,equipo) {
     if (this._model) {
         console.log("removeModel", this._model);
-      this._position = this._model.position;
-      console.log("removePlayerinPlayer", this._position);
+        if(equipo == "equipoAzul"){
+          this._savePosition.equipoAzul[position] = this._model.position
+        }else if(equipo == "equipoRojo"){
+          this._savePosition.equipoRojo[position] = this._model.position
+        }
       scene.remove(this._model);
     }
   };
