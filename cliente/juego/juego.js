@@ -55,33 +55,53 @@ export default class Juego {
     this._scene.add(object);
   };
 
-  //AÑADIR AL JUGADOR
   addPlayer = function (player, equipo) {
-    let playerModel
-    //FIX
+    let playerModel;
+    console.log("this.players", this.players);
     for (let clave of this.players) {
+      console.log("clave", clave);
+      console.log("player", player);
       if (clave.player.email === player.email) {
+        console.log("ENCONTRO UN PLAYER");
         playerModel = clave.model;
       }
     }
-    
-    if (!playerModel) playerModel = new Player();
+    console.log("this.players", this.players);
+
+    if (!playerModel) {
+      console.log("CREO UN NUEVO PLAYER");
+      playerModel = new Player();
+    }
 
     playerModel.initPlayer(this, player, equipo);
     const playerObj = {
       player: player,
       model: playerModel,
     };
-    this.players.push(playerObj);
+
+    // for (let clave of this.players) {
+    //   console.log("clave", clave);
+    //   console.log("player", player);
+    //   if (clave.player != player) {
+    //     this.players.push(playerObj);
+    //     break;
+    //   }
+    // }
+    if (this.players.length == 0) {
+      console.log("IF PLAYERS", this.players);
+      this.players.push(playerObj);
+    }
     console.log("this.players", this.players);
   };
 
-  removePlayer = function (player) {
+  removePlayer = function (player, equipo) {
     for (let clave of this.players) {
+      console.log("REMOVE PLAYER", clave.player.email, player.email);
       if (clave.player.email === player.email) {
-        clave.model.removeModel(this._scene);
+        clave.model.removeModel(this._scene, equipo);
       }
     }
+    console.log("THIS PLAYER REMOVE PLAYER", this.players);
   };
 
   onWindowResize = function () {

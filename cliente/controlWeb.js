@@ -901,7 +901,7 @@ function ControlWeb() {
             }, 2500);
           } else {
             rest.obtenerUsuario($.cookie("nick"), function (usr) {
-              window.juego.removePlayer(usr);
+              window.juego.removePlayer(usr,"equipoAzul");
               socket.emit("salirEquipo", {
                 partida: partida,
                 usr: usr,
@@ -935,7 +935,7 @@ function ControlWeb() {
             }, 2500);
           } else {
             rest.obtenerUsuario($.cookie("nick"), function (usr) {
-              window.juego.removePlayer(usr);
+              window.juego.removePlayer(usr,"equipoRojo");
               socket.emit("salirEquipo", {
                 partida: partida,
                 usr: usr,

@@ -18,12 +18,12 @@ class Player {
         object.scale.set(0.1, 0.1, 0.1);
         if (equipo == "equipoAzul") {
           console.log("thisSavePosition", this._savePosition)
-          if (this._savePosition.equipoAzul && this._savePosition.equipoAzul[equipo] == equipo) {
+          if (this._savePosition.equipoAzul && this._savePosition.equipoAzul.equipo == equipo) {
             console.log("thisSaveasddPosition", this._savePosition)
             object.position.set(
-              this._position.x,
-              this._position.y,
-              this._position.z
+              this._savePosition.equipoAzul.position.x,
+              this._savePosition.equipoAzul.position.y,
+              this._savePosition.equipoAzul.position.z
             );
           } else {
             let x = Math.floor(Math.random() * (-10 - -165) + -165);
@@ -33,11 +33,11 @@ class Player {
             this._savePosition.equipoAzul = saveB
           }
         }else if (equipo == "equipoRojo") {
-          if (this._savePosition.equipoRojo && this._savePosition.equipoRojo[equipo] == equipo) {
+          if (this._savePosition.equipoRojo && this._savePosition.equipoRojo.equipo == equipo) {
             object.position.set(
-              this._position.x,
-              this._position.y,
-              this._position.z
+              this._savePosition.equipoRojo.position.x,
+              this._savePosition.equipoRojo.position.y,
+              this._savePosition.equipoRojo.position.z
             );
           } else {
             //Quiero que vaya la X de 10 a 165
@@ -67,10 +67,13 @@ class Player {
   removeModel = function (scene,equipo) {
     if (this._model) {
         console.log("removeModel", this._model);
+        console.log("equipo", equipo)
         if(equipo == "equipoAzul"){
-          this._savePosition.equipoAzul[position] = this._model.position
+          console.log("savePositionAzul", this._savePosition)
+          this._savePosition.equipoAzul.position = this._model.position
         }else if(equipo == "equipoRojo"){
-          this._savePosition.equipoRojo[position] = this._model.position
+          console.log("savePositionRojo", this._savePosition)
+          this._savePosition.equipoRojo.position = this._model.position
         }
       scene.remove(this._model);
     }
