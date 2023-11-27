@@ -44,13 +44,15 @@ function Sistema(test) {
   };
 
   this.eliminarUsuario = function (nick) {
-    console.log("Eliminar usuario: " + nick);
+    // console.log("Eliminar usuario: " + nick);
+    // console.log("USUARIOS ANTES DE ELIMINAR", this.usuarios)
     if (this.usuarios[nick] == null) {
       // console.log("El usuario no existe: " + nick);
       return { nick: -1 };
     }
     delete this.usuarios[nick];
     console.log("Usuario eliminado: " + nick);
+    // console.log("USUARIOS DESPUES DE ELIMINAR", this.usuarios)
     return { nick: nick };
   };
 
@@ -77,16 +79,27 @@ function Sistema(test) {
       console.log("Conectado a Mongo Atlas");
     });
   }
+  correo.conectar (function(res){
+    console.log("Variables secretas obtenidas");
+  })
 
   this.usuarioOAuth = function (usr, callback) {
-    let copia = usr;
+    let copiaN = usr.nick;
+    let copiaE = usr.email;
     usr.confirmada = true;
-    this.cad.buscarOCrearUsuario(usr, function (obj) {
+    this.cad.buscarOCrearUsuario(usr, (obj) => {
+      let modelo = this;
       if (obj.email == null) {
         console.log("El usuario " + usr.email + " ya estaba registrado");
-        obj.email = copia;
+        obj.email = copiaE;
+        const user = { nick: copiaN, email: obj.email };
+        modelo.agregarUsuario(user);
+        callback(user);
+      } else {
+        const user = { nick: copiaN, email: copiaE };
+        modelo.agregarUsuario(user);
+        callback(user);
       }
-      callback(obj);
     });
   };
 
@@ -95,7 +108,7 @@ function Sistema(test) {
 
     this.cad.buscarUsuario(obj, function (usr) {
       console.log("usr", usr);
-      if (!usr) {
+      if (!usr || usr.error == -2) {
         obj.key = Date.now().toString();
         obj.confirmada = false;
         modelo.cad.insertarUsuario(obj, function (res) {
@@ -118,7 +131,10 @@ function Sistema(test) {
       obj.nick = obj.email;
     }
 
-    this.cad.buscarUsuario(obj, function (usr) {
+    console.log("OBJ!", obj);
+
+    this.cad.buscarUsuario(obj, (usr) => {
+      let modelo = this;
       console.log("Usuario encontrado:", usr); // Agregar esta línea para depuración
       if (!usr) {
         callback({ error: "Usuario no registrado" }, null);
@@ -126,7 +142,12 @@ function Sistema(test) {
         if (usr.error == -1) {
           callback({ error: "Contraseña incorrecta" }, null);
           return;
+        } else if (usr.error == -2) {
+          callback({ error: "Usuario no registrado en local" },null);
+          return;
         }
+        console.log("USUARIO LOGIN", usr);
+        modelo.agregarUsuario(usr);
         callback(null, usr);
       }
     });

@@ -59,6 +59,10 @@ passport.use(
               console.log("Usuario no registrado");
               return done(null, { error: "Usuario no registrado" });
             }
+            if (err.error == "Usuario no registrado en local") {
+              console.log("Usuario no registrado en local");
+              return done(null, { error: "Usuario no registrado en local" });
+            }
           }
 
           if (!usr) return done(null, { error: "Usuario no encontrado" });
@@ -113,16 +117,19 @@ app.get("/good", function (req, res) {
   switch (req.user.provider) {
     case "google":
     case "google-one-tap":
+      // console.log(req.user);
+      let nick = req.user.displayName;
       let email = req.user.emails[0].value;
-      sistema.usuarioOAuth({ email: email }, function (obj) {
+      sistema.usuarioOAuth({ nick: nick, email: email }, function (obj) {
         res.cookie("nick", obj.email);
         res.redirect("/");
       });
       break;
     case "github":
-      console.log(req.user);
+      // console.log(req.user);
+      let nick2 = req.user.displayName;
       let email2 = req.user.username;
-      sistema.usuarioOAuth({ email: email2 }, function (obj) {
+      sistema.usuarioOAuth({ nick: nick2, email: email2 }, function (obj) {
         console.log("obj", obj);
         res.cookie("nick", obj.email);
         res.redirect("/");
@@ -151,11 +158,11 @@ app.get("/", function (request, response) {
 });
 
 //... Una entrada por cada funcionalidad de mi capa lógica
-app.get("/agregarUsuario/:nick", function (request, response) {
-  let nick = request.params.nick;
-  let res = sistema.agregarUsuario(nick);
-  response.send(res);
-});
+// app.get("/agregarUsuario/:nick", function (request, response) {
+//   let nick = request.params.nick;
+//   let res = sistema.agregarUsuario(nick);
+//   response.send(res);
+// });
 
 app.get("/obtenerUsuario/:email", function (request, response) {
   let email = request.params.email;
@@ -169,16 +176,16 @@ app.get("/obtenerUsuarios", haIniciado, function (request, response) {
   response.send(usuarios);
 });
 
-app.get("/usuarioActivo/:nick", function (request, response) {
-  let nick = request.params.nick;
-  let res = sistema.usuarioActivo(nick);
-  response.send(res);
-});
+// app.get("/usuarioActivo/:nick", function (request, response) {
+//   let nick = request.params.nick;
+//   let res = sistema.usuarioActivo(nick);
+//   response.send(res);
+// });
 
-app.get("/numeroUsuarios", function (request, response) {
-  let res = sistema.numeroUsuarios();
-  response.send(res);
-});
+// app.get("/numeroUsuarios", function (request, response) {
+//   let res = sistema.numeroUsuarios();
+//   response.send(res);
+// });
 
 app.get("/eliminarUsuario/:nick", function (request, response) {
   let nick = request.params.nick;
@@ -206,8 +213,10 @@ app.get("/confirmarUsuario/:email/:key", function (request, response) {
 });
 
 app.get("/cerrarSesion", haIniciado, function (request, response) {
-  let nick = request.user.nick;
-  console.log("REQUEST", request.user);
+  console.log("CERRAR SESION", request.user);
+  let nick =
+    request.user.displayName || request.user.username || request.user.nick;
+  console.log("CERRAR SESION NICK", nick);
   request.logOut();
   response.redirect("/");
   if (nick) sistema.eliminarUsuario(nick);

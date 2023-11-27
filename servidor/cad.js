@@ -18,7 +18,11 @@ function CAD() {
   };
   
   this.buscarUsuario = function (obj, callback) {
-    buscar(this.usuarios, { email: obj.email, password: obj.password }, callback);
+    buscar(
+      this.usuarios,
+      { email: obj.email, password: obj.password },
+      callback
+    );
   };
 
   this.insertarUsuario = function (usuario, callback) {
@@ -28,33 +32,63 @@ function CAD() {
 
   function buscar(coleccion, criterio, callback) {
     let col = coleccion;
-    coleccion.find({email:criterio.email}).toArray(async function (error, coleccion) {
-      if (coleccion.length == 0) {
-        callback(undefined);
-      } else {
-        const isPasswordCorrect = await bcrypt.compare(criterio.password, coleccion[0].password)
-        if (isPasswordCorrect) {
-          callback(coleccion[0]);
-        } else {
-          callback({ error: -1 });
+    coleccion
+      .find({ email: criterio.email })
+      .toArray(async function (error, coleccion) {
+        console.log("Coleccion", coleccion);
+        if (coleccion.length == 0) {
+          callback(undefined);
         }
-      }
-    });
+        coleccion.forEach(async (element) => {
+          if (!element.password) {
+            console.log("USUARIO CON OAUTH CAD");
+            if (coleccion.length == 1) {
+              callback({ error: -2 });
+            }
+            return;
+          }
+          console.log("ELEMENTO CON CONTRASEÑA", element);
+          const isPasswordCorrect = await bcrypt.compare(
+            criterio.password,
+            element.password
+          );
+          if (isPasswordCorrect) callback(element);
+          else callback({ error: -1 });
+        });
+
+        // if (coleccion.length == 0 || !coleccion[0].password) {
+        //   callback(undefined);
+        // } else {
+        //   const isPasswordCorrect = await bcrypt.compare(
+        //     criterio.password,
+        //     coleccion[0].password
+        //   );
+        //   if (isPasswordCorrect) {
+        //     callback(coleccion[0]);
+        //   } else {
+        //     callback({ error: -1 });
+        //   }
+        // }
+      });
   }
 
   function insertar(coleccion, elemento, callback) {
     bcrypt.genSalt(10, (err, salt) => {
-      bcrypt.hash(elemento.password, salt, (err, hash) => {
-        elemento.password = hash;
-        coleccion.insertOne(elemento, function (err, result) {
-          if (err) {
-            console.log("error");
-          } else {
-            console.log("Nuevo elemento creado");
-            callback(elemento);
-          }
+      if (elemento.password) {
+        bcrypt.hash(elemento.password, salt, (err, hash) => {
+          console.log("ELEMENTO", elemento);
+          console.log("HASH", hash);
+          elemento.password = hash;
+          coleccion.insertOne(elemento, function (err, result) {
+            if (err) {
+              console.log("error");
+            } else {
+              console.log("Nuevo elemento creado");
+              callback(elemento);
+            }
+          });
         });
-      });
+      }
     });
   }
 
