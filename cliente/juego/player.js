@@ -16,7 +16,9 @@ class Player {
       "./cliente/juego/public/models/playerIdle.fbx",
       (object) => {
         object.scale.set(0.1, 0.1, 0.1);
+
         if (equipo == "equipoAzul") {
+          object.rotation.set(0, Math.PI / 2, 0);
           console.log("thisSavePosition", this._savePosition)
           if (this._savePosition.equipoAzul && this._savePosition.equipoAzul.equipo == equipo) {
             console.log("thisSaveasddPosition", this._savePosition)
@@ -33,6 +35,7 @@ class Player {
             this._savePosition.equipoAzul = saveB
           }
         }else if (equipo == "equipoRojo") {
+          object.rotation.set(0, -Math.PI / 2, 0);
           if (this._savePosition.equipoRojo && this._savePosition.equipoRojo.equipo == equipo) {
             object.position.set(
               this._savePosition.equipoRojo.position.x,
