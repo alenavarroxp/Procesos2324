@@ -5,15 +5,18 @@ const bcrypt = require("bcrypt");
 function CAD() {
   this.usuarios;
   this.partidas;
-
-  // this.obtenerUsuarios = function (callback) {
-  //   // tengo que hacer un fetch a la base de datos para que me devuelvan todos los usuarios
-  //   this.usuarios.find({}).toArray(function (err, result) {
-  //     if (err) throw err;
-  //     console.log("result", result);
-  //     callback(result);
-  //   });
-  // };
+  
+  this.obtenerUsuario = function (email, callback) {
+    let col = this.usuarios;
+    col.find({ email: email }).toArray(function (error, coleccion) {
+      if (coleccion.length == 0) {
+        callback(undefined);
+      } else {
+        callback(coleccion[0]);
+      }
+    });
+  };
+  
   this.buscarUsuario = function (obj, callback) {
     buscar(
       this.usuarios,

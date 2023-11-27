@@ -1,0 +1,157 @@
+<div id="navbarV"
+    class="animate__animated animate__slideInLeft select-none w-60 flex border-r border-gray-200 bg-gray-50 flex-col justify-between h-screen bg-base-200 transition-all duration-500 ease-in-out transform -translate-x-full lg:translate-x-0">
+    <nav class="navegacion mt-1 space-y-1">
+        <div>
+            <div class="items-center justify-center flex mt-3 flex-col">
+                <div
+                    class="relative mb-1 inline-flex items-center justify-center w-20 h-20 overflow-hidden bg-gray-200 rounded-full dark:bg-gray-800">
+                    <i class="fas fa-user text-3xl"></i>
+                    <div class="absolute z-10 inline-flex items-center justify-center w-6 h-6 text-xs font-bold text-white bg-red-500 border-2 border-white rounded-full -top-2 -right-2 dark:border-gray-900">20</div>
+
+                </div>
+                <span class="text-md font-bold">Nombre de usuario</span>
+                <span id="emailValue" class="text-xs text-gray-600 dark:text-gray-400"></span>
+            </div>
+        </div>
+        <div class="h-full px-3 py-4 overflow-y-auto bg-gray-50 dark:bg-gray-800">
+            <ul class="pt-5 mt-5 space-y-2 border-t border-gray-200 dark:border-gray-700">
+                <li>
+                    <a id="homeVisible"
+                        class="cursor-pointer flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group no-underline hover:no-underline">
+
+                        <i
+                            class="fas fa-home text-xl w-10 h-10 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-white flex items-center"></i>
+                        <span>Inicio</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a onclick="toggleSubMenu()"
+                        class="cursor-pointer flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group no-underline hover:no-underline">
+
+                        <i
+                            class="fas fa-futbol text-xl w-10 h-10 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-white flex items-center"></i>
+                        Partidos
+                    </a>
+                    <ul class="sub-menu hidden">
+                        <li>
+                            <a id="crearPartidaVisible"
+                                class="cursor-pointer flex items-center px-4 py-2 text-sm text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group no-underline hover:no-underline">
+                                <i
+                                    class="fas fa-plus-circle text-gray-500 mr-2 group-hover:text-blue-600 dark:group-hover:text-white"></i>
+                                Crear partido
+                            </a>
+                        </li>
+                        <li>
+                            <a id="explorarPartidosVisible"
+                                class="cursor-pointer flex items-center px-4 py-2 text-sm text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group no-underline hover:no-underline">
+                                <i
+                                    class="fas fa-search text-gray-500 mr-2 group-hover:text-blue-600 dark:group-hover:text-white"></i>
+                                Explorar partidos
+                            </a>
+                        </li>
+
+                    </ul>
+                </li>
+
+                <li>
+                    <a
+                        class="cursor-pointer flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group no-underline hover:no-underline">
+
+                        <i
+                            class="fas fa-chart-bar text-xl w-10 h-10 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-white flex items-center"></i>
+                        <span>Estadísticas</span>
+                    </a>
+                </li>
+            </ul>
+
+        </div>
+
+    </nav>
+
+
+    <div id="btnSalir" class="absolute bottom-2 w-full flex items-center justify-center mb-4">
+        <button type="button"
+            class="py-2 px-5 mt-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-xl border border-gray-200 hover:bg-gray-100 hover:text-red-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700 flex items-center justify-center">
+            <span class="mr-1">Salir</span>
+            <ion-icon name="exit-outline" class="text-lg"></ion-icon>
+        </button>
+    </div>
+    <div class="absolute bottom-24 w-full flex items-center justify-center mb-4 px-3">
+        <div class="border-t border-gray-200 w-full" />
+    </div>
+
+
+
+</div>
+
+
+<script>
+    function getCookiesValue(cookieName) {
+        const name = cookieName + "=";
+        const decodedCookie = decodeURIComponent(document.cookie);
+        const cookieArray = decodedCookie.split(';');
+
+        for (let i = 0; i < cookieArray.length; i++) {
+            let cookie = cookieArray[i];
+            while (cookie.charAt(0) == ' ') {
+                cookie = cookie.substring(1);
+            }
+            if (cookie.indexOf(name) == 0) {
+                return cookie.substring(name.length, cookie.length);
+            }
+        }
+        return "";
+    }
+    const emailValue = getCookiesValue("nick")
+    document.getElementById("emailValue").innerHTML = emailValue
+
+    $(document).ready(function () {
+        let visible = true
+
+        $("#ocultarNavbar").on("click", async function () {
+            const container = document.querySelector('#container');
+            const navBar = document.querySelector('#navbarV');
+            const button = document.querySelector('#navBarBtn');
+            const arrow = document.querySelector('#arrow');
+            const navbarWidth = navBar.style.width;
+
+            if (visible) {
+                
+                navBar.classList.remove('animate__slideInLeft');
+                navBar.classList.add('animate__slideOutLeft');
+                button.classList.add('-translate-x-52');
+                arrow.classList.add('rotate-0');
+
+                await new Promise(r => {
+                    setTimeout(r, 700)
+                });
+                navBar.classList.toggle('hidden');
+                
+
+
+
+
+
+            } else {
+                navBar.classList.remove('animate__slideOutLeft');
+                navBar.classList.add('animate__slideInLeft');
+                button.classList.remove('-translate-x-52');
+                arrow.classList.remove('rotate-0');
+                navBar.classList.toggle('hidden');
+            }
+
+
+
+
+            visible = !visible
+
+        });
+    });
+
+    function toggleSubMenu() {
+        const subMenu = document.querySelector('.sub-menu');
+        subMenu.classList.toggle('hidden');
+    }
+
+</script>

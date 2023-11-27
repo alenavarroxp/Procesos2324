@@ -10,7 +10,15 @@ const modelo = require("./servidor/modelo.js");
 const axios = require("axios");
 const PORT = process.env.PORT || 3000;
 
+const httpServer = require("http").Server(app);
+const { Server } = require("socket.io");
+
+const modeloWS = require("./servidor/socket.js");
+
+const ws = new modeloWS.WSServer();
+
 const haIniciado = function (request, response, next) {
+  console.log("REQUEST", request.user);
   if (request.user) next();
   else response.redirect("/");
 };
@@ -104,6 +112,8 @@ app.get(
 );
 
 app.get("/good", function (req, res) {
+  console.log("REQ", req.user.provider);
+  console.log("EMAIL", req.user.emails[0].value);
   switch (req.user.provider) {
     case "google":
     case "google-one-tap":
@@ -154,6 +164,13 @@ app.get("/", function (request, response) {
 //   response.send(res);
 // });
 
+app.get("/obtenerUsuario/:email", function (request, response) {
+  let email = request.params.email;
+  sistema.obtenerUsuario(email, function (obj) {
+    response.send(obj);
+  });
+});
+
 app.get("/obtenerUsuarios", haIniciado, function (request, response) {
   let usuarios = sistema.obtenerUsuarios();
   response.send(usuarios);
@@ -170,11 +187,17 @@ app.get("/obtenerUsuarios", haIniciado, function (request, response) {
 //   response.send(res);
 // });
 
-// app.get("/eliminarUsuario/:nick", function (request, response) {
-//   let nick = request.params.nick;
-//   let res = sistema.eliminarUsuario(nick);
-//   response.send(res);
-// });
+app.get("/eliminarUsuario/:nick", function (request, response) {
+  let nick = request.params.nick;
+  let res = sistema.eliminarUsuario(nick);
+  response.send(res);
+});
+
+app.get("/recuperarUsuario/:nick", function (request, response) {
+  let nick = request.params.nick;
+  let res = sistema.recuperarUsuario(nick);
+  response.send(res);
+});
 
 app.get("/confirmarUsuario/:email/:key", function (request, response) {
   let email = request.params.email;
@@ -263,7 +286,32 @@ app.post("/crearPartida", function (request, response) {
   });
 });
 
-app.listen(PORT, () => {
+app.get("/obtenerPartida/:id", function (request, response) {
+  let id = request.params.id;
+  sistema.obtenerPartida(id, function (obj) {
+    response.send(obj);
+  });
+});
+
+app.get("/obtenerPartidas", function (request, response) {
+  sistema.obtenerPartidas(function (obj) {
+    response.send(obj);
+  });
+});
+
+app.post("/unirsePartida", function (request, response) {
+  sistema.unirsePartida(request.body, function (obj) {
+    console.log("OBJE", obj);
+    response.send(obj);
+  });
+});
+
+httpServer.listen(PORT, () => {
   console.log(`App está escuchando en el puerto ${PORT}`);
   console.log("Ctrl+C para salir");
 });
+
+const io = new Server();
+io.listen(httpServer);
+
+ws.lanzarServidor(io, sistema);

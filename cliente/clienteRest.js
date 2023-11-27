@@ -36,6 +36,12 @@ function ClienteRest() {
     });
   };
 
+  this.obtenerUsuario = function (email, callback) {
+    $.getJSON("/obtenerUsuario/" + email, function (data) {
+      callback(data);
+    });
+  };
+
   this.obtenerUsuarios = function () {
     $.getJSON("/obtenerUsuarios", function (data) {
       console.log(data);
@@ -62,6 +68,16 @@ function ClienteRest() {
     $.getJSON("/eliminarUsuario/" + nick, function (data) {
       if (data.nick != -1) {
         console.log("Usuario " + nick + " ha sido eliminado");
+      } else {
+        console.log("El nick no está registrado");
+      }
+    });
+  };
+
+  this.recuperarUsuario = function (nick) {
+    $.getJSON("/recuperarUsuario/" + nick, function (data) {
+      if (data.nick != -1) {
+        console.log("Usuario " + nick + " ha sido recuperado");
       } else {
         console.log("El nick no está registrado");
       }
@@ -202,7 +218,8 @@ function ClienteRest() {
     nombrePartida,
     cantidadJugadores,
     duracion,
-    numGoles
+    numGoles,
+    passCode
   ) {
     $.ajax({
       type: "POST",
@@ -213,20 +230,54 @@ function ClienteRest() {
         cantidadJugadores: cantidadJugadores,
         duracion: duracion,
         numGoles: numGoles,
+        passCode: passCode,
       }),
       success: function (data) {
-        console.log("DATA", data);
         if (data.error) {
           cw.mostrarMsg(data.error);
         }
-        if (data.nombrePartida) {
-          console.log("Partida " + data.nombrePartida + " ha sido creada");
-          cw.limpiar();
-          cw.mostrarToast(
-            "Partida " + data.nombrePartida + " ha sido creada",
-            top
-          );
-          cw.mostrarInicio();
+        if (data) {
+          cw.obtenerPartida(data.id);
+        }
+      },
+      error: function (xhr, textStatus, errorThrown) {
+        console.log("Status: " + textStatus);
+        console.log("Error: " + errorThrown);
+      },
+      contentType: "application/json",
+    });
+  };
+
+  this.obtenerPartida = function (IDPartida, callback) {
+    $.getJSON("/obtenerPartida/" + IDPartida, function (data) {
+      if (data.error) {
+        cw.mostrarToast(data.error, top);
+      } else {
+        callback(data);
+      }
+    });
+  };
+
+  this.obtenerPartidas = function (callback) {
+    $.getJSON("/obtenerPartidas", function (data) {
+      console.log(data);
+      callback(data);
+    });
+  };
+
+  this.unirsePartida = function (usr, passCode) {
+    $.ajax({
+      type: "POST",
+      url: "/unirsePartida",
+      data: JSON.stringify({ usr: usr, passCode: passCode }),
+      success: function (data) {
+        console.log("DARA", data);
+        if (data.error) {
+          cw.mostrarToast(data.error, top);
+        } else {
+          if (data.id) {
+            cw.obtenerPartida(data.id);
+          }
         }
       },
       error: function (xhr, textStatus, errorThrown) {

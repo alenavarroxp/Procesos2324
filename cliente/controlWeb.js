@@ -48,6 +48,7 @@ function ControlWeb() {
   this.comprobarSesion = function () {
     let nick = $.cookie("nick");
     if (nick) {
+      rest.recuperarUsuario(nick);
       cw.mostrarToast("Bienvenido al sistema, " + nick, top);
       cw.mostrarInicio();
     } else {
@@ -55,6 +56,27 @@ function ControlWeb() {
       // cw.limpiar();
       cw.mostrarInicioSesion();
     }
+  };
+
+  this.init = function () {
+    let cw = this;
+    google.accounts.id.initialize({
+      client_id:
+        "726975145917-reol4tr88j6m8a0mqehb0k6sop45mto2.apps.googleusercontent.com", //local
+      // "726975145917-rae33a02hgmi3pjid1dh2dq334igsvqr.apps.googleusercontent.com", //prod
+      auto_select: false,
+      callback: cw.handleCredentialsResponse,
+    });
+    google.accounts.id.prompt();
+  };
+
+  this.handleCredentialsResponse = function (response) {
+    let jwt = response.credential;
+    let user = JSON.parse(atob(jwt.split(".")[1]));
+    console.log(user.name);
+    console.log(user.email);
+    console.log(user.picture);
+    rest.enviarJwt(jwt);
   };
 
   this.limpiar = function () {
@@ -141,87 +163,753 @@ function ControlWeb() {
   };
 
   this.mostrarInicio = function () {
-    $("#crearPartidaForm").remove();
+    cw.limpiarInicio();
     $("#inicio").load("./cliente/inicio.html", function () {
-      $("#btnSalir").on("click", function () {
-        cw.salir();
-      });
+      cw.mostrarHome();
+      // cw.mostrarPartido();
+      $("#navbar").load("./cliente/navbar.html", function () {
+        partido = document.getElementById("partido");
+        $("#btnSalir").on("click", function () {
+          if ($("#partido").is(":empty")) {
+            cw.salir();
+          } else {
+            cw.mostrarToast(
+              "No puedes salir de la partida mientras estás jugando",
+              top
+            );
+          }
+        });
+        $("#homeVisible").on("click", function () {
+          if ($("#partido").is(":empty")) {
+            cw.mostrarHome();
+          } else {
+            cw.mostrarToast(
+              "No puedes salir de la partida mientras estás jugando",
+              top
+            );
+          }
+        });
 
-      $("#btnCrearPartida").on("click", function () {
-        cw.mostrarCrearPartida();
-      });
+        $("#crearPartidaVisible").on("click", function () {
+          if ($("#partido").is(":empty")) {
+            cw.mostrarCrearPartida();
+          } else {
+            cw.mostrarToast(
+              "No puedes salir de la partida mientras estás jugando",
+              top
+            );
+          }
+        });
 
-      $("#btnUnirsePartida").on("click", function () {
-        cw.mostrarUnirsePartida();
+        $("#explorarPartidosVisible").on("click", function () {
+          if ($("#partido").is(":empty")) {
+            cw.mostrarExplorarPartida();
+          } else {
+            cw.mostrarToast(
+              "No puedes salir de la partida mientras estás jugando",
+              top
+            );
+          }
+        });
       });
     });
   };
 
-  this.animarInicio = function () {
-    return new Promise((resolve) => {
-      const crearPartida = document.getElementById("crearPartida");
-      const unirsePartida = document.getElementById("unirsePartida");
+  this.mostrarHome = function () {
+    if ($("#home").is(":empty")) {
+      cw.limpiarInicio();
+      $("#home").load("./cliente/home.html", function () {
+        // Agregar esta clase: class="w-full"
+        $("#home").removeClass("hidden");
+      });
+    }
+  };
 
-      crearPartida.classList.add("animate__animated", "animate__slideOutLeft");
-      unirsePartida.classList.add(
-        "animate__animated",
-        "animate__slideOutRight"
-      );
+  this.generarPassCode = function (longitud) {
+    const caracteres =
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    let passCode = "";
 
-      setTimeout(function () {
-        crearPartida.style.display = "none";
-        unirsePartida.style.display = "none";
+    for (let i = 0; i < longitud; i++) {
+      const indiceRandom = Math.floor(Math.random() * caracteres.length);
+      passCode += caracteres.charAt(indiceRandom);
+    }
+    console.log("PASSCODE GENERADO", passCode);
 
-        setTimeout(function () {
-          crearPartida.classList.remove("animate__fadeOutLeft");
-          unirsePartida.classList.remove("animate__fadeOutRight");
-
-          crearPartida.style.display = "block";
-          unirsePartida.style.display = "block";
-
-          resolve();
-        }, 50); // Ajusta este tiempo para permitir que los elementos se muestren antes de retirar las clases de animación
-      }, 1000); // Ajusta el tiempo según la duración de la animación
-    });
+    return passCode;
   };
 
   this.mostrarCrearPartida = async function () {
-    await cw.animarInicio();
-    $("#home").remove();
-    $("#crearPartida").load("./cliente/crearPartida.html", function () {
-      $("#btnCrearPartida").on("click", function () {
-        event.preventDefault();
-        let email = $.cookie("nick");
-        let nombrePartida = $("#nombrePartida").val();
-        let cantidadJugadores = $("#cantidadJugadores").val();
-        let duracion = $("#duracionPartida").val();
-        let numGoles = $("#numGoles").val();
-        if (
-          email &&
-          nombrePartida &&
-          cantidadJugadores &&
-          duracion &&
-          numGoles
-        ) {
-          rest.crearPartida(
-            email,
-            nombrePartida,
-            cantidadJugadores,
-            duracion,
-            numGoles
-          );
-          $("#mensajeError").remove();
-        } else {
-          cw.mostrarMsg("Introduce los campos obligatorios");
-        }
+    if ($("#crearPartida").is(":empty")) {
+      cw.limpiarInicio();
+
+      console.log("MOSTRAR CREAR PARTIDA");
+      let crearPartidaDiv = document.getElementById("crearPartida");
+
+      if (crearPartidaDiv.innerHTML === "") {
+        $("#crearPartida").load("./cliente/crearPartida.html", function () {
+          $("#crearPartida").removeClass("hidden");
+          $("#btnInfoPartida").on("click", function () {
+            event.preventDefault();
+            let email = $.cookie("nick");
+            let nombrePartida = $("#nombrePartida").val();
+            let cantidadJugadores = $("#cantidadJugadores").val();
+            let duracion = $("#duracionPartida").val();
+            let numGoles = $("#numGoles").val();
+            let passCode = cw.generarPassCode(8);
+            if (
+              email &&
+              nombrePartida &&
+              cantidadJugadores &&
+              (duracion || numGoles) &&
+              passCode
+            ) {
+              $("#mensajeError").empty();
+              cw.mostrarInfoPartida(
+                email,
+                nombrePartida,
+                cantidadJugadores,
+                duracion,
+                numGoles,
+                passCode
+              );
+            } else {
+              cw.mostrarMsg("Introduce los campos obligatorios");
+            }
+          });
+        });
+      }
+    }
+  };
+
+  this.mostrarInfoPartida = function (
+    email,
+    nombrePartida,
+    cantidadJugadores,
+    duracion,
+    numGoles,
+    passCode
+  ) {
+    infoPartida = document.getElementById("infoPartida");
+    infoPartida.classList.remove("hidden");
+    $("#infoPartida").load("./cliente/infoPartida.html", function () {
+      let iPartidaElement = document.getElementById("iPartida");
+      comunDiv = document.createElement("div");
+      comunDiv.className = "flex flex-col w-full mb-2";
+      comunDiv.innerHTML = `<div class="flex flex-col w-full mb-2">
+                <div class="mb-2">
+                    <p class="text-xl text-gray-800 font-bold">· Nombre de la partida:</p>
+                    <p class="text-lg text-gray-600 font-semibold tracking-tighter">${nombrePartida}</p>
+                </div>
+            </div>
+
+            <div class="flex flex-col w-full mb-2">
+                <div class="mb-2">
+                    <p class="text-xl text-gray-800 font-bold tracking-tight">· Cantidad de jugadores:</p>
+                    <p class="text-lg text-gray-600 font-semibold tracking-tighter">${cantidadJugadores} jugadores</p>
+                </div>
+            </div>
+            <div class="flex flex-col w-full">
+                <p class="text-xl text-gray-800 font-bold tracking-tight">· Tipo de Partido:</p>
+                `;
+
+      if (numGoles != "" && duracion != "") {
+        comunDiv.innerHTML += `<div class="flex flex-row justify-between p-1">
+                    <div class="flex flex-col ml-4 text-center">
+                        <p class="text-xl text-gray-800 font-bold tracking-tight">Duración</p>
+                        <p class="text-lg text-gray-600 font-semibold tracking-tighter">${duracion} minutos</p>
+                    </div>
+                    <div class="flex flex-col ml-4 text-center">
+                        <p class="text-xl text-gray-800 font-bold tracking-tight">Número de goles</p>
+                        <p class="text-lg text-gray-600 font-semibold tracking-tighter">${numGoles} goles</p>
+                    </div>
+                </div>
+            </div>`;
+      } else if (numGoles != "" && duracion == "") {
+        comunDiv.innerHTML += `<div class="flex flex-row justify-between p-1">
+                    <div class="flex flex-col ml-4 text-center">
+                        <p class="text-xl text-gray-800 font-bold tracking-tight">Duración</p>
+                        <p class="text-lg text-gray-600 font-semibold tracking-tighter">Por defecto: 5 minutos</p>
+                    </div>
+                    <div class="flex flex-col ml-4 text-center">
+                        <p class="text-xl text-gray-800 font-bold tracking-tight">Número de goles</p>
+                        <p class="text-lg text-gray-600 font-semibold tracking-tighter">${numGoles} goles</p>
+                    </div>
+                </div>
+            </div>`;
+      } else if (duracion != "" && numGoles == "") {
+        comunDiv.innerHTML += `<div class="flex flex-row justify-between p-1">
+            <div class="flex flex-col ml-4 text-center">
+              <p class="text-xl text-gray-800 font-bold tracking-tight">Duración</p>
+              <p class="text-lg text-gray-600 font-semibold tracking-tighter">${duracion} minutos</p>
+            </div>
+          </div>
+        </div>`;
+      }
+
+      iPartidaElement.appendChild(comunDiv);
+
+      $("#cancelarPartida").on("click", function () {
+        $("#infoPartida").addClass("hidden");
+      });
+
+      $("#crearPartidaBtn").on("click", function () {
+        rest.crearPartida(
+          email,
+          nombrePartida,
+          cantidadJugadores,
+          duracion,
+          numGoles,
+          passCode
+        );
       });
     });
   };
 
-  this.mostrarUnirsePartida = async function () {
-    await cw.animarInicio();
-    $("#home").remove();
-    $("#unirsePartida").load("./cliente/unirsePartida.html", function () {});
+  this.obtenerPartida = function (IDPartida) {
+    rest.obtenerPartida(IDPartida, function (partida) {
+      socket.emit("obtenerPartidas");
+      cw.mostrarPartido(partida);
+      const obj = {
+        user: $.cookie("nick"),
+        partida: partida,
+      };
+      socket.emit("cantidadJugadores", partida);
+      setTimeout(() => {
+        socket.emit("mensajeBienvenida", obj);
+      }, 5001);
+    });
+  };
+
+  this.mostrarExplorarPartida = async function () {
+    if ($("#explorarPartidas").is(":empty")) {
+      cw.limpiarInicio();
+      console.log("MOSTRAR EXPLORAR PARTIDA");
+      $("#explorarPartidas").load(
+        "./cliente/explorarPartidos.html",
+        async function () {
+          socket.emit("obtenerPartidas");
+          console.log("MOSTRAR EXPLORAR PARTIDA");
+          $("#explorarPartidas").removeClass("hidden");
+          if (document.getElementById("otp-input").innerHTML == "") {
+            const otpContainer = document.getElementById("otp-input");
+
+            for (let i = 0; i < 8; i++) {
+              const input = document.createElement("input");
+              input.type = "text";
+              input.maxLength = 1;
+              input.placeholder = "_";
+              input.className =
+                "w-12 h-12 text-center font-semibold justify-center flex text-2xl border-none rounded";
+
+              input.addEventListener("keydown", function (e) {
+                const key = e.key;
+
+                if (key === "Backspace") {
+                  if (!e.target.value) {
+                    const prevInput = e.target.previousElementSibling;
+                    if (prevInput) {
+                      prevInput.focus();
+                    }
+                  } else {
+                    e.target.value = "";
+                  }
+                } else {
+                  const actualInput = e.target;
+                  if (key.length > 1) {
+                    e.preventDefault();
+                    return;
+                  }
+                  actualInput.value = key;
+                  const nextInput = e.target.nextElementSibling;
+
+                  if (nextInput) {
+                    if (!nextInput.value) {
+                      nextInput.value = " ";
+                    }
+                    nextInput.focus();
+                  }
+                }
+              });
+
+              otpContainer.appendChild(input);
+            }
+          }
+
+          await rest.obtenerPartidas(function (partidas) {
+            const partidasPadre = document.getElementById("partidas");
+            const noPartidas = document.getElementById("no-partidas");
+            console.log("PartidasPadre", partidasPadre);
+            console.log("PARTIDASWEb", partidas);
+            const cantidadPartidas = Object.keys(partidas).length;
+            console.log("CANTIDAD PARTIDAS", cantidadPartidas);
+
+            if (cantidadPartidas === 0) {
+              console.log("NO HAY PARTIDAS");
+              partidasPadre.classList.add("hidden");
+              const noPartidasDiv = document.createElement("div");
+              noPartidasDiv.classList.add(
+                "flex",
+                "flex-col",
+                "justify-center",
+                "items-center",
+                "h-full"
+              );
+              noPartidasDiv.innerHTML = `
+              <div class="flex flex-col items-center justify-center w-full h-full">
+                <div class="text-center">
+                  <p class="text-lg text-gray-700 mb-4">En este momento, no hay ninguna partida disponible para poder unirte</p>
+                  <div class=" w-full  items-center justify-center mb-4 px-32">
+                  <div class=" overflow-hidden animate__animated animate__slideInRight justify-center items-center flex">
+                  <lottie-player src="./cliente/img/lottie/triste.json" background="transparent" speed="1"
+                  class="w-24 h-24" loop autoplay></lottie-player>
+                </div>
+                  <div class="border-t border-gray-200 w-full mt-4" /></div>
+                  <p class="m-3">¿Por qué no creas una?</p>
+                  <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full transition duration-300">Crear Partida</button>
+                </div>
+                
+              </div>
+          
+              `;
+
+              noPartidasDiv.addEventListener("click", () => {
+                // Aquí puedes agregar la lógica para redirigir al usuario a la página de creación de partidas
+                // Por ejemplo:
+                // window.location.href = "ruta de la página para crear partidas";
+                cw.mostrarCrearPartida();
+              });
+
+              noPartidas.appendChild(noPartidasDiv);
+              return;
+            }
+
+            partidas = cw.ordenarPartidas(partidas);
+            cw.renderizarPartidasOrdenadas(partidas);
+          });
+
+          $("#unirsePartidaPassCode").on("click", function () {
+            event.preventDefault();
+            let passCode = "";
+            const inputs = document.querySelectorAll("#otp-input > input");
+            inputs.forEach((input) => {
+              passCode += input.value;
+            });
+            rest.obtenerUsuario($.cookie("nick"), function (usr) {
+              rest.unirsePartida(usr, passCode);
+            });
+          });
+
+          socket.on("obtenerPartidas", function (partidas) {
+            const partidasOrdenadas = cw.ordenarPartidas(partidas);
+            cw.renderizarPartidasOrdenadas(partidasOrdenadas);
+          });
+        }
+      );
+    }
+  };
+
+  this.ordenarPartidas = function (partidas) {
+    const ordenEstado = {
+      completa: 1,
+      esperando: 2,
+      //AÑADIR JUGANDO
+    };
+    const partidasOrdenadas = Object.values(partidas).sort((a, b) => {
+      const estadoA = a.estado;
+      const estadoB = b.estado;
+
+      const ordena = ordenEstado[estadoA] || Number.MAX_SAFE_INTEGER;
+      const ordenb = ordenEstado[estadoB] || Number.MAX_SAFE_INTEGER;
+
+      return ordena - ordenb;
+    });
+    return partidasOrdenadas;
+  };
+
+  this.renderizarPartidasOrdenadas = function (partidas) {
+    const partidasPadre = document.getElementById("partidas");
+    const noPartidas = document.getElementById("no-partidas");
+    if (partidasPadre) partidasPadre.innerHTML = "";
+    if (!noPartidas) return;
+    for (let clave in partidas) {
+      noPartidas.style.display = "none";
+      partidasPadre.classList.remove("hidden");
+      let partida = partidas[clave];
+      console.log("PARTIDA", partida);
+      const nuevaPartidaDiv = document.createElement("div");
+      nuevaPartidaDiv.className =
+        "border rounded-xl p-2 m-2 flex-col flex cursor-pointer shadow-md min-w-max h-40";
+
+      if (partida.estado === "esperando") {
+        nuevaPartidaDiv.innerHTML = `
+            <div class="flex-1">
+                <h3 class="font-semibold text-xl">${partida.nombrePartida}</h3>
+                <p class="text-sm">${partida.creador}</p>
+            </div>
+            <div class="flex items-center bottom-0 justify-between">
+                <div class="items-center justify-center flex flex-row bg-neutral rounded-box text-neutral-content w-40">
+                  <span class="relative flex h-3 w-3 m-2">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-3 w-3 bg-blue-500"></span>
+                  </span>
+                  <p class="text-xl text-white font-bold">Esperando...</p>
+                </div>
+                <div class="flex items-center justify-center">
+                    <i class="fas fa-users text-xl mr-2"></i>
+                    <p class="text-xl font-bold">${partida.jugadoresConectados}/${partida.cantidadJugadores}</p>
+                </div>
+            </div>
+        `;
+      } else if (partida.estado === "completa") {
+        nuevaPartidaDiv.innerHTML = `
+            <div class="flex-1">
+                <h3 class="font-semibold text-xl">${partida.nombrePartida}</h3>
+                <p class="text-sm">${partida.creador}</p>
+            </div>
+            <div class="flex items-center bottom-0 justify-between">
+                <div class="items-center justify-center flex-row">
+                    <div class="flex flex-rol items-center justify-center px-2 py-1 bg-neutral rounded-box text-neutral-content">
+                        <span class="relative flex h-3 w-3 m-2">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                        </span>
+                        <span class="countdown font-mono text-2xl">
+                            <span style="--value:${partida.duracion};"></span> :
+                            <span style="--value:00;"></span>
+                        </span>
+                    </div>
+                </div>
+                <div class="flex items-center justify-center">
+                    <i class="fas fa-users text-xl mr-2"></i>
+                    <p class="text-xl font-bold">${partida.jugadoresConectados}/${partida.cantidadJugadores}</p>
+                </div>
+            </div>
+        `;
+      }
+
+      // Agregar el nuevo div al contenedor de partidas
+      partidasPadre.appendChild(nuevaPartidaDiv);
+    }
+  };
+
+  this.mostrarPartido = function (partida) {
+    console.log("MOSTRAR PARTIDO", partida);
+    $("#navbar").addClass("hidden");
+    $("#navBarBtn").addClass("hidden");
+    $("#container").addClass("hidden");
+    $("#partido").removeClass("hidden");
+
+    $("#partido").load("./cliente/juego/partido.html", function () {
+      //Inicializar el juego
+      cw.mostrarLoadingGame(partida);
+      socket.emit("joinRoom", partida.passCode);
+      $("#partido").removeClass("hidden");
+      $("#GUI").load("./cliente/juego/GUI.html", function () {
+        //PASSCODE
+        const passCodeDiv = document.getElementById("passCode");
+        const passCode = `<h1 class="text-white leading-none tracking-tighter justify-end items-center flex font-bold mt-2 text-2xl mr-2">Código de la partida: <span class="inline-block animate__animated animate__zoomInDown ml-2 text-yellow-500 pointer-events-auto hover:text-yellow-700">${partida.passCode}</span>
+        </h1>`;
+        passCodeDiv.innerHTML = passCode;
+
+        //ESPERANDO JUGADORES
+        socket.on("cantidadJugadores", (partida) => {
+          if (partida.estado === "esperando") {
+            const waitingDiv = document.getElementById("waitingDiv");
+            const waiting = `<h1 class="text-white">Esperando jugadores... ${partida.jugadoresConectados} / ${partida.cantidadJugadores}</h1>`;
+            waitingDiv.innerHTML = waiting;
+          } else if (partida.estado === "completa")
+            if (waitingDiv.innerHTML != "") {
+              waitingDiv.innerHTML = "";
+            }
+        });
+        if (partida.estado === "esperando") {
+          const waitingDiv = document.getElementById("waitingDiv");
+          const waiting = `<h1 class="text-white">Esperando jugadores... ${partida.jugadoresConectados} / ${partida.cantidadJugadores}</h1>`;
+          waitingDiv.innerHTML = waiting;
+        }
+
+        //CHAT
+        const chatPadre = document.getElementById("chat");
+
+        // Evento que maneja la recepción de mensajes de chat desde el servidor
+        socket.on("chatMessage", (message) => {
+          const chatMessages = document.getElementById("chatMessages");
+          const newMessage = document.createElement("div");
+          if (!message.username) {
+            newMessage.textContent = `${message}`;
+            newMessage.classList.add(
+              "text-yellow-500",
+              "p-1",
+              "rounded-md",
+              "mb-1",
+              "text-sm"
+            );
+            newMessage.style.wordWrap = "break-word";
+          } else {
+            newMessage.textContent = `${message.username}: ${message.message}`;
+            newMessage.classList.add(
+              "text-white",
+              "p-2",
+              "rounded-md",
+              "mb-1",
+              "mr-2",
+              "text-sm"
+            );
+            newMessage.style.wordWrap = "break-word";
+          }
+
+          chatMessages.appendChild(newMessage);
+
+          // Scroll hacia abajo para enfocar el último mensaje
+
+          // Mostrar el chat cuando se recibe un nuevo mensaje
+          chatPadre.classList.remove("hidden");
+          chatMessagesContainer.classList.remove("hidden");
+          chatMessages.scrollTop = chatMessages.scrollHeight;
+          // Reiniciar el temporizador para ocultar el chat
+          clearTimeout(timeoutId);
+          // Ocultar el chat después de 5 segundos
+          timeoutId = setTimeout(() => {
+            // chatMessagesContainer.classList.add('animate__fadeOut');
+
+            setTimeout(() => {
+              chatMessagesContainer.classList.add("hidden");
+              // chatMessagesContainer.classList.remove('animate__fadeOut');
+              chatPadre.classList.add("hidden");
+            }, 1000);
+          }, 5000);
+        });
+        // Evento que maneja el envío de mensajes desde el cliente al servidor
+        document
+          .getElementById("sendMessageButton")
+          .addEventListener("click", function () {
+            const messageText = document.getElementById("chatInputText").value;
+
+            if (messageText.trim() !== "") {
+              // Envía el mensaje al servidor
+              socket.emit("sendMessage", {
+                passCode: partida.passCode,
+                username: $.cookie("nick"),
+                message: messageText,
+              });
+
+              // Limpiar el campo de entrada después de enviar el mensaje
+              document.getElementById("chatInputText").value = "";
+            }
+          });
+
+        const chatMessagesContainer = document.getElementById("chatMessages");
+        let timeoutId;
+
+        //quiero detectar que el raton esté sobre el chat
+        chatMessagesContainer.addEventListener("mouseenter", function () {
+          clearTimeout(timeoutId);
+        });
+
+        chatMessagesContainer.addEventListener("mouseleave", function () {
+          clearTimeout(timeoutId);
+
+          timeoutId = setTimeout(() => {
+            // chatMessagesContainer.classList.add('animate__fadeOut');
+
+            setTimeout(() => {
+              chatMessagesContainer.classList.add("hidden");
+              // chatMessagesContainer.classList.remove('animate__fadeOut');
+              chatPadre.classList.add("hidden");
+            }, 1000);
+          }, 5000);
+        });
+
+        document
+          .getElementById("chatInputText")
+          .addEventListener("focus", function () {
+            clearTimeout(timeoutId);
+            // chatMessagesContainer.classList.remove('animate__fadeOut');
+            chatMessagesContainer.classList.remove("hidden");
+
+            chatMessagesContainer.scrollTop =
+              chatMessagesContainer.scrollHeight;
+          });
+
+        document
+          .getElementById("chatInputText")
+          .addEventListener("blur", function () {
+            clearTimeout(timeoutId);
+
+            timeoutId = setTimeout(() => {
+              // chatMessagesContainer.classList.add('animate__fadeOut');
+
+              setTimeout(() => {
+                chatMessagesContainer.classList.add("hidden");
+                // chatMessagesContainer.classList.remove('animate__fadeOut');
+                chatPadre.classList.add("hidden");
+              }, 1000);
+            }, 5000);
+          });
+
+        document.addEventListener("keydown", function (event) {
+          if (event.key === "Escape") {
+            chatPadre.classList.add("hidden");
+            chatMessagesContainer.classList.add("hidden");
+          }
+
+          if (event.key === "t" || event.key === "T") {
+            if (chatPadre.classList.contains("hidden")) {
+              event.preventDefault();
+              chatPadre.classList.remove("hidden");
+              chatMessagesContainer.classList.remove("hidden");
+              document.getElementById("chatInputText").focus();
+            }
+          }
+        });
+
+        // ...
+
+        document
+          .getElementById("chatInputText")
+          .addEventListener("keydown", function (event) {
+            if (event.key === "Enter") {
+              event.preventDefault(); // Evitar que el Enter realice un salto de línea en el campo de entrada
+
+              const messageText = this.value.trim();
+
+              if (messageText.trim() !== "") {
+                // Envía el mensaje al servidor
+                socket.emit("sendMessage", {
+                  passCode: partida.passCode,
+                  username: $.cookie("nick"),
+                  message: messageText,
+                });
+
+                // Limpiar el campo de entrada después de enviar el mensaje
+                document.getElementById("chatInputText").value = "";
+              }
+            }
+          });
+
+        document
+          .getElementById("closeChat")
+          .addEventListener("click", function () {
+            chatPadre.classList.add("hidden");
+            chatMessagesContainer.classList.add("hidden");
+          });
+
+        //ELEGIR EQUIPO
+        const checkboxB = document.getElementById("checkbTeam");
+        const checkJoinB = document.getElementById("checkbJoin");
+        const veriCheckB = document.getElementById("veribCheck");
+        const checkboxR = document.getElementById("checkrTeam");
+        const checkJoinR = document.getElementById("checkrJoin");
+        const veriCheckR = document.getElementById("verirCheck");
+
+        checkboxB.addEventListener("change", function () {
+          if (checkboxB.checked) {
+            rest.obtenerUsuario($.cookie("nick"), function (usr) {
+              window.juego.addPlayer(usr,"equipoAzul");
+              socket.emit("unirseAEquipo", {
+                partida: partida,
+                usr: usr,
+                equipo: "equipoAzul",
+              });
+            });
+
+            checkboxR.disabled = true;
+            veriCheckR.innerHTML = `<ion-icon name="close-outline" class="text-4xl text-gray-500 animate__animated animate__jackInTheBox"></ion-icon>`;
+            checkJoinB.classList.remove("hidden");
+            checkboxB.disabled = true;
+            setTimeout(() => {
+              checkJoinB.classList.add("hidden");
+              checkboxB.disabled = false;
+              veriCheckB.innerHTML = `<ion-icon name="checkmark-outline" class="text-4xl text-blue-500 animate__animated animate__jackInTheBox"></ion-icon>`;
+            }, 2500);
+          } else {
+            rest.obtenerUsuario($.cookie("nick"), function (usr) {
+              window.juego.removePlayer(usr,"equipoAzul");
+              socket.emit("salirEquipo", {
+                partida: partida,
+                usr: usr,
+                equipo: "equipoAzul",
+              });
+            });
+            checkboxR.disabled = false;
+            veriCheckR.innerHTML = ``;
+            veriCheckB.innerHTML = ``;
+          }
+        });
+
+        checkboxR.addEventListener("change", function () {
+          if (checkboxR.checked) {
+            rest.obtenerUsuario($.cookie("nick"), function (usr) {
+              window.juego.addPlayer(usr,"equipoRojo");
+              socket.emit("unirseAEquipo", {
+                partida: partida,
+                usr: usr,
+                equipo: "equipoRojo",
+              });
+            });
+            checkboxB.disabled = true;
+            veriCheckB.innerHTML = `<ion-icon name="close-outline" class="text-4xl text-gray-500 animate__animated animate__jackInTheBox"></ion-icon>`;
+            checkJoinR.classList.remove("hidden");
+            checkboxR.disabled = true;
+            setTimeout(() => {
+              checkJoinR.classList.add("hidden");
+              checkboxR.disabled = false;
+              veriCheckR.innerHTML = `<ion-icon name="checkmark-outline" class="text-4xl text-red-500 animate__animated animate__jackInTheBox"></ion-icon>`;
+            }, 2500);
+          } else {
+            rest.obtenerUsuario($.cookie("nick"), function (usr) {
+              window.juego.removePlayer(usr,"equipoRojo");
+              socket.emit("salirEquipo", {
+                partida: partida,
+                usr: usr,
+                equipo: "equipoRojo",
+              });
+            });
+            checkboxB.disabled = false;
+            veriCheckB.innerHTML = ``;
+            veriCheckR.innerHTML = ``;
+          }
+        });
+
+        socket.on("actualizarContadorEquipo", function (obj) {
+          partida = obj;
+          if (obj.equipos["equipoAzul"]) {
+            const cantidadBlue = document.getElementById("cantidadBlue");
+            cantidadBlue.innerHTML =
+              "Jugadores: " +
+              Object.values(obj.equipos["equipoAzul"].jugadores).length;
+          }
+          if (obj.equipos["equipoRojo"]) {
+            const cantidadRed = document.getElementById("cantidadRed");
+            cantidadRed.innerHTML =
+              "Jugadores: " +
+              Object.values(obj.equipos["equipoRojo"].jugadores).length;
+          }
+        });
+      });
+    });
+  };
+
+  this.mostrarLoadingGame = function (partida) {
+    console.log("MOSTARARLOADING");
+    $("#loading").load("./cliente/juego/loading.html", function () {
+      setTimeout(function () {
+        $("#loading").addClass("animate__fadeOut");
+        setTimeout(function () {
+          $("#loading").addClass("hidden");
+        }, 1000);
+      }, 5000);
+    });
+  };
+
+  this.limpiarInicio = function () {
+    $("#explorarPartidas").empty();
+    $("#crearPartida").empty();
+    $("#home").empty();
+    $("#home").addClass("hidden");
+    $("#crearPartida").addClass("hidden");
+    $("#explorarPartidas").addClass("hidden");
   };
 
   this.salir = function () {
