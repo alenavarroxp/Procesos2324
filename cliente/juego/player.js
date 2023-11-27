@@ -5,7 +5,7 @@ class Player {
     this._player = null;
     this._model = null;
     this._mixer = null;
-    this._position = null;
+    this._savePosition = {};
   }
 
   initPlayer = function (juego, player, equipo) {
@@ -17,8 +17,7 @@ class Player {
       (object) => {
         object.scale.set(0.1, 0.1, 0.1);
         if (equipo == "equipoAzul") {
-            console.log("THISPOSITION", this._position);
-          if (this._position) {
+          if (this._savePosition) {
             object.position.set(
               this._position.x,
               this._position.y,
@@ -26,6 +25,22 @@ class Player {
             );
           } else {
             let x = Math.floor(Math.random() * (-10 - -165) + -165);
+            let z = Math.floor(Math.random() * (90 - -90) + -90);
+            object.position.set(x, 0, z);
+            const save = {equipo: equipo, position: object.position}
+            this._savePosition.push(save)
+          }
+        }else if (equipo == "equipoRojo") {
+          if (this._position) {
+            object.position.set(
+              this._position.x,
+              this._position.y,
+              this._position.z
+            );
+          } else {
+            //Quiero que vaya la X de 10 a 165
+            //Quiero que vaya la Z de -90 a 90
+            let x = Math.floor(Math.random() * (165 - 10) + 10);
             let z = Math.floor(Math.random() * (90 - -90) + -90);
             object.position.set(x, 0, z);
           }
@@ -45,8 +60,8 @@ class Player {
     );
   };
 
-  removeModel = function (scene) {
-    if (this._position) {
+  removeModel = function (scene,equipo) {
+    if (this._model) {
         console.log("removeModel", this._model);
       this._position = this._model.position;
       console.log("removePlayerinPlayer", this._position);

@@ -57,15 +57,15 @@ export default class Juego {
 
   //AÑADIR AL JUGADOR
   addPlayer = function (player, equipo) {
-    const playerModel = null;
+    let playerModel
     //FIX
     for (let clave of this.players) {
       if (clave.player.email === player.email) {
-        playerModel = new Player(); 
-      }else{
         playerModel = clave.model;
       }
     }
+    
+    if (!playerModel) playerModel = new Player();
 
     playerModel.initPlayer(this, player, equipo);
     const playerObj = {
