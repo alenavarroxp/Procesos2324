@@ -892,7 +892,6 @@ function ControlWeb() {
   };
 
   this.mostrarLoadingGame = function (partida) {
-    console.log("MOSTARARLOADING");
     $("#loading").load("./cliente/juego/loading.html", function () {
       setTimeout(function () {
         $("#loading").addClass("animate__fadeOut");
