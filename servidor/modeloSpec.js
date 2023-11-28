@@ -64,7 +64,16 @@ describe("El sistema", function () {
     expect(sistema.numeroUsuarios()).toEqual({ num: 2 });
   });
 
+  describe("Pruebas de las partidas", function(){
+    //TODO
+    beforeEach(function(){
+      let usr1;
+      let usr2;
+    });
+  })
+
   describe("Métodos que acceden a datos", function () {
+    //TODO
     let usrTest = {"email":"test@test.es","nick":"test"};
 
     beforeEach(function (done) {

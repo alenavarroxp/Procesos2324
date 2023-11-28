@@ -10,16 +10,15 @@ class Player {
 
   initPlayer = function (juego, player, equipo) {
     this._player = player;
-    console.log("initPlayer");
     this._model = new FBXLoader();
     this._model.load(
       "./cliente/juego/public/models/playerIdle.fbx",
       (object) => {
         object.scale.set(0.1, 0.1, 0.1);
+
         if (equipo == "equipoAzul") {
-          console.log("thisSavePosition", this._savePosition)
+          object.rotation.set(0, Math.PI / 2, 0);
           if (this._savePosition.equipoAzul && this._savePosition.equipoAzul.equipo == equipo) {
-            console.log("thisSaveasddPosition", this._savePosition)
             object.position.set(
               this._savePosition.equipoAzul.position.x,
               this._savePosition.equipoAzul.position.y,
@@ -33,6 +32,7 @@ class Player {
             this._savePosition.equipoAzul = saveB
           }
         }else if (equipo == "equipoRojo") {
+          object.rotation.set(0, -Math.PI / 2, 0);
           if (this._savePosition.equipoRojo && this._savePosition.equipoRojo.equipo == equipo) {
             object.position.set(
               this._savePosition.equipoRojo.position.x,
@@ -49,16 +49,18 @@ class Player {
             this._savePosition.equipoRojo = saveR
           }
         }
-        console.log(object);
+        // console.log(object);
         const animation = object.animations.find(
           (anim) => anim.name === "mixamo.com"
         );
-        console.log(animation);
+        // console.log(animation);
         this._mixer = new THREE.AnimationMixer(object);
         const action = this._mixer.clipAction(animation);
-        console.log("action", action);
+        // console.log("action", action);
         action.play();
         this._model = object;
+        console.log("PLAYER",this)
+        // socket.emit("playerCreado", this)
         juego.addToScene(object);
       }
     );
