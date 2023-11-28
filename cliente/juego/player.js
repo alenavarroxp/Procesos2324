@@ -8,7 +8,7 @@ class Player {
     this._savePosition = {};
   }
 
-  initPlayer = function (juego, player, equipo) {
+  initPlayer = (juego, code, player, equipo) => {
     this._player = player;
     this._model = new FBXLoader();
     this._model.load(
@@ -18,7 +18,10 @@ class Player {
 
         if (equipo == "equipoAzul") {
           object.rotation.set(0, Math.PI / 2, 0);
-          if (this._savePosition.equipoAzul && this._savePosition.equipoAzul.equipo == equipo) {
+          if (
+            this._savePosition.equipoAzul &&
+            this._savePosition.equipoAzul.equipo == equipo
+          ) {
             object.position.set(
               this._savePosition.equipoAzul.position.x,
               this._savePosition.equipoAzul.position.y,
@@ -28,12 +31,15 @@ class Player {
             let x = Math.floor(Math.random() * (-10 - -165) + -165);
             let z = Math.floor(Math.random() * (90 - -90) + -90);
             object.position.set(x, 0, z);
-            const saveB = {equipo: equipo, position: object.position}
-            this._savePosition.equipoAzul = saveB
+            const saveB = { equipo: equipo, position: object.position };
+            this._savePosition.equipoAzul = saveB;
           }
-        }else if (equipo == "equipoRojo") {
+        } else if (equipo == "equipoRojo") {
           object.rotation.set(0, -Math.PI / 2, 0);
-          if (this._savePosition.equipoRojo && this._savePosition.equipoRojo.equipo == equipo) {
+          if (
+            this._savePosition.equipoRojo &&
+            this._savePosition.equipoRojo.equipo == equipo
+          ) {
             object.position.set(
               this._savePosition.equipoRojo.position.x,
               this._savePosition.equipoRojo.position.y,
@@ -45,8 +51,8 @@ class Player {
             let x = Math.floor(Math.random() * (165 - 10) + 10);
             let z = Math.floor(Math.random() * (90 - -90) + -90);
             object.position.set(x, 0, z);
-            const saveR = {equipo: equipo, position: object.position}
-            this._savePosition.equipoRojo = saveR
+            const saveR = { equipo: equipo, position: object.position };
+            this._savePosition.equipoRojo = saveR;
           }
         }
         // console.log(object);
@@ -59,24 +65,36 @@ class Player {
         // console.log("action", action);
         action.play();
         this._model = object;
-        console.log("PLAYER",this)
-        // socket.emit("playerCreado", this)
+        console.log("PLAYER", this);
+        console.log("CODE", code);
+        let player = this;
+        console.log("player", player._model);
+        try {
+          socket.emit("playerCreado", {
+            code: code,
+            player: player._player,
+            position: player._model.position,
+            equipo: equipo
+          });
+        } catch (e) {
+          console.log("error", e);
+        }
         juego.addToScene(object);
       }
     );
   };
 
-  removeModel = function (scene,equipo) {
+  removeModel = function (scene, equipo) {
     if (this._model) {
-        console.log("removeModel", this._model);
-        console.log("equipo", equipo)
-        if(equipo == "equipoAzul"){
-          console.log("savePositionAzul", this._savePosition)
-          this._savePosition.equipoAzul.position = this._model.position
-        }else if(equipo == "equipoRojo"){
-          console.log("savePositionRojo", this._savePosition)
-          this._savePosition.equipoRojo.position = this._model.position
-        }
+      console.log("removeModel", this._model);
+      console.log("equipo", equipo);
+      if (equipo == "equipoAzul") {
+        console.log("savePositionAzul", this._savePosition);
+        this._savePosition.equipoAzul.position = this._model.position;
+      } else if (equipo == "equipoRojo") {
+        console.log("savePositionRojo", this._savePosition);
+        this._savePosition.equipoRojo.position = this._model.position;
+      }
       scene.remove(this._model);
     }
   };

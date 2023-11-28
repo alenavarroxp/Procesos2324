@@ -55,7 +55,7 @@ export default class Juego {
     this._scene.add(object);
   };
 
-  addPlayer = function (player, equipo) {
+  addPlayer = function (code,player, equipo) {
     let playerModel;
     console.log("this.players", this.players);
     for (let clave of this.players) {
@@ -73,7 +73,7 @@ export default class Juego {
       playerModel = new Player();
     }
 
-    playerModel.initPlayer(this, player, equipo);
+    playerModel.initPlayer(this,code, player, equipo);
     const playerObj = {
       player: player,
       model: playerModel,
@@ -93,6 +93,19 @@ export default class Juego {
     }
     console.log("this.players", this.players);
   };
+
+  addOtherPlayer = function (player, equipo){
+    for(let clave of this.players){
+      console.log("claveOTHER", clave);
+      console.log("playerOTHER", player);
+      if(clave.player == player){
+        return;
+      }
+    }
+    // let playerModel = new Player();
+    // playerModel.initPlayer(this, code, player, equipo);
+    
+  }
 
   removePlayer = function (player, equipo) {
     for (let clave of this.players) {

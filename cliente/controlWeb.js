@@ -806,7 +806,7 @@ function ControlWeb() {
         checkboxB.addEventListener("change", function () {
           if (checkboxB.checked) {
             rest.obtenerUsuario($.cookie("nick"), function (usr) {
-              window.juego.addPlayer(usr,"equipoAzul");
+              window.juego.addPlayer(partida.passCode,usr,"equipoAzul");
               socket.emit("unirseAEquipo", {
                 partida: partida,
                 usr: usr,
@@ -841,7 +841,7 @@ function ControlWeb() {
         checkboxR.addEventListener("change", function () {
           if (checkboxR.checked) {
             rest.obtenerUsuario($.cookie("nick"), function (usr) {
-              window.juego.addPlayer(usr,"equipoRojo");
+              window.juego.addPlayer(partida.passCode,usr,"equipoRojo");
               socket.emit("unirseAEquipo", {
                 partida: partida,
                 usr: usr,
@@ -886,6 +886,11 @@ function ControlWeb() {
               "Jugadores: " +
               Object.values(obj.equipos["equipoRojo"].jugadores).length;
           }
+        });
+
+        socket.on("playerCreado",function(obj){
+          console.log("PLAYER CREADOWEBBBBBBBBBB",obj);
+          window.juego.addOtherPlayer(obj.player,obj.equipo);
         });
       });
     });

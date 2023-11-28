@@ -210,7 +210,7 @@ function Sistema(test) {
     for (let partida in this.partidas) {
       if (this.partidas[partida].passCode == obj.passCode) {
         let check = this.partidas[partida].añadirJugador(obj.usr);
-        console.log("PARTIDAS", this.partidas);
+        // console.log("PARTIDAS", this.partidas);
         switch (check) {
           case true:
             callback({ id: partida });
@@ -233,11 +233,11 @@ function Sistema(test) {
 
   this.unirseAEquipo = function (partida,usr, equipo, callback) {
     console.log("UNIRSE A EQUIPO EN SISTEMA");
-    console.log("PARTIDA", partida);
+    // console.log("PARTIDA", partida);
     if(!this.partidas[partida.id]) return;
     let check = this.partidas[partida.id].unirseAEquipo(usr, equipo);
-    console.log("CHECK", check);
-    console.log("PARTIDAS", this.partidas[partida.id])
+    // console.log("CHECK", check);
+    // console.log("PARTIDAS", this.partidas[partida.id])
     switch (check) {
       case true:
         callback({ partida: this.partidas[partida.id] });
@@ -334,7 +334,7 @@ function Partida(
   this.unirseAEquipo = function (usr, equipo) {
     if (this.jugadores[usr.nick]) {
       const añadido = this.equipos[equipo].unirseAEquipo(usr);
-      console.log("EQUIPOS EN LA PARTIDA", this.equipos);
+      // console.log("EQUIPOS EN LA PARTIDA", this.equipos);
       return añadido;
     } else {
       console.log("El jugador no está en la partida: " + usr.nick);

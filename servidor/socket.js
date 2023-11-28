@@ -42,6 +42,10 @@ function WSServer() {
         });
       });
 
+      socket.on("playerCreado", (obj) => {
+        console.log("PLAYER CREADOSERVIDOOOOOOOOR", obj)
+        io.to(obj.code).emit("playerCreado", obj);
+      });
       socket.on("salirEquipo", (obj) => {
         sistema.salirEquipo(obj.partida, obj.usr, obj.equipo, function (obj) {
           socket.emit("actualizarContadorEquipo", obj.partida);
