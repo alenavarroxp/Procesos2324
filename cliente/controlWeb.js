@@ -890,7 +890,7 @@ function ControlWeb() {
 
         socket.on("playerCreado",function(obj){
           console.log("PLAYER CREADOWEBBBBBBBBBB",obj);
-          window.juego.addOtherPlayer(obj.player,obj.equipo);
+          window.juego.addOtherPlayer(obj.player,obj.equipo,obj.position);
         });
       });
     });
