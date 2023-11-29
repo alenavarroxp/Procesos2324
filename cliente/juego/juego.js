@@ -76,7 +76,7 @@ export default class Juego {
     playerModel.initPlayer(this, code, player, equipo);
     const playerObj = {
       player: player,
-      model: playerModel,
+      model: playerModel
     };
 
     // for (let clave of this.players) {
@@ -91,22 +91,33 @@ export default class Juego {
       console.log("IF PLAYERS", this.players);
       this.players.push(playerObj);
     }
-    console.log("this.players", this.players);
+    console.log("this.players INIT PLAYER", this.players);
   };
 
   addOtherPlayer = function (player, equipo, position) {
     for (let clave of this.players) {
       console.log("claveOTHER", clave);
       console.log("playerOTHER", player);
-      if (clave.player == player) {
+      if (
+        clave.player.email == player.email &&
+        clave.player.nick == player.nick
+      ) {
+        console.log("ENCONTRO UN PLAYER");
         return;
       }
     }
     console.log("CREO UN NUEVO PLAYER");
     console.log("position", position);
     console.log("equipo", equipo);
-    // let playerModel = new Player();
-    // playerModel.initPlayer(this, code, player, equipo);
+
+    let playerModel = new Player();
+    playerModel.renderOtherPlayer(this, player, position, equipo);
+    const playerObj = {
+      player: player,
+      model: playerModel
+    };
+    this.players.push(playerObj);
+    console.log("this.players OTHER PLAYERS", this.players);
   };
 
   removePlayer = function (player, equipo) {
@@ -128,7 +139,6 @@ export default class Juego {
   animate = function () {
     this._orbitControls.update();
     this.players.forEach((player) => {
-      // console.log("player", player)
       if (player.model._model && player.model._mixer) {
         player.model._mixer.update(this._clock.getDelta());
       }

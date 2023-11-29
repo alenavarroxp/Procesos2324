@@ -74,11 +74,39 @@ class Player {
             code: code,
             player: player._player,
             position: player._model.position,
-            equipo: equipo
+            equipo: equipo,
           });
         } catch (e) {
           console.log("error", e);
         }
+        juego.addToScene(object);
+      }
+    );
+  };
+
+  renderOtherPlayer = function (juego, player, position, equipo) {
+    this._player = player;
+    this._model = new FBXLoader();
+    this._model.load(
+      "./cliente/juego/public/models/playerIdle.fbx",
+      (object) => {
+        object.scale.set(0.1, 0.1, 0.1);
+        if (!position) return;
+        if (equipo == "equipoAzul") {
+          object.rotation.set(0, Math.PI / 2, 0);
+          object.position.set(position.x, position.y, position.z);
+        } else if (equipo == "equipoRojo") {
+          object.rotation.set(0, -Math.PI / 2, 0);
+          object.position.set(position.x, position.y, position.z);
+        }
+
+        const animation = object.animations.find(
+          (anim) => anim.name === "mixamo.com"
+        );
+        this._mixer = new THREE.AnimationMixer(object);
+        const action = this._mixer.clipAction(animation);
+        action.play();
+        this._model = object;
         juego.addToScene(object);
       }
     );
