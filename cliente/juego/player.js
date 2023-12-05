@@ -126,6 +126,80 @@ class Player {
       scene.remove(this._model);
     }
   };
+
+  movePlayer = function (player) {
+    if (this._player == player) {
+      var direction = new THREE.Vector3(0, 0, -1);
+      var movementSpeed = 0.002; // Ajusta la velocidad de movimiento según tu preferencia
+      var rotationSpeed = 0.0001; // Ajusta la velocidad de giro según tu preferencia
+      var euler = new THREE.Euler(0, 0, 0, "YXZ");
+      var moveForward = false;
+      var moveBackward = false;
+      var moveLeft = false;
+      var moveRight = false;
+
+      document.addEventListener("keydown", (event) => {
+        switch (event.code) {
+          case "KeyW":
+            moveForward = true;
+            break;
+          case "KeyA":
+            moveLeft = true;
+            break;
+          case "KeyS":
+            moveBackward = true;
+            break;
+          case "KeyD":
+            moveRight = true;
+            break;
+        }
+      });
+
+      document.addEventListener("keyup", (event) => {
+        switch (event.code) {
+          case "KeyW":
+            moveForward = false;
+            break;
+          case "KeyA":
+            moveLeft = false;
+            break;
+          case "KeyS":
+            moveBackward = false;
+            break;
+          case "KeyD":
+            moveRight = false;
+            break;
+        }
+      });
+
+      const update = () => {
+        var deltaTime = 1; // Fijo el deltaTime a un valor constante (16 ms) para evitar aumentos de velocidad
+
+        if (moveForward) {
+          this._model.translateOnAxis(direction, -movementSpeed * deltaTime);
+        }
+        if (moveBackward) {
+          this._model.translateOnAxis(direction, movementSpeed * deltaTime);
+        }
+        if (moveLeft) {
+          euler.setFromQuaternion(this._model.quaternion);
+          euler.y -= rotationSpeed * deltaTime;
+          this._model.setRotationFromEuler(euler);
+        }
+        if (moveRight) {
+          euler.setFromQuaternion(this._model.quaternion);
+          euler.y += rotationSpeed * deltaTime;
+          this._model.setRotationFromEuler(euler);
+        }
+
+        // Puedes agregar aquí más lógica de movimiento según tus necesidades
+
+        requestAnimationFrame(update);
+      };
+
+      update();
+    }
+  };
 }
 
 export default Player;

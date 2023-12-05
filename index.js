@@ -193,9 +193,9 @@ app.get("/eliminarUsuario/:nick", function (request, response) {
   response.send(res);
 });
 
-app.get("/recuperarUsuario/:nick", function (request, response) {
+app.get("/recuperarUsuario/:nick", async function (request, response) {
   let nick = request.params.nick;
-  let res = sistema.recuperarUsuario(nick);
+  let res = await sistema.recuperarUsuario(nick);
   response.send(res);
 });
 

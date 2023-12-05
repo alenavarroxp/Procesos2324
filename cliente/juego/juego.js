@@ -141,6 +141,7 @@ export default class Juego {
     this.players.forEach((player) => {
       if (player.model._model && player.model._mixer) {
         player.model._mixer.update(this._clock.getDelta());
+        player.model.movePlayer(player.player)
       }
     });
     requestAnimationFrame(this.animate.bind(this));
