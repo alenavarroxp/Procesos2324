@@ -172,7 +172,6 @@ class Player {
       const update = (currentTime) => {
         if (this._animationRunning) {
           let deltaTime = (currentTime - this._prevTime) / 1000;
-          console.log("delta ", +deltaTime);
           this._prevTime = currentTime;
           if (deltaTime == 0) return;
           if (this._isPlayerRunning) deltaTime += 275;

@@ -396,6 +396,7 @@ function ControlWeb() {
 
             for (let i = 0; i < 8; i++) {
               const input = document.createElement("input");
+              input.id = "otp-" + i;
               input.type = "text";
               input.maxLength = 1;
               input.placeholder = "_";
@@ -434,6 +435,45 @@ function ControlWeb() {
 
               otpContainer.appendChild(input);
             }
+
+            let pegarBoton = document.getElementById("pegarCodigo");
+            let icono = document.getElementById("icono");
+            let texto = document.getElementById("texto");
+
+            pegarBoton.addEventListener("mouseenter", () => {
+              icono.style.opacity = "0";
+              pegarBoton.className =
+                "absolute -right-4 -top-9 text-white bg-blue-600 font-bold py-1 px-8 rounded-full transition-opacity duration-200 ease-in-out";
+              texto.style.opacity = "1";
+            });
+
+            pegarBoton.addEventListener("mouseleave", () => {
+              icono.style.opacity = "1";
+              pegarBoton.className =
+                "absolute -right-4 -top-9 text-white bg-blue-500 font-bold py-1 px-2 rounded-full transition-opacity duration-200 ease-in-out";
+              texto.style.opacity = "0";
+            });
+
+            pegarBoton.addEventListener("click", () => {
+              navigator.clipboard
+                .readText()
+                .then((text) => {
+                  const maxLength = Math.min(text.length, 8);
+
+                  for (let i = 0; i < maxLength; i++) {
+                    const inputId = `otp-${i}`;
+                    const inputElement = document.getElementById(inputId);
+
+                    // Verificar que el input exista
+                    if (inputElement) {
+                      inputElement.value = text[i];
+                    }
+                  }
+                })
+                .catch((err) => {
+                  console.error("Failed to read clipboard contents: ", err);
+                });
+            });
           }
 
           await rest.obtenerPartidas(function (partidas) {
@@ -806,7 +846,7 @@ function ControlWeb() {
         checkboxB.addEventListener("change", function () {
           if (checkboxB.checked) {
             rest.obtenerUsuario($.cookie("nick"), function (usr) {
-              window.juego.addPlayer(partida.passCode,usr,"equipoAzul");
+              window.juego.addPlayer(partida.passCode, usr, "equipoAzul");
               socket.emit("unirseAEquipo", {
                 partida: partida,
                 usr: usr,
@@ -825,7 +865,7 @@ function ControlWeb() {
             }, 2500);
           } else {
             rest.obtenerUsuario($.cookie("nick"), function (usr) {
-              window.juego.removePlayer(usr,"equipoAzul");
+              window.juego.removePlayer(usr, "equipoAzul");
               socket.emit("salirEquipo", {
                 partida: partida,
                 usr: usr,
@@ -841,7 +881,7 @@ function ControlWeb() {
         checkboxR.addEventListener("change", function () {
           if (checkboxR.checked) {
             rest.obtenerUsuario($.cookie("nick"), function (usr) {
-              window.juego.addPlayer(partida.passCode,usr,"equipoRojo");
+              window.juego.addPlayer(partida.passCode, usr, "equipoRojo");
               socket.emit("unirseAEquipo", {
                 partida: partida,
                 usr: usr,
@@ -859,7 +899,7 @@ function ControlWeb() {
             }, 2500);
           } else {
             rest.obtenerUsuario($.cookie("nick"), function (usr) {
-              window.juego.removePlayer(usr,"equipoRojo");
+              window.juego.removePlayer(usr, "equipoRojo");
               socket.emit("salirEquipo", {
                 partida: partida,
                 usr: usr,
@@ -888,9 +928,9 @@ function ControlWeb() {
           }
         });
 
-        socket.on("playerCreado",function(obj){
-          console.log("PLAYER CREADOWEBBBBBBBBBB",obj);
-          window.juego.addOtherPlayer(obj.player,obj.equipo,obj.position);
+        socket.on("playerCreado", function (obj) {
+          console.log("PLAYER CREADOWEBBBBBBBBBB", obj);
+          window.juego.addOtherPlayer(obj.player, obj.equipo, obj.position);
         });
       });
     });

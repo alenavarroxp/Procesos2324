@@ -7,6 +7,10 @@ function CAD() {
   this.partidas;
   
   this.obtenerUsuario = function (email, callback) {
+    if(!this.usuarios || !this.usuarios.find){
+      callback(undefined);
+      return;
+    }
     let col = this.usuarios;
     col.find({ email: email }).toArray(function (error, coleccion) {
       if (coleccion.length == 0) {

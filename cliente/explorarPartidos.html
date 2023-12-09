@@ -20,7 +20,13 @@
             <form class="mx-auto max-w-lg">
                 <div class="mb-4 text-left relative">
                     <div id="otp-input" class="flex justify-center space-x-2"></div>
+                    <button id="pegarCodigo" type="button"
+                        class="absolute -right-4 -top-9 text-white bg-blue-500 font-bold py-1 px-2 rounded-full">
+                        <i id="icono" class="fas fa-clone transition-opacity duration-300 ease-in-out"></i>
+                        <span id="texto"
+                            class="absolute inset-0 flex items-center justify-center font-semibold text-white opacity-0 transition-opacity duration-100 ease-in-out">Pegar</span>
 
+                    </button>
                 </div>
 
                 <div id="mensajeError"
