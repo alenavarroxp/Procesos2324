@@ -381,6 +381,51 @@ function ControlWeb() {
     });
   };
 
+  this.crearInputsUnirse = function (otpContainer, isModal) {
+    for (let i = 0; i < 8; i++) {
+      const input = document.createElement("input");
+      if (isModal) input.id = "otp-modal-" + i;
+      else input.id = "otp-" + i;
+      input.type = "text";
+      input.maxLength = 1;
+      input.placeholder = "_";
+      input.className =
+        "w-12 h-12 text-center font-semibold justify-center flex text-2xl border-none rounded";
+
+      input.addEventListener("keydown", function (e) {
+        const key = e.key;
+
+        if (key === "Backspace") {
+          if (!e.target.value) {
+            const prevInput = e.target.previousElementSibling;
+            if (prevInput) {
+              prevInput.focus();
+            }
+          } else {
+            e.target.value = "";
+          }
+        } else {
+          const actualInput = e.target;
+          if (key.length > 1) {
+            e.preventDefault();
+            return;
+          }
+          actualInput.value = key;
+          const nextInput = e.target.nextElementSibling;
+
+          if (nextInput) {
+            if (!nextInput.value) {
+              nextInput.value = " ";
+            }
+            nextInput.focus();
+          }
+        }
+      });
+
+      otpContainer.appendChild(input);
+    }
+  };
+
   this.mostrarExplorarPartida = async function () {
     if ($("#explorarPartidas").is(":empty")) {
       cw.limpiarInicio();
@@ -393,48 +438,7 @@ function ControlWeb() {
           $("#explorarPartidas").removeClass("hidden");
           if (document.getElementById("otp-input").innerHTML == "") {
             const otpContainer = document.getElementById("otp-input");
-
-            for (let i = 0; i < 8; i++) {
-              const input = document.createElement("input");
-              input.id = "otp-" + i;
-              input.type = "text";
-              input.maxLength = 1;
-              input.placeholder = "_";
-              input.className =
-                "w-12 h-12 text-center font-semibold justify-center flex text-2xl border-none rounded";
-
-              input.addEventListener("keydown", function (e) {
-                const key = e.key;
-
-                if (key === "Backspace") {
-                  if (!e.target.value) {
-                    const prevInput = e.target.previousElementSibling;
-                    if (prevInput) {
-                      prevInput.focus();
-                    }
-                  } else {
-                    e.target.value = "";
-                  }
-                } else {
-                  const actualInput = e.target;
-                  if (key.length > 1) {
-                    e.preventDefault();
-                    return;
-                  }
-                  actualInput.value = key;
-                  const nextInput = e.target.nextElementSibling;
-
-                  if (nextInput) {
-                    if (!nextInput.value) {
-                      nextInput.value = " ";
-                    }
-                    nextInput.focus();
-                  }
-                }
-              });
-
-              otpContainer.appendChild(input);
-            }
+            cw.crearInputsUnirse(otpContainer, false);
 
             let pegarBoton = document.getElementById("pegarCodigo");
             let icono = document.getElementById("icono");
@@ -578,6 +582,7 @@ function ControlWeb() {
       let partida = partidas[clave];
       console.log("PARTIDA", partida);
       const nuevaPartidaDiv = document.createElement("div");
+      nuevaPartidaDiv.id = "part-" + partida.passCode;
       nuevaPartidaDiv.className =
         "border rounded-xl p-2 m-2 flex-col flex cursor-pointer shadow-md min-w-max h-40";
 
@@ -630,7 +635,113 @@ function ControlWeb() {
 
       // Agregar el nuevo div al contenedor de partidas
       partidasPadre.appendChild(nuevaPartidaDiv);
+      nuevaPartidaDiv.addEventListener("click", () => {
+        cw.mostrarModalUnirtePartida(partida);
+      });
     }
+  };
+
+  this.mostrarModalUnirtePartida = function (partida) {
+    const modalUnirse = document.getElementById("modalUnirse");
+    const infoUnirse = document.getElementById("infoUnirse");
+    infoUnirse.innerHTML = `
+        <div class="flex flex-col items-center justify-center w-full mb-4">
+        <h1 class="text-2xl text-gray-800 font-bold">Información de la partida</h1>
+          <div class="flex items-center bg-gray-200 p-2 mt-6 rounded-lg">
+          
+            <div class="flex flex-col items-center mr-4">
+              <p class="text-sm text-gray-900 font-bold px-8">NOMBRE</p>
+              <p class="text-md text-gray-600 tracking-tighter">${partida.nombrePartida}</p>
+            </div>
+            <div class="flex flex-col items-center mr-4">
+              <p class="text-sm text-gray-900 font-bold px-8">JUGADORES</p>
+              <p class="text-md text-gray-600 tracking-tighter">${partida.cantidadJugadores}</p>
+            </div>
+            <div class="flex flex-col items-center">
+              <p class="text-sm text-gray-900 font-bold px-8">DURACIÓN</p>
+              <p class="text-md text-gray-600 tracking-tighter">${partida.duracion} minutos</p>
+            </div>
+          </div>
+
+          <div class="mt-3 flex items-center">
+            <h2 class="text-lg text-gray-800 font-bold mr-2">Creador:</h2>
+            <h2 class="text-md text-gray-600 font-semibold tracking-tighter">${partida.creador}</h2>
+          </div>
+
+
+          <div class="mt-2 flex">
+            <h1 class="text-xl text-gray-800 font-bold">Ingresa el código</h1>
+            <button id="pegarUCodigo" type="button"
+              class="absolute right-16 ml-2 text-white bg-blue-500 font-bold py-1 px-2 rounded-full transition-opacity duration-200 ease-in-out">
+                <i id="Uicono" class="fas fa-clone transition-opacity duration-300 ease-in-out"></i>
+                <span id="Utexto" class="absolute inset-0 flex items-center justify-center font-semibold text-white opacity-0 transition-opacity duration-100 ease-in-out">Pegar</span>
+            </button>
+          </div>
+          <div class="flex flex-col items-center justify-center w-full mt-1">
+            <div id="modal-input" class="flex flex-row justify-center"></div>
+          </div>
+          <div class="flex flex-col items-center justify-center w-full mt-4">
+            <button id="unirsePartidaModalPassCode" class="bg-blue-500 text-white font-bold text-xxs py-1 px-2 rounded-full">Unirse a la partida</button>
+          </div>
+        </div>
+      `;
+    const modalInput = document.getElementById("modal-input");
+    cw.crearInputsUnirse(modalInput, true);
+
+    let pegarBoton = document.getElementById("pegarUCodigo");
+    let icono = document.getElementById("Uicono");
+    let texto = document.getElementById("Utexto");
+
+    pegarBoton.addEventListener("mouseenter", () => {
+      icono.style.opacity = "0";
+      pegarBoton.className =
+        "absolute right-16 ml-2 text-white bg-blue-500 font-bold py-1 px-8 rounded-full transition-opacity duration-200 ease-in-out";
+      texto.style.opacity = "1";
+    });
+
+    pegarBoton.addEventListener("mouseleave", () => {
+      icono.style.opacity = "1";
+      pegarBoton.className =
+        "absolute right-16 ml-2 text-white bg-blue-500 font-bold py-1 px-2 rounded-full transition-opacity duration-200 ease-in-out";
+      texto.style.opacity = "0";
+    });
+
+    pegarBoton.addEventListener("click", () => {
+      navigator.clipboard
+        .readText()
+        .then((text) => {
+          const maxLength = Math.min(text.length, 8);
+
+          for (let i = 0; i < maxLength; i++) {
+            const inputId = `otp-modal-${i}`;
+            const inputElement = document.getElementById(inputId);
+
+            if (inputElement) {
+              inputElement.value = text[i];
+            }
+          }
+        })
+        .catch((err) => {
+          console.error("Failed to read clipboard contents: ", err);
+        });
+    });
+
+    $("#unirsePartidaModalPassCode").on("click", function () {
+      event.preventDefault();
+      let passCode = "";
+      const inputs = document.querySelectorAll("#modal-input > input");
+      inputs.forEach((input) => {
+        passCode += input.value;
+      });
+      if(passCode == partida.passCode){
+      rest.obtenerUsuario($.cookie("nick"), function (usr) {
+        rest.unirsePartida(usr, passCode);
+      })}else{
+        cw.mostrarToast("El código introducido no es correcto", "top", "right", "rgb(255, 59, 48)");
+      }
+    });
+      
+    modalUnirse.showModal();
   };
 
   this.mostrarPartido = function (partida) {
