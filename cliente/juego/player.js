@@ -6,6 +6,14 @@ class Player {
     this._model = null;
     this._mixer = null;
     this._savePosition = {};
+    this._direction = new THREE.Vector3(0, 0, -1);
+    this._movementSpeed = 0.002;
+    this._rotationSpeed = 0.0001;
+    this._euler = new THREE.Euler(0, 0, 0, "YXZ");
+    this._keysPressed = {};
+    this._animationRunning = false;
+    this._isPlayerRunning = false;
+    this._prevTime = null;
   }
 
   initPlayer = (juego, code, player, equipo) => {
@@ -129,77 +137,77 @@ class Player {
 
   movePlayer = function (player) {
     if (this._player == player) {
-      var direction = new THREE.Vector3(0, 0, -1);
-      var movementSpeed = 0.002; // Ajusta la velocidad de movimiento según tu preferencia
-      var rotationSpeed = 0.0001; // Ajusta la velocidad de giro según tu preferencia
-      var euler = new THREE.Euler(0, 0, 0, "YXZ");
-      var moveForward = false;
-      var moveBackward = false;
-      var moveLeft = false;
-      var moveRight = false;
-
-      document.addEventListener("keydown", (event) => {
-        switch (event.code) {
-          case "KeyW":
-            moveForward = true;
-            break;
-          case "KeyA":
-            moveLeft = true;
-            break;
-          case "KeyS":
-            moveBackward = true;
-            break;
-          case "KeyD":
-            moveRight = true;
-            break;
+      this._prevTime = performance.now();
+      const handleKeyDown = (event) => {
+        this._keysPressed[event.code] = true;
+        if (!this._animationRunning) {
+          this._animationRunning = true;
+          this._prevTime = performance.now();
+          requestAnimationFrame(update);
         }
-      });
-
-      document.addEventListener("keyup", (event) => {
-        switch (event.code) {
-          case "KeyW":
-            moveForward = false;
-            break;
-          case "KeyA":
-            moveLeft = false;
-            break;
-          case "KeyS":
-            moveBackward = false;
-            break;
-          case "KeyD":
-            moveRight = false;
-            break;
+        if (event.code == "ShiftLeft") {
+          this._isPlayerRunning = true;
         }
-      });
-
-      const update = () => {
-        var deltaTime = 1; // Fijo el deltaTime a un valor constante (16 ms) para evitar aumentos de velocidad
-
-        if (moveForward) {
-          this._model.translateOnAxis(direction, -movementSpeed * deltaTime);
-        }
-        if (moveBackward) {
-          this._model.translateOnAxis(direction, movementSpeed * deltaTime);
-        }
-        if (moveLeft) {
-          euler.setFromQuaternion(this._model.quaternion);
-          euler.y -= rotationSpeed * deltaTime;
-          this._model.setRotationFromEuler(euler);
-        }
-        if (moveRight) {
-          euler.setFromQuaternion(this._model.quaternion);
-          euler.y += rotationSpeed * deltaTime;
-          this._model.setRotationFromEuler(euler);
-        }
-
-        // Puedes agregar aquí más lógica de movimiento según tus necesidades
-
-        requestAnimationFrame(update);
       };
 
-      update();
+      const handleKeyUp = (event) => {
+        this._keysPressed[event.code] = false;
+        // Puedes detener la animación cuando todas las teclas están liberadas
+        if (
+          !this._keysPressed["KeyW"] &&
+          !this._keysPressed["KeyA"] &&
+          !this._keysPressed["KeyS"] &&
+          !this._keysPressed["KeyD"]
+        ) {
+          this._animationRunning = false;
+        }
+        if (event.code == "ShiftLeft") {
+          this._isPlayerRunning = false;
+        }
+      };
+
+      document.addEventListener("keydown", handleKeyDown);
+      document.addEventListener("keyup", handleKeyUp);
+
+      const update = (currentTime) => {
+        if (this._animationRunning) {
+          let deltaTime = (currentTime - this._prevTime) / 1000;
+          console.log("delta ", +deltaTime);
+          this._prevTime = currentTime;
+          if (deltaTime == 0) return;
+          if (this._isPlayerRunning) deltaTime += 275;
+          else deltaTime += 100;
+
+          if (this._keysPressed["KeyW"]) {
+            this._model.translateOnAxis(
+              this._direction,
+              -this._movementSpeed * deltaTime
+            );
+          }
+          if (this._keysPressed["KeyS"]) {
+            this._model.translateOnAxis(
+              this._direction,
+              this._movementSpeed * deltaTime
+            );
+          }
+          if (this._keysPressed["KeyA"]) {
+            this._euler.setFromQuaternion(this._model.quaternion);
+            this._euler.y -= this._rotationSpeed * deltaTime;
+            this._model.setRotationFromEuler(this._euler);
+          }
+          if (this._keysPressed["KeyD"]) {
+            this._euler.setFromQuaternion(this._model.quaternion);
+            this._euler.y += this._rotationSpeed * deltaTime;
+            this._model.setRotationFromEuler(this._euler);
+          }
+
+          // Si hay teclas presionadas, sigue ejecutando el bucle
+          requestAnimationFrame((time) => update(time));
+        }
+      };
+
+      update(performance.now());
     }
   };
 }
-
 export default Player;
