@@ -191,12 +191,12 @@ class Player {
           }
           if (this._keysPressed["KeyA"]) {
             this._euler.setFromQuaternion(this._model.quaternion);
-            this._euler.y -= this._rotationSpeed * deltaTime;
+            this._euler.y += this._rotationSpeed * deltaTime;
             this._model.setRotationFromEuler(this._euler);
           }
           if (this._keysPressed["KeyD"]) {
             this._euler.setFromQuaternion(this._model.quaternion);
-            this._euler.y += this._rotationSpeed * deltaTime;
+            this._euler.y -= this._rotationSpeed * deltaTime;
             this._model.setRotationFromEuler(this._euler);
           }
 

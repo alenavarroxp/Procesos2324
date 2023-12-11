@@ -287,6 +287,7 @@ function ClienteRest() {
       contentType: "application/json",
     });
   };
+  
 
   this.cerrarSesion = function () {
     $.getJSON("/cerrarSesion", function () {

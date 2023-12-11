@@ -548,6 +548,7 @@ function ControlWeb() {
             const partidasOrdenadas = cw.ordenarPartidas(partidas);
             cw.renderizarPartidasOrdenadas(partidasOrdenadas);
           });
+
         }
       );
     }
@@ -733,14 +734,20 @@ function ControlWeb() {
       inputs.forEach((input) => {
         passCode += input.value;
       });
-      if(passCode == partida.passCode){
-      rest.obtenerUsuario($.cookie("nick"), function (usr) {
-        rest.unirsePartida(usr, passCode);
-      })}else{
-        cw.mostrarToast("El código introducido no es correcto", "top", "right", "rgb(255, 59, 48)");
+      if (passCode == partida.passCode) {
+        rest.obtenerUsuario($.cookie("nick"), function (usr) {
+          rest.unirsePartida(usr, passCode);
+        });
+      } else {
+        cw.mostrarToast(
+          "El código introducido no es correcto",
+          "top",
+          "right",
+          "rgb(255, 59, 48)"
+        );
       }
     });
-      
+
     modalUnirse.showModal();
   };
 
@@ -762,6 +769,18 @@ function ControlWeb() {
         const passCode = `<h1 class="text-white leading-none tracking-tighter justify-end items-center flex font-bold mt-2 text-2xl mr-2">Código de la partida: <span class="inline-block animate__animated animate__zoomInDown ml-2 text-yellow-500 pointer-events-auto hover:text-yellow-700">${partida.passCode}</span>
         </h1>`;
         passCodeDiv.innerHTML = passCode;
+
+        //SALIR BUTTON
+        const salirDiv = document.getElementById("salirDiv");
+        const salir = `<button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mt-2 cursor-pointer pointer-events-auto" id="salirBtn">Salir</button>`;
+        salirDiv.innerHTML = salir;
+
+        $("#salirBtn").on("click", function () {
+          rest.obtenerUsuario($.cookie("nick"), function (usr) {
+            socket.emit("salirPartida", { usr, partida });
+
+          });
+        });
 
         //ESPERANDO JUGADORES
         socket.on("cantidadJugadores", (partida) => {

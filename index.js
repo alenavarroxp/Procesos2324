@@ -301,10 +301,10 @@ app.get("/obtenerPartidas", function (request, response) {
 
 app.post("/unirsePartida", function (request, response) {
   sistema.unirsePartida(request.body, function (obj) {
-    console.log("OBJE", obj);
     response.send(obj);
   });
 });
+
 
 httpServer.listen(PORT, () => {
   console.log(`App está escuchando en el puerto ${PORT}`);

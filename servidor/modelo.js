@@ -178,7 +178,7 @@ function Sistema(test) {
       obj.duracion,
       obj.numGoles,
       estado,
-      obj.passCode
+      obj.passCode,
     );
     modelo.obtenerUsuario(obj.email, function (usr) {
       console.log("USUARIO OBTENIDO", usr);
@@ -230,6 +230,39 @@ function Sistema(test) {
     let error = "No se ha encontrado la partida con el código: " + obj.passCode;
     callback({ error: error });
   };
+
+  this.salirPartida = function (partida, usr, callback) {
+    if (!this.partidas[partida.id]) {
+      callback({ error: "Partida no encontrada" });
+      return;
+    } else {
+      console.log("antes partida", this.partidas)
+      let check = this.partidas[partida.id].salirPartida(usr);
+      console.log("partidas", this.partidas)
+      switch (check) {
+        case true:
+          callback({ partida:this.partidas[partida.id] });
+          return;
+        case false:
+          callback({ error: "El jugador no está en la partida" });
+          return;
+        default:
+          callback({ error: "Error" });
+          return;
+      }
+    }
+  };
+
+  this.eliminarPartida = function (id) {
+    if (!this.partidas[id]) {
+      console.log("Partida no encontrada");
+      return;
+    } else {
+      delete this.partidas[id];
+      console.log("Partida eliminada");
+    }
+  };
+
 
   this.unirseAEquipo = function (partida,usr, equipo, callback) {
     console.log("UNIRSE A EQUIPO EN SISTEMA");
@@ -347,6 +380,29 @@ function Partida(
       const eliminado = this.equipos[equipo].salirEquipo(usr);
       return eliminado;
     } else {
+      console.log("El jugador no está en la partida: " + usr.nick);
+      return false;
+    }
+  }
+
+  this.salirPartida = function (usr){
+    if (this.jugadores[usr.nick]) {
+      delete this.jugadores[usr.nick];
+      this.jugadoresConectados = Object.keys(this.jugadores).length;
+      if (this.jugadoresConectados < this.cantidadJugadores) {
+        this.estado = "esperando";
+      }else if(this.jugadoresConectados == 0){
+        this.sistema.eliminarPartida(this.id);
+      }
+      // Comprobar si el jugador está en un equipo y eliminarlo
+      for(let equipo in this.equipos){
+        if(this.equipos[equipo].jugadores[usr.nick]){
+          this.equipos[equipo].salirEquipo(usr);
+        }
+      }
+      console.log("Jugador eliminado: " + usr.nick);
+      return true;
+    }else{
       console.log("El jugador no está en la partida: " + usr.nick);
       return false;
     }

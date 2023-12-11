@@ -46,11 +46,21 @@ function WSServer() {
         console.log("PLAYER CREADOSERVIDOOOOOOOOR", obj)
         io.to(obj.code).emit("playerCreado", obj);
       });
+
       socket.on("salirEquipo", (obj) => {
         sistema.salirEquipo(obj.partida, obj.usr, obj.equipo, function (obj) {
           socket.emit("actualizarContadorEquipo", obj.partida);
         });
       });
+      
+      socket.on("salirPartida", (obj) => {
+        sistema.salirPartida(obj.partida, obj.usr, function (obj) {
+          socket.emit("actualizarContadorEquipo", obj.partida);
+          // socket.emit("obtenerPartidas", obj.partidas);
+          
+        });
+      });
+
     });
   };
 }
