@@ -239,6 +239,11 @@ function Sistema(test) {
       console.log("antes partida", this.partidas)
       let check = this.partidas[partida.id].salirPartida(usr);
       console.log("partidas", this.partidas)
+      
+      if(this.partidas[partida.id].jugadoresConectados == 0){
+        this.eliminarPartida(partida.id);
+      }
+
       switch (check) {
         case true:
           callback({ partida:this.partidas[partida.id] });
@@ -391,8 +396,6 @@ function Partida(
       this.jugadoresConectados = Object.keys(this.jugadores).length;
       if (this.jugadoresConectados < this.cantidadJugadores) {
         this.estado = "esperando";
-      }else if(this.jugadoresConectados == 0){
-        this.sistema.eliminarPartida(this.id);
       }
       // Comprobar si el jugador está en un equipo y eliminarlo
       for(let equipo in this.equipos){

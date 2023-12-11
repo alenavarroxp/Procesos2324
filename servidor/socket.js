@@ -56,8 +56,10 @@ function WSServer() {
       socket.on("salirPartida", (obj) => {
         sistema.salirPartida(obj.partida, obj.usr, function (obj) {
           socket.emit("actualizarContadorEquipo", obj.partida);
-          // socket.emit("obtenerPartidas", obj.partidas);
-          
+          sistema.obtenerPartidas(function (obj) {
+            console.log("OBJ", obj);
+            socket.broadcast.emit("obtenerPartidas", obj);
+          });          
         });
       });
 

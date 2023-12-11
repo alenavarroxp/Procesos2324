@@ -640,6 +640,10 @@ function ControlWeb() {
         cw.mostrarModalUnirtePartida(partida);
       });
     }
+    if(Object.keys(partidas).length == 0){
+      noPartidas.style.display = "block";
+      partidasPadre.classList.add("hidden");
+    }
   };
 
   this.mostrarModalUnirtePartida = function (partida) {
@@ -778,6 +782,12 @@ function ControlWeb() {
         $("#salirBtn").on("click", function () {
           rest.obtenerUsuario($.cookie("nick"), function (usr) {
             socket.emit("salirPartida", { usr, partida });
+            $("#partido").empty()
+            $("#navbar").removeClass("hidden");
+            $("#navBarBtn").removeClass("hidden");
+            $("#container").removeClass("hidden");
+            $("#GUI").empty();
+            cw.mostrarInicio();
 
           });
         });
@@ -1044,6 +1054,7 @@ function ControlWeb() {
 
         socket.on("actualizarContadorEquipo", function (obj) {
           partida = obj;
+          if(!obj) return;
           if (obj.equipos["equipoAzul"]) {
             const cantidadBlue = document.getElementById("cantidadBlue");
             cantidadBlue.innerHTML =
