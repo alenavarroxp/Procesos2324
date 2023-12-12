@@ -168,6 +168,10 @@ function ControlWeb() {
       cw.mostrarHome();
       // cw.mostrarPartido();
       $("#navbar").load("./cliente/navbar.html", function () {
+        rest.obtenerUsuario($.cookie("nick"), function (usr) {
+          $("#username").text(usr.nick);
+          // $("#imgUsuario").attr("src", usr.img);
+        });
         partido = document.getElementById("partido");
         $("#btnSalir").on("click", function () {
           if ($("#partido").is(":empty")) {
@@ -794,6 +798,7 @@ function ControlWeb() {
 
         //ESPERANDO JUGADORES
         socket.on("cantidadJugadores", (partida) => {
+          console.log("CANTIDAD JUGADORES CONTROL WEB", partida);
           if (partida.estado === "esperando") {
             const waitingDiv = document.getElementById("waitingDiv");
             const waiting = `<h1 class="text-white">Esperando jugadores... ${partida.jugadoresConectados} / ${partida.cantidadJugadores}</h1>`;

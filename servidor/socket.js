@@ -23,6 +23,10 @@ function WSServer() {
           "Se ha unido a la partida " + obj.user
         );
       });
+      
+      
+
+
 
       socket.on("cantidadJugadores", (obj) => {
         console.log("Cantidad de jugadores", obj);
@@ -54,8 +58,12 @@ function WSServer() {
       });
       
       socket.on("salirPartida", (obj) => {
+        console.log("OBJETO", obj)
+        io.to(obj.partida.passCode).emit("chatMessage", "Se ha ido de la partida " + obj.usr.email);
         sistema.salirPartida(obj.partida, obj.usr, function (obj) {
           socket.emit("actualizarContadorEquipo", obj.partida);
+          console.log("OBJ", obj)
+          io.to(obj.partida.passCode).emit("cantidadJugadores", obj.partida);
           sistema.obtenerPartidas(function (obj) {
             console.log("OBJ", obj);
             socket.broadcast.emit("obtenerPartidas", obj);
