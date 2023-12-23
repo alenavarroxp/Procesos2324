@@ -287,7 +287,27 @@ function ClienteRest() {
       contentType: "application/json",
     });
   };
-  
+
+  this.salirPartida = function (usr, partida, callback) {
+    console.log("ASDHKASD");
+    
+    $.ajax({
+      type: "POST",
+      url: "/salirPartida",
+      data: JSON.stringify({ usr: usr, partida: partida }),
+      success: function (data) {
+        console.log("DATA", data);
+        callback(data);
+      },
+      error: function (xhr, textStatus, errorThrown) {
+        console.log("Status: " + textStatus);
+        console.log("Error: " + errorThrown);
+        callback(data);
+      },
+      contentType: "application/json",
+    });
+    
+  };
 
   this.cerrarSesion = function () {
     $.getJSON("/cerrarSesion", function () {

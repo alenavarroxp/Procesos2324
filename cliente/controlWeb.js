@@ -766,6 +766,22 @@ function ControlWeb() {
     $("#partido").removeClass("hidden");
 
     $("#partido").load("./cliente/juego/partido.html", function () {
+      const user = $.cookie("nick");
+      window.addEventListener("beforeunload", async function (e) {
+        e.preventDefault()
+        
+        if (e.eventPhase == 2) {
+          await rest.obtenerUsuario(user, async function (usr) {
+            console.log("Usuario", usr);
+            await rest.salirPartida(usr, partida, function (data) {
+              console.log("Saliendo de la partida");
+              location.reload(true)
+            });
+          });
+        }
+
+      });
+
       //Inicializar el juego
       cw.mostrarLoadingGame(partida);
       socket.emit("joinRoom", partida.passCode);

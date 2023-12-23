@@ -305,6 +305,19 @@ app.post("/unirsePartida", function (request, response) {
   });
 });
 
+app.post("/salirPartida", function (request, response) {
+  console.log("SALIR PARTIDA");
+  console.log("REQUEST", request.body);
+  let usr = request.body.usr;
+  let partida = request.body.partida;
+  sistema.salirPartida(partida, usr, function (obj) {
+    sistema.obtenerPartidas(function (obj) {
+      console.log("OBJ", obj);
+      io.emit("obtenerPartidas", obj);
+    });
+    response.send("Usuario salió de la partida");
+  });
+});
 
 httpServer.listen(PORT, () => {
   console.log(`App está escuchando en el puerto ${PORT}`);
