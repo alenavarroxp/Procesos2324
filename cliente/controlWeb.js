@@ -172,6 +172,7 @@ function ControlWeb() {
           $("#username").text(usr.nick);
           // $("#imgUsuario").attr("src", usr.img);
         });
+
         partido = document.getElementById("partido");
         $("#btnSalir").on("click", function () {
           if ($("#partido").is(":empty")) {
@@ -183,6 +184,11 @@ function ControlWeb() {
             );
           }
         });
+
+        $("#editProfile").on("click", function () {
+          cw.mostrarEditarPerfil();
+        });
+
         $("#homeVisible").on("click", function () {
           if ($("#partido").is(":empty")) {
             cw.mostrarHome();
@@ -215,6 +221,86 @@ function ControlWeb() {
             );
           }
         });
+      });
+    });
+  };
+
+  this.mostrarEditarPerfil = function () {
+    $("#home").empty();
+    $("#crearPartida").empty();
+    $("#explorarPartidas").empty();
+
+    $("#editarPerfil").load("./cliente/editProfile.html", function () {
+
+      const imagen = document.getElementById("imgUsuario");
+      const photo = document.getElementById("photo");
+
+      photo.addEventListener("change", function (e) {
+        imagen.innerHTML = "";
+        const file = e.target.files[0];
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          
+          const imgElement = document.createElement("img");
+          imgElement.src = e.target.result;
+          imgElement.alt = "Foto de perfil";
+          imgElement.classList.add(
+            "w-28",
+            "h-28",
+            "bg-gray-400",
+            "rounded-full",
+            "mb-2"
+          );
+
+          imagen.appendChild(imgElement);
+        };
+        reader.readAsDataURL(file);
+      });
+      rest.obtenerUsuario($.cookie("nick"), function (usr) {
+        console.log("USUARIO", usr);
+        $("#usernameInput").attr("placeholder", usr.nick);
+        $("#emailInput").attr("placeholder", usr.email);
+
+        if (usr.img) {
+          const imgElement = document.createElement("img");
+          imgElement.src = usr.img;
+          imgElement.alt = "Foto de perfil";
+          imgElement.classList.add(
+            "w-28",
+            "h-28",
+            "bg-gray-400",
+            "rounded-full",
+            "mb-2"
+          );
+
+          imagen.appendChild(imgElement);
+        } else {
+          const divElement = document.createElement("div");
+          divElement.classList.add(
+            "relative",
+            "mb-1",
+            "inline-flex",
+            "items-center",
+            "justify-center",
+            "w-28",
+            "h-28",
+            "bg-gray-200",
+            "rounded-full",
+            "dark:bg-gray-800"
+          );
+
+          const iElement = document.createElement("i");
+          iElement.classList.add(
+            "fas",
+            "fa-user",
+            "text-3xl",
+            "relative",
+            "z-10"
+          );
+
+          divElement.appendChild(iElement);
+          imagen.appendChild(divElement);
+        }
       });
     });
   };
@@ -768,18 +854,17 @@ function ControlWeb() {
     $("#partido").load("./cliente/juego/partido.html", function () {
       const user = $.cookie("nick");
       window.addEventListener("beforeunload", async function (e) {
-        e.preventDefault()
-        
+        e.preventDefault();
+
         if (e.eventPhase == 2) {
           await rest.obtenerUsuario(user, async function (usr) {
             console.log("Usuario", usr);
             await rest.salirPartida(usr, partida, function (data) {
               console.log("Saliendo de la partida");
-              location.reload(true)
+              location.reload(true);
             });
           });
         }
-
       });
 
       //Inicializar el juego
@@ -1107,6 +1192,7 @@ function ControlWeb() {
   };
 
   this.limpiarInicio = function () {
+    $("#editarPerfil").empty();
     $("#explorarPartidas").empty();
     $("#crearPartida").empty();
     $("#home").empty();
