@@ -552,7 +552,6 @@ function ControlWeb() {
             const partidasOrdenadas = cw.ordenarPartidas(partidas);
             cw.renderizarPartidasOrdenadas(partidasOrdenadas);
           });
-
         }
       );
     }
@@ -644,7 +643,7 @@ function ControlWeb() {
         cw.mostrarModalUnirtePartida(partida);
       });
     }
-    if(Object.keys(partidas).length == 0){
+    if (Object.keys(partidas).length == 0) {
       noPartidas.style.display = "block";
       partidasPadre.classList.add("hidden");
     }
@@ -786,13 +785,12 @@ function ControlWeb() {
         $("#salirBtn").on("click", function () {
           rest.obtenerUsuario($.cookie("nick"), function (usr) {
             socket.emit("salirPartida", { usr, partida });
-            $("#partido").empty()
+            $("#partido").empty();
             $("#navbar").removeClass("hidden");
             $("#navBarBtn").removeClass("hidden");
             $("#container").removeClass("hidden");
             $("#GUI").empty();
             cw.mostrarInicio();
-
           });
         });
 
@@ -843,15 +841,13 @@ function ControlWeb() {
             );
             newMessage.style.wordWrap = "break-word";
           }
+          if (chatMessages) {
+            chatMessages.appendChild(newMessage);
+            chatPadre.classList.remove("hidden");
+            chatMessagesContainer.classList.remove("hidden");
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+          }
 
-          chatMessages.appendChild(newMessage);
-
-          // Scroll hacia abajo para enfocar el último mensaje
-
-          // Mostrar el chat cuando se recibe un nuevo mensaje
-          chatPadre.classList.remove("hidden");
-          chatMessagesContainer.classList.remove("hidden");
-          chatMessages.scrollTop = chatMessages.scrollHeight;
           // Reiniciar el temporizador para ocultar el chat
           clearTimeout(timeoutId);
           // Ocultar el chat después de 5 segundos
@@ -1059,7 +1055,7 @@ function ControlWeb() {
 
         socket.on("actualizarContadorEquipo", function (obj) {
           partida = obj;
-          if(!obj) return;
+          if (!obj) return;
           if (obj.equipos["equipoAzul"]) {
             const cantidadBlue = document.getElementById("cantidadBlue");
             cantidadBlue.innerHTML =

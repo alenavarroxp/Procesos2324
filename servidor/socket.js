@@ -63,12 +63,16 @@ function WSServer() {
         sistema.salirPartida(obj.partida, obj.usr, function (obj) {
           socket.emit("actualizarContadorEquipo", obj.partida);
           console.log("OBJ", obj)
-          io.to(obj.partida.passCode).emit("cantidadJugadores", obj.partida);
+          if(obj.partida) io.to(obj.partida.passCode).emit("cantidadJugadores", obj.partida);
           sistema.obtenerPartidas(function (obj) {
             console.log("OBJ", obj);
             socket.broadcast.emit("obtenerPartidas", obj);
           });          
         });
+      });
+
+      socket.on("recargarPagina", (obj) => {
+        console.log("OBJETOasdasdasdasdasdasdrecarga", obj)
       });
 
     });

@@ -60,6 +60,10 @@ function Sistema(test) {
     let modelo = this;
     if (!modelo.usuarios[nick]) {
       await modelo.cad.obtenerUsuario(nick, function (usr) {
+        if(!usr) {
+          console.log("El usuario " + nick + " no está registrado");
+          return
+        }
         if (usr.email == null) {
           console.log("El usuario " + nick + " no está registrado");
         } else {
