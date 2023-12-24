@@ -97,6 +97,51 @@ function ControlWeb() {
   this.mostrarRegistro = function () {
     $("#fmInicioSesion").remove();
     $("#registro").load("./cliente/registro.html", function () {
+      $("#imagenPerfil").on("click", function () {
+        console.log("CLICK CAMBIAR FOTO");
+      });
+      // Configurar el evento change para el input file
+      $("#photoReg").on("change", function (e) {
+        const imagen = $("#imgUsuarioReg");
+        const existingImage = $("#imagenPerfil");
+
+        const file = e.target.files[0];
+        const reader = new FileReader();
+
+        reader.onload = function (e) {
+          // Si ya hay una imagen, la reemplazamos; de lo contrario, creamos una nueva
+          if (existingImage.length) {
+            existingImage.attr({
+              src: e.target.result,
+              alt: "Foto de perfil",
+            });
+          } else {
+            const imgElement = $("<img id='imagenPerfil'>")
+              .attr({
+                src: e.target.result,
+                alt: "Foto de perfil",
+              })
+              .addClass(
+                "w-28 h-28 bg-gray-400 rounded-full mb-2 cursor-pointer pointer-events-auto"
+              )
+              .on("click", function () {
+                // Al hacer clic en la imagen, activamos el input file
+                $("#photoReg").val(""); // Limpiamos el valor actual del input file
+                $("#photoReg").click();
+              });
+
+            imagen.append(imgElement);
+          }
+          $("#noImage").addClass("hidden");
+        };
+
+        // Limpiar el valor actual del input file
+        $("#photoReg").val("")
+        reader.readAsDataURL(file);
+      });
+
+      
+
       $("#btnRegistro").on("click", function () {
         let email = $("#email").val();
 
@@ -231,7 +276,6 @@ function ControlWeb() {
     $("#explorarPartidas").empty();
 
     $("#editarPerfil").load("./cliente/editProfile.html", function () {
-
       const imagen = document.getElementById("imgUsuario");
       const photo = document.getElementById("photo");
 
@@ -240,7 +284,6 @@ function ControlWeb() {
         const file = e.target.files[0];
         const reader = new FileReader();
         reader.onload = function (e) {
-          
           const imgElement = document.createElement("img");
           imgElement.src = e.target.result;
           imgElement.alt = "Foto de perfil";
