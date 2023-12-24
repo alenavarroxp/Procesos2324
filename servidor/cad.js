@@ -59,20 +59,6 @@ function CAD() {
           if (isPasswordCorrect) callback(element);
           else callback({ error: -1 });
         });
-
-        // if (coleccion.length == 0 || !coleccion[0].password) {
-        //   callback(undefined);
-        // } else {
-        //   const isPasswordCorrect = await bcrypt.compare(
-        //     criterio.password,
-        //     coleccion[0].password
-        //   );
-        //   if (isPasswordCorrect) {
-        //     callback(coleccion[0]);
-        //   } else {
-        //     callback({ error: -1 });
-        //   }
-        // }
       });
   }
 

@@ -97,9 +97,6 @@ function ControlWeb() {
   this.mostrarRegistro = function () {
     $("#fmInicioSesion").remove();
     $("#registro").load("./cliente/registro.html", function () {
-      $("#imagenPerfil").on("click", function () {
-        console.log("CLICK CAMBIAR FOTO");
-      });
       // Configurar el evento change para el input file
       $("#photoReg").on("change", function (e) {
         const imagen = $("#imgUsuarioReg");
@@ -107,40 +104,11 @@ function ControlWeb() {
 
         const file = e.target.files[0];
         const reader = new FileReader();
-
-        reader.onload = function (e) {
-          // Si ya hay una imagen, la reemplazamos; de lo contrario, creamos una nueva
-          if (existingImage.length) {
-            existingImage.attr({
-              src: e.target.result,
-              alt: "Foto de perfil",
-            });
-          } else {
-            const imgElement = $("<img id='imagenPerfil'>")
-              .attr({
-                src: e.target.result,
-                alt: "Foto de perfil",
-              })
-              .addClass(
-                "w-28 h-28 bg-gray-400 rounded-full mb-2 cursor-pointer pointer-events-auto"
-              )
-              .on("click", function () {
-                // Al hacer clic en la imagen, activamos el input file
-                $("#photoReg").val(""); // Limpiamos el valor actual del input file
-                $("#photoReg").click();
-              });
-
-            imagen.append(imgElement);
-          }
-          $("#noImage").addClass("hidden");
-        };
+        cw.cambiarFotoPerfil(imagen, existingImage, file, reader);
 
         // Limpiar el valor actual del input file
-        $("#photoReg").val("")
-        reader.readAsDataURL(file);
+        $("#photoReg").val("");
       });
-
-      
 
       $("#btnRegistro").on("click", function () {
         let email = $("#email").val();
@@ -190,6 +158,39 @@ function ControlWeb() {
     });
   };
 
+  this.cambiarFotoPerfil = function (imagen, existingImage, file, reader) {
+    console.log("cambio de foto de perfil");
+    reader.onload = function (e) {
+      // Si ya hay una imagen, la reemplazamos; de lo contrario, creamos una nueva
+      if (existingImage.length) {
+        console.log("EXISTE IMAGEN");
+        existingImage.attr({
+          src: e.target.result,
+          alt: "Foto de perfil",
+        });
+      } else {
+        console.log("NO EXISTE IMAGEN");
+        const imgElement = $("<img id='imagenPerfil'>")
+          .attr({
+            src: e.target.result,
+            alt: "Foto de perfil",
+          })
+          .addClass(
+            "w-28 h-28 bg-gray-400 rounded-full mb-2 cursor-pointer pointer-events-auto"
+          )
+          .on("click", function () {
+            // Al hacer clic en la imagen, activamos el input file
+            $("#photoReg").val(""); // Limpiamos el valor actual del input file
+            $("#photoReg").click();
+          });
+
+        imagen.append(imgElement);
+      }
+      $("#noImage").addClass("hidden");
+    };
+    reader.readAsDataURL(file);
+  };
+
   this.mostrarInicioSesion = function () {
     $("#fmRegistro").remove();
     $("#mOP").remove();
@@ -215,12 +216,13 @@ function ControlWeb() {
       // cw.mostrarPartido();
       $("#navbar").load("./cliente/navbar.html", function () {
         rest.obtenerUsuario($.cookie("nick"), function (usr) {
+          console.log("usr", usr);
           $("#username").text(usr.nick);
-          if(usr.photo){
+          if (usr.photo) {
             $("#imgUsuario").removeClass("hidden");
             $("#noPhoto").addClass("hidden");
             $("#imgUsuario").attr("src", usr.photo);
-          }else{
+          } else {
             $("#imgUsuario").addClass("hidden");
             $("#noPhoto").removeClass("hidden");
           }
@@ -284,47 +286,30 @@ function ControlWeb() {
     $("#explorarPartidas").empty();
 
     $("#editarPerfil").load("./cliente/editProfile.html", function () {
-      const imagen = document.getElementById("imgUsuario");
-      const photo = document.getElementById("photo");
+      const imagen = $("#imgUsuario");
+      $("#photoReg").on("change", function (e) {
+        const actualProfile = $("#actualProfile");
+        const existingImage = $("#imagenPerfil");
 
-      photo.addEventListener("change", function (e) {
-        imagen.innerHTML = "";
         const file = e.target.files[0];
         const reader = new FileReader();
-        reader.onload = function (e) {
-          const imgElement = document.createElement("img");
-          imgElement.src = e.target.result;
-          imgElement.alt = "Foto de perfil";
-          imgElement.classList.add(
-            "w-28",
-            "h-28",
-            "bg-gray-400",
-            "rounded-full",
-            "mb-2"
-          );
+        cw.cambiarFotoPerfil(actualProfile, existingImage, file, reader);
 
-          imagen.appendChild(imgElement);
-        };
-        reader.readAsDataURL(file);
+        const actualImage = document.getElementById("actualImage");
+        actualImage.classList.add("hidden");
+
+        // Limpiar el valor actual del input file
+        $("#photoReg").val("");
       });
       rest.obtenerUsuario($.cookie("nick"), function (usr) {
-        console.log("USUARIO", usr);
-        $("#usernameInput").attr("placeholder", usr.nick);
-        $("#emailInput").attr("placeholder", usr.email);
+        const actualImage = document.getElementById("actualImage");
 
-        if (usr.img) {
+        if (usr.photo) {
           const imgElement = document.createElement("img");
-          imgElement.src = usr.img;
+          imgElement.src = usr.photo;
           imgElement.alt = "Foto de perfil";
-          imgElement.classList.add(
-            "w-28",
-            "h-28",
-            "bg-gray-400",
-            "rounded-full",
-            "mb-2"
-          );
-
-          imagen.appendChild(imgElement);
+          imgElement.classList.add("w-28", "h-28", "rounded-full", "mb-2");
+          actualImage.appendChild(imgElement);
         } else {
           const divElement = document.createElement("div");
           divElement.classList.add(
@@ -344,14 +329,18 @@ function ControlWeb() {
           iElement.classList.add(
             "fas",
             "fa-user",
-            "text-3xl",
+            "text-4xl",
             "relative",
             "z-10"
           );
 
           divElement.appendChild(iElement);
-          imagen.appendChild(divElement);
+          actualImage.appendChild(divElement);
         }
+
+        console.log("USUARIO", usr);
+        $("#usernameInput").attr("placeholder", usr.nick);
+        $("#emailInput").attr("placeholder", usr.email);
       });
     });
   };

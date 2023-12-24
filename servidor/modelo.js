@@ -20,8 +20,9 @@ function Sistema(test) {
   };
 
   this.obtenerUsuario = function (email, callback) {
-    console.log("AQUIOBJETENERUSUARIO");
+    console.log("USUARIOS", this.usuarios);
     for (let usr in this.usuarios) {
+      console.log("usr", usr);
       if (this.usuarios[usr].email == email) {
         callback(this.usuarios[usr]);
         return;
@@ -60,9 +61,9 @@ function Sistema(test) {
     let modelo = this;
     if (!modelo.usuarios[nick]) {
       await modelo.cad.obtenerUsuario(nick, function (usr) {
-        if(!usr) {
+        if (!usr) {
           console.log("El usuario " + nick + " no está registrado");
-          return
+          return;
         }
         if (usr.email == null) {
           console.log("El usuario " + nick + " no está registrado");
@@ -83,9 +84,9 @@ function Sistema(test) {
       console.log("Conectado a Mongo Atlas");
     });
   }
-  correo.conectar (function(res){
+  correo.conectar(function (res) {
     console.log("Variables secretas obtenidas");
-  })
+  });
 
   this.usuarioOAuth = function (usr, callback) {
     let copiaN = usr.nick;
@@ -109,6 +110,7 @@ function Sistema(test) {
 
   this.registrarUsuario = function (obj, callback) {
     let modelo = this;
+    console.log("OBJREGISTRAR", obj);
 
     this.cad.buscarUsuario(obj, function (usr) {
       console.log("usr", usr);
@@ -118,10 +120,14 @@ function Sistema(test) {
         modelo.cad.insertarUsuario(obj, function (res) {
           callback(res);
         });
-
-        modelo.usuarios[obj.nick] = new Usuario(obj.email, obj.password,obj.photo);
+        modelo.usuarios[obj.nick] = new Usuario({
+          nick: obj.nick,
+          email: obj.email,
+          password: obj.password,
+          photo: obj.photo,
+        });
         this.usuarios = modelo.usuarios;
-        console.log("USUARIOS", this.usuarios);
+        console.log("USUARIOSIIII", this.usuarios);
         correo.enviarEmail(obj.email, obj.key, "Confirmar cuenta");
       } else {
         callback({ email: -1 });
@@ -147,7 +153,7 @@ function Sistema(test) {
           callback({ error: "Contraseña incorrecta" }, null);
           return;
         } else if (usr.error == -2) {
-          callback({ error: "Usuario no registrado en local" },null);
+          callback({ error: "Usuario no registrado en local" }, null);
           return;
         }
         console.log("USUARIO LOGIN", usr);
@@ -182,7 +188,7 @@ function Sistema(test) {
       obj.duracion,
       obj.numGoles,
       estado,
-      obj.passCode,
+      obj.passCode
     );
     modelo.obtenerUsuario(obj.email, function (usr) {
       console.log("USUARIO OBTENIDO", usr);
@@ -240,17 +246,17 @@ function Sistema(test) {
       callback({ error: "Partida no encontrada" });
       return;
     } else {
-      console.log("antes partida", this.partidas)
+      console.log("antes partida", this.partidas);
       let check = this.partidas[partida.id].salirPartida(usr);
-      console.log("partidas", this.partidas)
-      
-      if(this.partidas[partida.id].jugadoresConectados == 0){
+      console.log("partidas", this.partidas);
+
+      if (this.partidas[partida.id].jugadoresConectados == 0) {
         this.eliminarPartida(partida.id);
       }
 
       switch (check) {
         case true:
-          callback({ partida:this.partidas[partida.id] });
+          callback({ partida: this.partidas[partida.id] });
           return;
         case false:
           callback({ error: "El jugador no está en la partida" });
@@ -272,11 +278,10 @@ function Sistema(test) {
     }
   };
 
-
-  this.unirseAEquipo = function (partida,usr, equipo, callback) {
+  this.unirseAEquipo = function (partida, usr, equipo, callback) {
     console.log("UNIRSE A EQUIPO EN SISTEMA");
     // console.log("PARTIDA", partida);
-    if(!this.partidas[partida.id]) return;
+    if (!this.partidas[partida.id]) return;
     let check = this.partidas[partida.id].unirseAEquipo(usr, equipo);
     // console.log("CHECK", check);
     // console.log("PARTIDAS", this.partidas[partida.id])
@@ -296,7 +301,7 @@ function Sistema(test) {
     }
   };
   this.salirEquipo = function (partida, usr, equipo, callback) {
-    if(!this.partidas[partida.id]) return;
+    if (!this.partidas[partida.id]) return;
     let check = this.partidas[partida.id].salirEquipo(usr, equipo);
     switch (check) {
       case true:
@@ -312,8 +317,7 @@ function Sistema(test) {
         callback({ error: "Error" });
         return;
     }
-  }
-    
+  };
 }
 
 function Usuario(usr) {
@@ -393,9 +397,9 @@ function Partida(
       console.log("El jugador no está en la partida: " + usr.nick);
       return false;
     }
-  }
+  };
 
-  this.salirPartida = function (usr){
+  this.salirPartida = function (usr) {
     if (this.jugadores[usr.nick]) {
       delete this.jugadores[usr.nick];
       this.jugadoresConectados = Object.keys(this.jugadores).length;
@@ -403,18 +407,18 @@ function Partida(
         this.estado = "esperando";
       }
       // Comprobar si el jugador está en un equipo y eliminarlo
-      for(let equipo in this.equipos){
-        if(this.equipos[equipo].jugadores[usr.nick]){
+      for (let equipo in this.equipos) {
+        if (this.equipos[equipo].jugadores[usr.nick]) {
           this.equipos[equipo].salirEquipo(usr);
         }
       }
       console.log("Jugador eliminado: " + usr.nick);
       return true;
-    }else{
+    } else {
       console.log("El jugador no está en la partida: " + usr.nick);
       return false;
     }
-  }
+  };
 }
 
 function Equipo() {
@@ -433,7 +437,7 @@ function Equipo() {
   };
 
   this.salirEquipo = function (usr) {
-    console.log("JUGADORES EN EQUIPO", this.jugadores)
+    console.log("JUGADORES EN EQUIPO", this.jugadores);
     if (this.jugadores[usr.nick]) {
       delete this.jugadores[usr.nick];
       console.log("Jugador eliminado: " + usr.nick);
@@ -442,7 +446,7 @@ function Equipo() {
       console.log("El jugador no está en este equipo: " + usr.nick);
       return undefined;
     }
-  }
+  };
 }
 
 module.exports.Sistema = Sistema;

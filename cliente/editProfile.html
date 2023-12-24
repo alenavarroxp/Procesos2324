@@ -1,18 +1,18 @@
 <div class="flex h-screen items-center justify-center select-none">
-    <div class="bg-white p-8 rounded-md shadow-md w-fit">
+    <div class="bg-white p-8 rounded-md shadow-md w-96">
         <!-- Título "Editar Perfil" -->
         <h1 class="text-black text-2xl font-bold mb-6 ">Editar perfil</h1>
 
         <!-- Foto de perfil actual -->
         <div id="imgUsuario" class="mb-4 flex items-center justify-center">
-            
+            <div id="actualProfile">
+                <label for="photoReg" class="cursor-pointer pointer-events-auto">
+                    <div id="actualImage" class=""></div>
+                </label>
+                <input type="file" id="photoReg" style="display: none;" accept="image/*" />
+            </div>
         </div>
         
-
-        <!-- Cambiar foto de perfil -->
-        <div class="mb-4 flex items-center justify-center">
-            <input type="file" id="photo" name="photo" class="mt-1 p-2 border rounded-md w-full" />
-        </div>
 
         <!-- Resto del formulario -->
         <form>
@@ -31,7 +31,8 @@
             <!-- Repetir contraseña -->
             <div class="mb-4">
                 <label for="passwordRepeat" class="block text-sm font-medium text-gray-600">Repetir contraseña</label>
-                <input type="password" id="passwordRepeat" name="passwordRepeat" class="mt-1 p-2 border rounded-md w-full" />
+                <input type="password" id="passwordRepeat" name="passwordRepeat"
+                    class="mt-1 p-2 border rounded-md w-full" />
             </div>
 
             <!-- Correo electrónico -->
