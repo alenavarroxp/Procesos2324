@@ -119,7 +119,7 @@ function Sistema(test) {
           callback(res);
         });
 
-        modelo.usuarios[obj.nick] = new Usuario(obj.email, obj.password);
+        modelo.usuarios[obj.nick] = new Usuario(obj.email, obj.password,obj.photo);
         this.usuarios = modelo.usuarios;
         console.log("USUARIOS", this.usuarios);
         correo.enviarEmail(obj.email, obj.key, "Confirmar cuenta");
@@ -320,6 +320,7 @@ function Usuario(usr) {
   this.nick = usr.nick;
   this.email = usr.email;
   this.clave = usr.password;
+  this.photo = usr.photo;
 }
 
 function Partida(

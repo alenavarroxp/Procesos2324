@@ -168,14 +168,15 @@ function ControlWeb() {
         console.log("REGISTRO");
         event.preventDefault();
         let nick = $("#nick").val();
-
+        let photo = $("#imagenPerfil").attr("src");
+        console.log("PHOTO", photo);
         let pwd = $("#pwd").val();
 
         if (nick && email && pwd) {
           $("#mensajeError").empty();
           try {
             if (captchaValidado) {
-              rest.registrarUsuario(nick, email, pwd);
+              rest.registrarUsuario(nick, email, pwd, photo);
               captchaValidado = false;
             }
             console.log(nick, email, pwd);
@@ -215,7 +216,14 @@ function ControlWeb() {
       $("#navbar").load("./cliente/navbar.html", function () {
         rest.obtenerUsuario($.cookie("nick"), function (usr) {
           $("#username").text(usr.nick);
-          // $("#imgUsuario").attr("src", usr.img);
+          if(usr.photo){
+            $("#imgUsuario").removeClass("hidden");
+            $("#noPhoto").addClass("hidden");
+            $("#imgUsuario").attr("src", usr.photo);
+          }else{
+            $("#imgUsuario").addClass("hidden");
+            $("#noPhoto").removeClass("hidden");
+          }
         });
 
         partido = document.getElementById("partido");

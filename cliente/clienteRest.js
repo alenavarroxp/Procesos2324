@@ -135,11 +135,11 @@ function ClienteRest() {
     });
   };
 
-  this.registrarUsuario = function (nick, email, password) {
+  this.registrarUsuario = function (nick, email, password, photo) {
     $.ajax({
       type: "POST",
       url: "/registrarUsuario",
-      data: JSON.stringify({ nick: nick, email: email, password: password }),
+      data: JSON.stringify({ nick: nick, email: email, password: password, photo: photo }),
       success: function (data) {
         console.log("data", data);
         if (data.nick != undefined) {
