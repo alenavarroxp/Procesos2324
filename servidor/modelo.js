@@ -31,6 +31,13 @@ function Sistema(test) {
     callback({ email: null });
   };
 
+this.obtenerUsuarioBD = function (email, callback){
+  this.cad.obtenerUsuario(email, function(usr){
+    console.log("USUARIO EN BD", usr)
+    callback(usr)
+  })
+}
+
   this.obtenerUsuarios = function () {
     return this.usuarios;
   };
@@ -139,6 +146,7 @@ function Sistema(test) {
     let modelo = this;
     console.log("OBJACTUALIZAR", obj)
     this.cad.buscarUsuario(obj, function (usr) {
+      console.log("USUARIO ENCONTRADO", usr)
       if (!usr) {
         callback({ error: "Usuario no encontrado" });
       } else {
@@ -164,10 +172,10 @@ function Sistema(test) {
     console.log("LOCAL", usr)
     for(let user in this.usuarios){
       if(this.usuarios[user].email == usr.oldEmail && this.usuarios[user].nick == usr.oldNick){
-        this.usuarios[user].nick = usr.nick;
-        this.usuarios[user].email = usr.email;
-        this.usuarios[user].photo = usr.photo;
-        this.usuarios[user].clave = usr.password;
+        delete this.usuarios[user];
+        const updateUser = new Usuario({nick: usr.nick, email: usr.email, password: usr.password, photo: usr.photo})
+        this.usuarios[usr.nick] = updateUser;
+        console.log("USUARIOS Local tras update", this.usuarios)
       }
     }
     

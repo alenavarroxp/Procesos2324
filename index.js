@@ -171,6 +171,15 @@ app.get("/obtenerUsuario/:email", function (request, response) {
   });
 });
 
+app.get("/obtenerUsuarioBD/:email", function (request, response) {
+  let email = request.params.email;
+  console.log("EMAIL", email);
+  sistema.obtenerUsuarioBD(email, function (obj) {
+    console.log("OBJ", obj);
+    response.send(obj);
+  });
+});
+
 app.post("/actualizarUsuario", function (request, response) {
   sistema.actualizarUsuario(request.body.usr, function (obj) {
     response.send(obj);

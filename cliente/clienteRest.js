@@ -42,6 +42,21 @@ function ClienteRest() {
     });
   };
 
+  this.obtenerUsuarioBD = function (email, callback) {
+    $.ajax({
+      type: "GET",
+      url: "/obtenerUsuarioBD/" + email,
+      success: function (data) {
+        callback(data);
+      },
+      error: function (xhr, textStatus, errorThrown) {
+        console.log("Status: " + textStatus);
+        console.log("Error: " + errorThrown);
+      },
+      contentType: "application/json",
+    });
+  };
+
   this.actualizarUsuario = function (usr) {
     $.ajax({
       type: "POST",
@@ -49,8 +64,9 @@ function ClienteRest() {
       data: JSON.stringify({ usr: usr }),
       success: function (data) {
         console.log("DATA", data);
-        if(data.error == "Contraseña actual incorrecta"){
+        if (data.error == "Contraseña actual incorrecta") {
           cw.mostrarMsg("Contraseña actual incorrecta");
+          return;
         }
         $.cookie("nick", data.email);
         cw.mostrarToast("Usuario actualizado", top);

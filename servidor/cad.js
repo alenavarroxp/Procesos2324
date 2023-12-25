@@ -139,7 +139,6 @@ function CAD() {
 
   function actualizar(coleccion, elemento, callback) {
     let col = coleccion;
-    console.log("ELEMENTO ACTUALIZAR", elemento);
     if (!elemento.newNick) {
       elemento.newNick = elemento.nick;
     }
@@ -152,39 +151,71 @@ function CAD() {
       elemento.newPassword = elemento.password;
     }
 
-    bcrypt.genSalt(
-      10,
-      async (err, salt) =>
-        await bcrypt.hash(elemento.newPassword, salt, (err, hash) => {
-          elemento.newPassword = hash;
-          console.log("hash", hash);
-          console.log("elemento new password", elemento.newPassword);
-          col.findOneAndUpdate(
-            {
-              email: elemento.email,
-              nick: elemento.nick,
-            },
-            {
-              $set: {
-                email: elemento.newEmail,
-                nick: elemento.newNick,
-                password: elemento.newPassword,
-                photo: elemento.newPhoto,
+    if (!elemento.newPhoto) {
+      elemento.newPhoto = elemento.photo;
+    }
+
+    console.log("ELEMENTO PARA ACTUALIZAR", elemento);
+    if (elemento.newPassword != elemento.password) {
+      bcrypt.genSalt(
+        10,
+        async (err, salt) =>
+          await bcrypt.hash(elemento.newPassword, salt, (err, hash) => {
+            elemento.newPassword = hash;
+            console.log("hash", hash);
+            console.log("elemento new password", elemento.newPassword);
+            col.findOneAndUpdate(
+              {
+                email: elemento.email,
+                nick: elemento.nick,
               },
-            },
-            { returnDocument: "after" },
-            function (err, doc) {
-              if (err) {
-                throw err;
-              } else {
-                console.log("Elemento actualizado");
-                console.log(doc.value);
-                callback(doc.value);
+              {
+                $set: {
+                  email: elemento.newEmail,
+                  nick: elemento.newNick,
+                  password: elemento.newPassword,
+                  photo: elemento.newPhoto,
+                },
+              },
+              { returnDocument: "after" },
+              function (err, doc) {
+                if (err) {
+                  throw err;
+                } else {
+                  console.log("Elemento actualizado");
+                  console.log(doc.value);
+                  callback(doc.value);
+                }
               }
-            }
-          );
-        })
-    );
+            );
+          })
+      );
+    } else {
+      col.findOneAndUpdate(
+        {
+          email: elemento.email,
+          nick: elemento.nick,
+        },
+        {
+          $set: {
+            email: elemento.newEmail,
+            nick: elemento.newNick,
+            password: elemento.newPassword,
+            photo: elemento.newPhoto,
+          },
+        },
+        { returnDocument: "after" },
+        function (err, doc) {
+          if (err) {
+            throw err;
+          } else {
+            console.log("Elemento actualizado");
+            console.log(doc.value);
+            callback(doc.value);
+          }
+        }
+      );
+    }
   }
 
   this.conectar = async function (callback) {

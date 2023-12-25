@@ -402,7 +402,18 @@ function ControlWeb() {
             if (password) usr.newPassword = password;
             console.log("USR", usr);
             usr.password = currentPassword;
-            rest.actualizarUsuario(usr);
+            if (email) {
+              rest.obtenerUsuarioBD(email, function (obj) {
+                console.log("USREMAIL", obj.email);
+                if (obj.email != undefined) {
+                  cw.mostrarMsg("Ya existe un usuario con ese email");
+                  return;
+                }
+                rest.actualizarUsuario(usr);
+              });
+            } else {
+              rest.actualizarUsuario(usr);
+            }
           });
         } else {
           cw.mostrarMsg("Introduce al menos un campo");
