@@ -112,24 +112,29 @@ app.get(
 );
 
 app.get("/good", function (req, res) {
-  console.log("REQ", req.user.provider);
-  console.log("EMAIL", req.user.emails[0].value);
+  // console.log("REQ", req.user.provider);
+  // console.log("EMAIL", req.user.emails[0].value);
   switch (req.user.provider) {
     case "google":
     case "google-one-tap":
       // console.log(req.user);
       let nick = req.user.displayName;
       let email = req.user.emails[0].value;
-      sistema.usuarioOAuth({ nick: nick, email: email }, function (obj) {
-        res.cookie("nick", obj.email);
-        res.redirect("/");
-      });
+      let photo = req.user.photos[0].value;
+      sistema.usuarioOAuth(
+        { nick: nick, email: email, photo: photo },
+        function (obj) {
+          res.cookie("nick", obj.email);
+          res.redirect("/");
+        }
+      );
       break;
     case "github":
       // console.log(req.user);
       let nick2 = req.user.displayName;
       let email2 = req.user.username;
-      sistema.usuarioOAuth({ nick: nick2, email: email2 }, function (obj) {
+      let photo2 = req.user.photos[0].value;
+      sistema.usuarioOAuth({ nick: nick2, email: email2, photo: photo2 }, function (obj) {
         console.log("obj", obj);
         res.cookie("nick", obj.email);
         res.redirect("/");

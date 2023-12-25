@@ -98,17 +98,18 @@ this.obtenerUsuarioBD = function (email, callback){
   this.usuarioOAuth = function (usr, callback) {
     let copiaN = usr.nick;
     let copiaE = usr.email;
+    let copiaP = usr.photo;
     usr.confirmada = true;
     this.cad.buscarOCrearUsuario(usr, (obj) => {
       let modelo = this;
       if (obj.email == null) {
         console.log("El usuario " + usr.email + " ya estaba registrado");
         obj.email = copiaE;
-        const user = { nick: copiaN, email: obj.email };
+        const user = { nick: copiaN, email: obj.email, photo: copiaP };
         modelo.agregarUsuario(user);
         callback(user);
       } else {
-        const user = { nick: copiaN, email: copiaE };
+        const user = { nick: copiaN, email: copiaE, photo: copiaP};
         modelo.agregarUsuario(user);
         callback(user);
       }
