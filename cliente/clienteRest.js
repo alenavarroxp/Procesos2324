@@ -42,6 +42,29 @@ function ClienteRest() {
     });
   };
 
+  this.actualizarUsuario = function (usr) {
+    $.ajax({
+      type: "POST",
+      url: "/actualizarUsuario",
+      data: JSON.stringify({ usr: usr }),
+      success: function (data) {
+        console.log("DATA", data);
+        if(data.error == "Contraseña actual incorrecta"){
+          cw.mostrarMsg("Contraseña actual incorrecta");
+        }
+        $.cookie("nick", data.email);
+        cw.mostrarToast("Usuario actualizado", top);
+        cw.actualizarNavbar();
+        cw.mostrarInicio();
+      },
+      error: function (xhr, textStatus, errorThrown) {
+        console.log("Status: " + textStatus);
+        console.log("Error: " + errorThrown);
+      },
+      contentType: "application/json",
+    });
+  };
+
   this.obtenerUsuarios = function () {
     $.getJSON("/obtenerUsuarios", function (data) {
       console.log(data);
@@ -139,7 +162,12 @@ function ClienteRest() {
     $.ajax({
       type: "POST",
       url: "/registrarUsuario",
-      data: JSON.stringify({ nick: nick, email: email, password: password, photo: photo }),
+      data: JSON.stringify({
+        nick: nick,
+        email: email,
+        password: password,
+        photo: photo,
+      }),
       success: function (data) {
         console.log("data", data);
         if (data.nick != undefined) {
@@ -290,7 +318,7 @@ function ClienteRest() {
 
   this.salirPartida = function (usr, partida, callback) {
     console.log("ASDHKASD");
-    
+
     $.ajax({
       type: "POST",
       url: "/salirPartida",
@@ -306,7 +334,6 @@ function ClienteRest() {
       },
       contentType: "application/json",
     });
-    
   };
 
   this.cerrarSesion = function () {

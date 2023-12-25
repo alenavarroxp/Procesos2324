@@ -12,7 +12,7 @@
                 <input type="file" id="photoReg" style="display: none;" accept="image/*" />
             </div>
         </div>
-        
+
 
         <!-- Resto del formulario -->
         <form>
@@ -22,18 +22,10 @@
                 <input type="text" id="usernameInput" name="username" class="mt-1 p-2 border rounded-md w-full" />
             </div>
 
-            <!-- Contraseña -->
-            <div class="mb-4">
-                <label for="password" class="block text-sm font-medium text-gray-600">Contraseña</label>
-                <input type="password" id="password" name="password" class="mt-1 p-2 border rounded-md w-full" />
+            <div id="noOAuth">
+                
             </div>
-
-            <!-- Repetir contraseña -->
-            <div class="mb-4">
-                <label for="passwordRepeat" class="block text-sm font-medium text-gray-600">Repetir contraseña</label>
-                <input type="password" id="passwordRepeat" name="passwordRepeat"
-                    class="mt-1 p-2 border rounded-md w-full" />
-            </div>
+            
 
             <!-- Correo electrónico -->
             <div class="mb-4">
@@ -41,8 +33,15 @@
                 <input type="email" id="emailInput" name="email" class="mt-1 p-2 border rounded-md w-full" />
             </div>
 
+            <!-- Mensaje de error -->
+            <div id="mensajeError"
+                class="text-red-500 text-sm font-semibold mt-0 mb-4 justify-center items-center hidden">
+                <i class="fas fa-exclamation-circle text-red-500 mr-2"></i>
+                <span>Mensaje de error</span>
+            </div>
+
             <!-- Botón "Guardar cambios" -->
-            <button type="submit" class="bg-blue-500 text-white rounded-md p-2 w-full">Guardar cambios</button>
+            <button id="saveChanges" class="bg-blue-500 text-white rounded-md p-2 w-full">Guardar cambios</button>
         </form>
     </div>
 </div>

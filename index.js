@@ -171,6 +171,12 @@ app.get("/obtenerUsuario/:email", function (request, response) {
   });
 });
 
+app.post("/actualizarUsuario", function (request, response) {
+  sistema.actualizarUsuario(request.body.usr, function (obj) {
+    response.send(obj);
+  });
+});
+
 app.get("/obtenerUsuarios", haIniciado, function (request, response) {
   let usuarios = sistema.obtenerUsuarios();
   response.send(usuarios);

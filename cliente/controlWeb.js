@@ -304,6 +304,33 @@ function ControlWeb() {
       rest.obtenerUsuario($.cookie("nick"), function (usr) {
         const actualImage = document.getElementById("actualImage");
 
+        if (usr.clave) {
+          const noOAuth = document.getElementById("noOAuth");
+
+          // HTML que quieres agregar
+          const passwordElement = `
+    <!-- Contraseña actual -->
+    <div class="mb-4">
+        <label for="currentPassword" class="block text-sm font-medium text-gray-600">Contraseña actual (*)</label>
+        <input type="password" id="currentPassword" name="currentPassword" class="mt-1 p-2 border rounded-md w-full" />
+    </div>
+
+    <!-- Nueva Contraseña -->
+    <div class="mb-4">
+        <label for="password" class="block text-sm font-medium text-gray-600">Contraseña</label>
+        <input type="password" id="passwordInput" name="password" class="mt-1 p-2 border rounded-md w-full" />
+    </div>
+
+    <!-- Repetir contraseña -->
+    <div class="mb-4">
+        <label for="passwordRepeat" class="block text-sm font-medium text-gray-600">Repetir contraseña</label>
+        <input type="password" id="passwordRepeat" name="passwordRepeat" class="mt-1 p-2 border rounded-md w-full" />
+    </div>
+`;
+
+          // Agregar el HTML al elemento con id "noOAuth"
+          noOAuth.innerHTML = passwordElement;
+        }
         if (usr.photo) {
           const imgElement = document.createElement("img");
           imgElement.src = usr.photo;
@@ -342,6 +369,62 @@ function ControlWeb() {
         $("#usernameInput").attr("placeholder", usr.nick);
         $("#emailInput").attr("placeholder", usr.email);
       });
+
+      $("#saveChanges").on("click", function (e) {
+        e.preventDefault();
+        const username = $("#usernameInput").val();
+        const email = $("#emailInput").val();
+        const photo = $("#imagenPerfil").attr("src");
+        const password = $("#passwordInput").val();
+        const confirmPassword = $("#passwordRepeat").val();
+        const currentPassword = $("#currentPassword").val();
+
+        if (email) {
+          if (!cw.validarEmail(email)) {
+            cw.mostrarMsg("Introduce un email válido");
+            return;
+          }
+        }
+
+        if (password !== confirmPassword) {
+          cw.mostrarMsg("Las contraseñas no coinciden");
+          return;
+        } else {
+          $("#mensajeError").empty();
+        }
+
+        if (username || email || photo || password || currentPassword) {
+          $("#mensajeError").empty();
+          rest.obtenerUsuario($.cookie("nick"), function (usr) {
+            if (username) usr.newNick = username;
+            if (email) usr.newEmail = email;
+            if (photo) usr.newPhoto = photo;
+            if (password) usr.newPassword = password;
+            console.log("USR", usr);
+            usr.password = currentPassword;
+            rest.actualizarUsuario(usr);
+          });
+        } else {
+          cw.mostrarMsg("Introduce al menos un campo");
+        }
+      });
+    });
+  };
+
+  this.actualizarNavbar = function () {
+    console.log("ACTUALIZAR NAVBAR");
+    rest.obtenerUsuario($.cookie("nick"), function (usr) {
+      console.log("USR", usr);
+      console.log("USR", usr);
+      if (usr.photo) {
+        $("#imgUsuario").attr("src", usr.photo);
+      } else {
+        $("#imgUsuario").addClass("hidden");
+        $("#noPhoto").removeClass("hidden");
+      }
+
+      $("#username").text(usr.nick);
+      $("#emailValue").text(usr.email);
     });
   };
 

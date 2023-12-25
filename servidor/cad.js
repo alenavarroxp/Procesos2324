@@ -5,9 +5,9 @@ const bcrypt = require("bcrypt");
 function CAD() {
   this.usuarios;
   this.partidas;
-  
+
   this.obtenerUsuario = function (email, callback) {
-    if(!this.usuarios || !this.usuarios.find){
+    if (!this.usuarios || !this.usuarios.find) {
       callback(undefined);
       return;
     }
@@ -20,7 +20,7 @@ function CAD() {
       }
     });
   };
-  
+
   this.buscarUsuario = function (obj, callback) {
     buscar(
       this.usuarios,
@@ -132,6 +132,60 @@ function CAD() {
     console.log("INSERTARPARTIDA");
     insertar(this.partidas, partida, callback);
   };
+
+  this.actualizarUsuario = function (usuario, callback) {
+    actualizar(this.usuarios, usuario, callback);
+  };
+
+  function actualizar(coleccion, elemento, callback) {
+    let col = coleccion;
+    console.log("ELEMENTO ACTUALIZAR", elemento);
+    if (!elemento.newNick) {
+      elemento.newNick = elemento.nick;
+    }
+
+    if (!elemento.newEmail) {
+      elemento.newEmail = elemento.email;
+    }
+
+    if (!elemento.newPassword) {
+      elemento.newPassword = elemento.password;
+    }
+
+    bcrypt.genSalt(
+      10,
+      async (err, salt) =>
+        await bcrypt.hash(elemento.newPassword, salt, (err, hash) => {
+          elemento.newPassword = hash;
+          console.log("hash", hash);
+          console.log("elemento new password", elemento.newPassword);
+          col.findOneAndUpdate(
+            {
+              email: elemento.email,
+              nick: elemento.nick,
+            },
+            {
+              $set: {
+                email: elemento.newEmail,
+                nick: elemento.newNick,
+                password: elemento.newPassword,
+                photo: elemento.newPhoto,
+              },
+            },
+            { returnDocument: "after" },
+            function (err, doc) {
+              if (err) {
+                throw err;
+              } else {
+                console.log("Elemento actualizado");
+                console.log(doc.value);
+                callback(doc.value);
+              }
+            }
+          );
+        })
+    );
+  }
 
   this.conectar = async function (callback) {
     let cad = this;

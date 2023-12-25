@@ -135,6 +135,44 @@ function Sistema(test) {
     });
   };
 
+  this.actualizarUsuario = function (obj, callback) {
+    let modelo = this;
+    console.log("OBJACTUALIZAR", obj)
+    this.cad.buscarUsuario(obj, function (usr) {
+      if (!usr) {
+        callback({ error: "Usuario no encontrado" });
+      } else {
+        if(usr.error == -1){
+          callback({ error: "Contraseña actual incorrecta" });
+          return;
+        }
+        usr.newNick = obj.newNick;
+        usr.newEmail = obj.newEmail;
+        usr.newPhoto = obj.newPhoto;
+        usr.newPassword = obj.newPassword;
+        modelo.cad.actualizarUsuario(usr, function (res) {
+          res.oldEmail = usr.email
+          res.oldNick = usr.nick
+          modelo.actualizarUsuarioLocal(res)
+          callback(res);
+        });
+      }
+    });
+  }
+
+  this.actualizarUsuarioLocal = function (usr) {
+    console.log("LOCAL", usr)
+    for(let user in this.usuarios){
+      if(this.usuarios[user].email == usr.oldEmail && this.usuarios[user].nick == usr.oldNick){
+        this.usuarios[user].nick = usr.nick;
+        this.usuarios[user].email = usr.email;
+        this.usuarios[user].photo = usr.photo;
+        this.usuarios[user].clave = usr.password;
+      }
+    }
+    
+  }
+
   this.iniciarSesion = function (obj, callback) {
     console.log("INICIAR SESION", obj);
     if (!obj.nick) {
