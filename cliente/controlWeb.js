@@ -978,6 +978,7 @@ function ControlWeb() {
       if (passCode == partida.passCode) {
         rest.obtenerUsuario($.cookie("nick"), function (usr) {
           rest.unirsePartida(usr, passCode);
+          modalUnirse.close()
         });
       } else {
         cw.mostrarToast(
@@ -1008,6 +1009,7 @@ function ControlWeb() {
           await rest.obtenerUsuario(user, async function (usr) {
             console.log("Usuario", usr);
             await rest.salirPartida(usr, partida, function (data) {
+              socket.emit("salirPartida", { usr, partida })
               console.log("Saliendo de la partida");
               location.reload(true);
             });
