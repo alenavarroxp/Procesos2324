@@ -311,21 +311,27 @@ function ControlWeb() {
           const passwordElement = `
     <!-- Contraseña actual -->
     <div class="mb-4">
-        <label for="currentPassword" class="block text-sm font-medium text-gray-600">Contraseña actual (*)</label>
+        <label class="block text-sm font-medium text-gray-600">Contraseña actual (*)</label>
         <input type="password" id="currentPassword" name="currentPassword" class="mt-1 p-2 border rounded-md w-full" />
     </div>
 
     <!-- Nueva Contraseña -->
     <div class="mb-4">
-        <label for="password" class="block text-sm font-medium text-gray-600">Contraseña</label>
+        <label class="block text-sm font-medium text-gray-600">Contraseña</label>
         <input type="password" id="passwordInput" name="password" class="mt-1 p-2 border rounded-md w-full" />
     </div>
 
     <!-- Repetir contraseña -->
     <div class="mb-4">
-        <label for="passwordRepeat" class="block text-sm font-medium text-gray-600">Repetir contraseña</label>
+        <label class="block text-sm font-medium text-gray-600">Repetir contraseña</label>
         <input type="password" id="passwordRepeat" name="passwordRepeat" class="mt-1 p-2 border rounded-md w-full" />
     </div>
+
+    <!-- Correo electrónico -->
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-600">Correo electrónico</label>
+                <input type="email" id="emailInput" name="email" class="mt-1 p-2 border rounded-md w-full" />
+            </div>
 `;
 
           // Agregar el HTML al elemento con id "noOAuth"

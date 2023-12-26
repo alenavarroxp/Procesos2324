@@ -9,7 +9,13 @@ function Sistema(test) {
 
   this.agregarUsuario = function (usr) {
     let res = { nick: -1 };
+
     if (!this.usuarios[usr.nick]) {
+      if (!usr.clave && Object.values(this.usuarios).length > 0) {
+        for (let user in this.usuarios){
+          if(this.usuarios[user].email == usr.email) return;
+        }
+      }
       this.usuarios[usr.nick] = new Usuario(usr);
       res.nick = usr.nick;
       console.log("Usuario agregado: " + usr.nick);
@@ -31,12 +37,12 @@ function Sistema(test) {
     callback({ email: null });
   };
 
-this.obtenerUsuarioBD = function (email, callback){
-  this.cad.obtenerUsuario(email, function(usr){
-    console.log("USUARIO EN BD", usr)
-    callback(usr)
-  })
-}
+  this.obtenerUsuarioBD = function (email, callback) {
+    this.cad.obtenerUsuario(email, function (usr) {
+      console.log("USUARIO EN BD", usr);
+      callback(usr);
+    });
+  };
 
   this.obtenerUsuarios = function () {
     return this.usuarios;
@@ -66,6 +72,7 @@ this.obtenerUsuarioBD = function (email, callback){
 
   this.recuperarUsuario = async function (nick) {
     let modelo = this;
+    console.log("USUARIOS EN RECUPERAR USUARIO", modelo.usuarios);
     if (!modelo.usuarios[nick]) {
       await modelo.cad.obtenerUsuario(nick, function (usr) {
         if (!usr) {
@@ -76,6 +83,7 @@ this.obtenerUsuarioBD = function (email, callback){
           console.log("El usuario " + nick + " no está registrado");
         } else {
           console.log("El usuario " + nick + " ha sido recuperado");
+          console.log("USUARIOS EN EL LOCAL", modelo.usuarios);
           modelo.agregarUsuario(usr);
         }
       });
@@ -100,16 +108,26 @@ this.obtenerUsuarioBD = function (email, callback){
     let copiaE = usr.email;
     let copiaP = usr.photo;
     usr.confirmada = true;
-    this.cad.buscarOCrearUsuario(usr, (obj) => {
+    this.cad.buscarUsuario(usr, (obj) => {
       let modelo = this;
-      if (obj.email == null) {
-        console.log("El usuario " + usr.email + " ya estaba registrado");
-        obj.email = copiaE;
-        const user = { nick: copiaN, email: obj.email, photo: copiaP };
-        modelo.agregarUsuario(user);
-        callback(user);
+
+      if (!obj) {
+        console.log("USUA", usr);
+        modelo.cad.insertarUsuarioOAuth(usr, function (res) {
+          callback(res);
+        });
+        // console.log("El usuario " + usr.email + " ya estaba registrado");
+        // obj.email = copiaE;
+        // const user = { nick: copiaN, email: obj.email, photo: copiaP };
+        // modelo.agregarUsuario(user);
+        // callback(user);
       } else {
-        const user = { nick: copiaN, email: copiaE, photo: copiaP};
+        const user = {
+          nick: copiaN,
+          email: copiaE,
+          photo: copiaP,
+          clave: undefined,
+        };
         modelo.agregarUsuario(user);
         callback(user);
       }
@@ -145,13 +163,13 @@ this.obtenerUsuarioBD = function (email, callback){
 
   this.actualizarUsuario = function (obj, callback) {
     let modelo = this;
-    console.log("OBJACTUALIZAR", obj)
+    console.log("OBJACTUALIZAR", obj);
     this.cad.buscarUsuario(obj, function (usr) {
-      console.log("USUARIO ENCONTRADO", usr)
+      console.log("USUARIO ENCONTRADO", usr);
       if (!usr) {
         callback({ error: "Usuario no encontrado" });
       } else {
-        if(usr.error == -1){
+        if (usr.error == -1) {
           callback({ error: "Contraseña actual incorrecta" });
           return;
         }
@@ -160,27 +178,34 @@ this.obtenerUsuarioBD = function (email, callback){
         usr.newPhoto = obj.newPhoto;
         usr.newPassword = obj.newPassword;
         modelo.cad.actualizarUsuario(usr, function (res) {
-          res.oldEmail = usr.email
-          res.oldNick = usr.nick
-          modelo.actualizarUsuarioLocal(res)
+          res.oldEmail = usr.email;
+          res.oldNick = usr.nick;
+          modelo.actualizarUsuarioLocal(res);
           callback(res);
         });
       }
     });
-  }
+  };
 
   this.actualizarUsuarioLocal = function (usr) {
-    console.log("LOCAL", usr)
-    for(let user in this.usuarios){
-      if(this.usuarios[user].email == usr.oldEmail && this.usuarios[user].nick == usr.oldNick){
+    console.log("LOCAL", usr);
+    for (let user in this.usuarios) {
+      if (
+        this.usuarios[user].email == usr.oldEmail &&
+        this.usuarios[user].nick == usr.oldNick
+      ) {
         delete this.usuarios[user];
-        const updateUser = new Usuario({nick: usr.nick, email: usr.email, password: usr.password, photo: usr.photo})
+        const updateUser = new Usuario({
+          nick: usr.nick,
+          email: usr.email,
+          password: usr.password,
+          photo: usr.photo,
+        });
         this.usuarios[usr.nick] = updateUser;
-        console.log("USUARIOS Local tras update", this.usuarios)
+        console.log("USUARIOS Local tras update", this.usuarios);
       }
     }
-    
-  }
+  };
 
   this.iniciarSesion = function (obj, callback) {
     console.log("INICIAR SESION", obj);

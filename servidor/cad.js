@@ -16,6 +16,7 @@ function CAD() {
       if (coleccion.length == 0) {
         callback(undefined);
       } else {
+        console.log("LA COLECCION 0 ES ", coleccion[0])
         callback(coleccion[0]);
       }
     });
@@ -30,8 +31,11 @@ function CAD() {
   };
 
   this.insertarUsuario = function (usuario, callback) {
-    console.log("INSERTARUSUARIO");
     insertar(this.usuarios, usuario, callback);
+  };
+
+  this.insertarUsuarioOAuth = function (usuario, callback) {
+    insertarOAuth(this.usuarios, usuario, callback);
   };
 
   function buscar(coleccion, criterio, callback) {
@@ -47,7 +51,12 @@ function CAD() {
           if (!element.password) {
             console.log("USUARIO CON OAUTH CAD");
             if (coleccion.length == 1) {
-              callback({ error: -2 });
+              callback({
+                error: -2,
+                nick: element.nick,
+                email: element.email,
+                photo: element.photo,
+              });
             }
             return;
           }
@@ -78,6 +87,17 @@ function CAD() {
             }
           });
         });
+      }
+    });
+  }
+
+  function insertarOAuth(coleccion, elemento, callback) {
+    coleccion.insertOne(elemento, function (err, result) {
+      if (err) {
+        console.log("error");
+      } else {
+        console.log("Nuevo elemento creado");
+        callback(elemento);
       }
     });
   }
@@ -191,30 +211,56 @@ function CAD() {
           })
       );
     } else {
-      col.findOneAndUpdate(
-        {
-          email: elemento.email,
-          nick: elemento.nick,
-        },
-        {
-          $set: {
-            email: elemento.newEmail,
-            nick: elemento.newNick,
-            password: elemento.newPassword,
-            photo: elemento.newPhoto,
+      if (!elemento.error) {
+        col.findOneAndUpdate(
+          {
+            email: elemento.email,
+            nick: elemento.nick,
           },
-        },
-        { returnDocument: "after" },
-        function (err, doc) {
-          if (err) {
-            throw err;
-          } else {
-            console.log("Elemento actualizado");
-            console.log(doc.value);
-            callback(doc.value);
+          {
+            $set: {
+              email: elemento.newEmail,
+              nick: elemento.newNick,
+              password: elemento.newPassword,
+              photo: elemento.newPhoto,
+            },
+          },
+          { returnDocument: "after" },
+          function (err, doc) {
+            if (err) {
+              throw err;
+            } else {
+              console.log("Elemento actualizado");
+              console.log(doc.value);
+              callback(doc.value);
+            }
           }
-        }
-      );
+        );
+      } else {
+        col.findOneAndUpdate(
+          {
+            email: elemento.email,
+            nick: elemento.nick,
+          },
+          {
+            $set: {
+              email: elemento.newEmail,
+              nick: elemento.newNick,
+              photo: elemento.newPhoto,
+            },
+          },
+          { returnDocument: "after" },
+          function (err, doc) {
+            if (err) {
+              throw err;
+            } else {
+              console.log("Elemento actualizado");
+              console.log(doc.value);
+              callback(doc.value);
+            }
+          }
+        );
+      }
     }
   }
 
