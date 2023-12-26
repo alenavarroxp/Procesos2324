@@ -242,6 +242,7 @@ function ClienteRest() {
           cw.mostrarMsg(data.usr.error);
         }
         if (data.usr.email) {
+          console.log("DATA", data.usr)
           console.log("Usuario " + data.usr.email + " ha iniciado sesion");
           cw.limpiar();
           $.cookie("nick", data.usr.email);

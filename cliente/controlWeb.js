@@ -117,6 +117,7 @@ function ControlWeb() {
           cw.mostrarMsg("Introduce un email válido");
           return;
         }
+
         var recaptchaContainer = document.getElementById("recaptchaContainer");
         if (recaptchaContainer.innerHTML.trim() === "") {
           grecaptcha.ready(function () {
@@ -144,8 +145,15 @@ function ControlWeb() {
           $("#mensajeError").empty();
           try {
             if (captchaValidado) {
-              rest.registrarUsuario(nick, email, pwd, photo);
-              captchaValidado = false;
+              rest.obtenerUsuarioBD(email, function (obj) {
+                console.log("USREMAIL", obj.email);
+                if (obj.email != undefined) {
+                  cw.mostrarMsg("Ya existe un usuario con ese email");
+                  return;
+                }
+                rest.registrarUsuario(nick, email, pwd, photo);
+                captchaValidado = false;
+              });
             }
             console.log(nick, email, pwd);
           } catch (error) {
