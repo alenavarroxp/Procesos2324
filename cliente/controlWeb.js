@@ -1305,6 +1305,7 @@ function ControlWeb() {
         });
 
         socket.on("actualizarContadorEquipo", function (obj) {
+          console.log("ACTUALIZAR CONTADOR EQUIPO", obj);
           partida = obj;
           if (!obj) return;
           if (obj.equipos["equipoAzul"]) {

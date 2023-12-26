@@ -355,7 +355,7 @@ function Sistema(test) {
     // console.log("PARTIDA", partida);
     if (!this.partidas[partida.id]) return;
     let check = this.partidas[partida.id].unirseAEquipo(usr, equipo);
-    // console.log("CHECK", check);
+    console.log("CHECK", check);
     // console.log("PARTIDAS", this.partidas[partida.id])
     switch (check) {
       case true:

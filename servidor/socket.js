@@ -42,7 +42,8 @@ function WSServer() {
 
       socket.on("unirseAEquipo", (obj) => {
         sistema.unirseAEquipo(obj.partida, obj.usr, obj.equipo, function (obj) {
-          socket.emit("actualizarContadorEquipo", obj.partida);
+          console.log("SOCKET UNIRSE A EQUIPO: ",obj)
+          io.to(obj.partida.passCode).emit("actualizarContadorEquipo", obj.partida);
         });
       });
 
@@ -53,7 +54,7 @@ function WSServer() {
 
       socket.on("salirEquipo", (obj) => {
         sistema.salirEquipo(obj.partida, obj.usr, obj.equipo, function (obj) {
-          socket.emit("actualizarContadorEquipo", obj.partida);
+          io.to(obj.partida.passCode).emit("actualizarContadorEquipo", obj.partida);
         });
       });
       
@@ -61,7 +62,7 @@ function WSServer() {
         console.log("OBJETO", obj)
         io.to(obj.partida.passCode).emit("chatMessage", "Se ha ido de la partida " + obj.usr.email);
         sistema.salirPartida(obj.partida, obj.usr, function (obj) {
-          socket.emit("actualizarContadorEquipo", obj.partida);
+          io.to(obj.partida.passCode).emit("actualizarContadorEquipo", obj.partida);
           console.log("OBJ", obj)
           if(obj.partida) io.to(obj.partida.passCode).emit("cantidadJugadores", obj.partida);
           sistema.obtenerPartidas(function (obj) {
