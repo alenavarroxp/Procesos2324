@@ -1073,9 +1073,10 @@ function ControlWeb() {
 
         // Evento que maneja la recepción de mensajes de chat desde el servidor
         socket.on("chatMessage", (message) => {
+          console.log("CHAT MESSAGE", message);
           const chatMessages = document.getElementById("chatMessages");
           const newMessage = document.createElement("div");
-          if (!message.username) {
+          if (!message.user) {
             newMessage.textContent = `${message}`;
             newMessage.classList.add(
               "text-yellow-500",
@@ -1086,16 +1087,37 @@ function ControlWeb() {
             );
             newMessage.style.wordWrap = "break-word";
           } else {
-            newMessage.textContent = `${message.username}: ${message.message}`;
+            const photoChat = document.createElement("div");
+            if (message.user.photo) {
+              photoChat.innerHTML = `<div class="w-8 h-8 rounded-full mr-2 bg-gray-200 flex items-center justify-center"><img src="${message.user.photo}" class="w-8 h-8 rounded-full"></div>`;
+            } else {
+              photoChat.innerHTML = `<div class="w-8 h-8 rounded-full mr-2 bg-gray-200 flex items-center justify-center"><i id="noPhoto" class="fas fa-user text-black text-xl relative z-10"></i></div>`;
+            }
+            newMessage.appendChild(photoChat);
             newMessage.classList.add(
               "text-white",
               "p-2",
               "rounded-md",
               "mb-1",
               "mr-2",
-              "text-sm"
+              "text-sm",
+              "flex",
+              "items-center"
             );
-            newMessage.style.wordWrap = "break-word";
+            // Contenedor para el texto del mensaje
+            const messageContainer = document.createElement("div");
+            messageContainer.style.overflowWrap = "break-word";
+            messageContainer.style.maxWidth = "93.5%";
+            messageContainer.style.flexShrink = 1; // Permitir que el texto se reduzca en lugar de expandirse
+
+            // Contenido del mensaje
+            const textMessage = document.createElement("div");
+            textMessage.textContent = `${message.user.nick}: ${message.message}`;
+            textMessage.style.overflow = "hidden";
+
+            // Agregar elementos al DOM
+            messageContainer.appendChild(textMessage);
+            newMessage.appendChild(messageContainer);
           }
           if (chatMessages) {
             chatMessages.appendChild(newMessage);
@@ -1108,11 +1130,8 @@ function ControlWeb() {
           clearTimeout(timeoutId);
           // Ocultar el chat después de 5 segundos
           timeoutId = setTimeout(() => {
-            // chatMessagesContainer.classList.add('animate__fadeOut');
-
             setTimeout(() => {
               chatMessagesContainer.classList.add("hidden");
-              // chatMessagesContainer.classList.remove('animate__fadeOut');
               chatPadre.classList.add("hidden");
             }, 1000);
           }, 5000);
@@ -1125,10 +1144,12 @@ function ControlWeb() {
 
             if (messageText.trim() !== "") {
               // Envía el mensaje al servidor
-              socket.emit("sendMessage", {
-                passCode: partida.passCode,
-                username: $.cookie("nick"),
-                message: messageText,
+              rest.obtenerUsuario($.cookie("nick"), function (usr) {
+                socket.emit("sendMessage", {
+                  passCode: partida.passCode,
+                  user: usr,
+                  message: messageText,
+                });
               });
 
               // Limpiar el campo de entrada después de enviar el mensaje
@@ -1137,7 +1158,12 @@ function ControlWeb() {
           });
 
         const chatMessagesContainer = document.getElementById("chatMessages");
+        const chatInputText = document.getElementById("chatInputText");
         let timeoutId;
+
+        chatInputText.addEventListener("input", function () {
+          clearTimeout(timeoutId);
+        });
 
         //quiero detectar que el raton esté sobre el chat
         chatMessagesContainer.addEventListener("mouseenter", function () {
@@ -1213,10 +1239,12 @@ function ControlWeb() {
 
               if (messageText.trim() !== "") {
                 // Envía el mensaje al servidor
-                socket.emit("sendMessage", {
-                  passCode: partida.passCode,
-                  username: $.cookie("nick"),
-                  message: messageText,
+                rest.obtenerUsuario($.cookie("nick"), function (usr) {
+                  socket.emit("sendMessage", {
+                    passCode: partida.passCode,
+                    user: usr,
+                    message: messageText,
+                  });
                 });
 
                 // Limpiar el campo de entrada después de enviar el mensaje
@@ -1315,18 +1343,127 @@ function ControlWeb() {
           if (!obj) return;
           if (obj.equipos["equipoAzul"]) {
             const cantidadBlue = document.getElementById("cantidadBlue");
+            const bluePlayers = document.getElementById("bluePlayers");
             console.log("cantidadBlueDiv", cantidadBlue);
-            if (cantidadBlue)
+            if (cantidadBlue && bluePlayers) {
               cantidadBlue.innerHTML =
                 "Jugadores: " +
                 Object.values(obj.equipos["equipoAzul"].jugadores).length;
+
+              const bluePlayersContainer = document.createElement("div");
+              bluePlayersContainer.className =
+                "avatar-group -space-x-4 rtl:space-x-reverse";
+
+              for (let i in obj.equipos["equipoAzul"].jugadores) {
+                const jugador = obj.equipos["equipoAzul"].jugadores[i];
+                const jugadorDiv = document.createElement("div");
+                jugadorDiv.className = "avatar";
+
+                const avatarContainer = document.createElement("div");
+                avatarContainer.className =
+                  "w-9 h-9 rounded-full bg-gray-200 flex items-center justify-center";
+
+                if (jugador.photo) {
+                  const avatarImage = document.createElement("img");
+                  avatarImage.src = jugador.photo;
+                  avatarContainer.appendChild(avatarImage);
+                } else {
+                  const avatarImage = document.createElement("i");
+                  avatarImage.className = "fas fa-user text-2xl relative";
+                  avatarContainer.appendChild(avatarImage);
+                }
+
+                jugadorDiv.appendChild(avatarContainer);
+                bluePlayersContainer.appendChild(jugadorDiv);
+              }
+
+              bluePlayers.innerHTML = "";
+              bluePlayers.appendChild(bluePlayersContainer);
+            }
           }
           if (obj.equipos["equipoRojo"]) {
             const cantidadRed = document.getElementById("cantidadRed");
-            if (cantidadRed)
+            const redPlayers = document.getElementById("redPlayers");
+            if (cantidadRed && redPlayers) {
               cantidadRed.innerHTML =
                 "Jugadores: " +
                 Object.values(obj.equipos["equipoRojo"].jugadores).length;
+
+              const redPlayersContainer = document.createElement("div");
+              redPlayersContainer.className =
+                "avatar-group -space-x-4 rtl:space-x-reverse";
+
+              for (let i in obj.equipos["equipoRojo"].jugadores) {
+                const jugador = obj.equipos["equipoRojo"].jugadores[i];
+                const jugadorDiv = document.createElement("div");
+                jugadorDiv.className = "avatar";
+
+                const avatarContainer = document.createElement("div");
+                avatarContainer.className =
+                  "w-9 h-9 rounded-full bg-gray-200 flex items-center justify-center";
+
+                if (jugador.photo) {
+                  const avatarImage = document.createElement("img");
+                  avatarImage.src = jugador.photo;
+                  avatarContainer.appendChild(avatarImage);
+                } else {
+                  const avatarImage = document.createElement("i");
+                  avatarImage.className = "fas fa-user text-2xl relative";
+                  avatarContainer.appendChild(avatarImage);
+                }
+
+                jugadorDiv.appendChild(avatarContainer);
+                redPlayersContainer.appendChild(jugadorDiv);
+              }
+
+              redPlayers.innerHTML = "";
+              redPlayers.appendChild(redPlayersContainer);
+            }
+          }
+
+          let jugadoresEnEquipos = 0;
+
+          for (let i in obj.equipos) {
+            jugadoresEnEquipos += Object.values(
+              obj.equipos[i].jugadores
+            ).length;
+          }
+          console.log("JUGADORES EN EQUIPOS", jugadoresEnEquipos);
+
+          let startButton = document.getElementById("startButton");
+          if (jugadoresEnEquipos == obj.cantidadJugadores) {
+            startButton.classList.remove("hidden");
+          } else {
+            startButton.classList.add("hidden");
+          }
+        });
+        startButton.addEventListener("click", function () {
+          //QUiero mostrar un modal, que tenga un boton de cancelar y otro de empezar pero solo si algun equipo tiene 0 jugadores
+          //Si no, que se empiece directamente
+          if (
+            Object.values(partida.equipos["equipoAzul"].jugadores).length == 0 ||
+            Object.values(partida.equipos["equipoRojo"].jugadores).length == 0
+          ) {
+            //Mostrar modal pero de advertencia de que hay un equipo sin jugadores
+            const modal = document.getElementById("modalStart");
+            const info = document.getElementById("infoStart");
+            const warningMessageDiv = document.createElement("div");
+            // Y en este warningMessage, quiero meter un mensaje de que hay un equipo sin jugadores
+            const warningMessage = `<div class="flex flex-col items-center justify-center w-full mt-2">
+            <h1 class="text-2xl text-gray-800 font-bold">⚠️ ¡Advertencia! ⚠️</h1>
+            <p class="text-gray-700 text-center mt-2">Hay un equipo sin jugadores, la partida no puede comenzar.</p>
+            <button id="cancelarBtn" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mt-2 cursor-pointer pointer-events-auto">Cancelar</button>
+            </div>`;
+            warningMessageDiv.innerHTML = warningMessage;
+            info.appendChild(warningMessageDiv);
+            
+            modal.showModal();
+            document.getElementById("cancelarBtn").addEventListener("click", function () {
+              modal.close();
+              setTimeout(() => {
+                info.innerHTML = "";
+              }, 500);
+            });
           }
         });
 

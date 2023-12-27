@@ -1,5 +1,5 @@
 <div id="salirDiv"></div>
-<div id="passCode"></div>
+<div id="passCode" class="absolute top-2 right-2"></div>
 <div id="waitingDiv" class="bottom-20 fixed text-center justify-center w-full flex items-end"></div>
 <div id="joinDiv" class="w-96 bg-black bg-opacity-50 fixed right-0 top-1/4 text-center p-4">
     <h1 class="text-xl font-bold mb-4 text-yellow-400">Elige un equipo</h1>
@@ -21,6 +21,8 @@
             <h2 class="text-lg font-bold text-blue-500">Equipo Azul</h2>
             <p id="cantidadBlue" class="text-white">Jugadores: 0</p>
         </div>
+
+        <div id="bluePlayers" class="flex items-center"></div>
     </div>
 
     <div class="flex items-center mb-4 relative">
@@ -35,11 +37,24 @@
             </div>
         </label>
 
-        <div id="blueTeam" class="text-left ml-3 mb-2 ">
+        <div id="redTeam" class="text-left ml-3 mb-2 ">
             <h2 class="text-lg font-bold text-red-500">Equipo Rojo</h2>
             <p id="cantidadRed" class="text-white">Jugadores: 0</p>
         </div>
+
+        <div id="redPlayers" class="flex items-center"></div>
     </div>
+
+    <div>
+        <button id="startButton" class="bg-blue-500 text-white border-2 border-blue-800 rounded-md py-2 px-2 animate__animated animate__heartBeat text-2xl cursor-pointer pointer-events-auto w-48 font-bold">EMPEZAR</button>
+    </div>
+    
+    <dialog id="modalStart" class="modal">
+        <div class="modal-box">
+          <div id="infoStart"></div>
+        </div>
+      </dialog>
+
 </div>
 
 <div id="chat" class="fixed bottom-0 left-0 w-[450px] p-4 bg-black bg-opacity-40 hidden">
