@@ -608,14 +608,16 @@ function ControlWeb() {
     rest.obtenerPartida(IDPartida, function (partida) {
       socket.emit("obtenerPartidas");
       cw.mostrarPartido(partida);
-      const obj = {
-        user: $.cookie("nick"),
-        partida: partida,
-      };
-      socket.emit("cantidadJugadores", partida);
-      setTimeout(() => {
-        socket.emit("mensajeBienvenida", obj);
-      }, 5001);
+      rest.obtenerUsuario($.cookie("nick"), function (usr) {
+        const obj = {
+          user: usr,
+          partida: partida,
+        };
+        socket.emit("cantidadJugadores", partida);
+        setTimeout(() => {
+          socket.emit("mensajeBienvenida", obj);
+        }, 5001);
+      });
     });
   };
 
@@ -978,7 +980,7 @@ function ControlWeb() {
       if (passCode == partida.passCode) {
         rest.obtenerUsuario($.cookie("nick"), function (usr) {
           rest.unirsePartida(usr, passCode);
-          modalUnirse.close()
+          modalUnirse.close();
         });
       } else {
         cw.mostrarToast(
@@ -1006,13 +1008,14 @@ function ControlWeb() {
         e.preventDefault();
 
         if (e.eventPhase == 2) {
-          await rest.obtenerUsuario(user, async function (usr) {
-            console.log("Usuario", usr);
-            await rest.salirPartida(usr, partida, function (data) {
-              socket.emit("salirPartida", { usr, partida })
-              console.log("Saliendo de la partida");
-              location.reload(true);
-            });
+          rest.obtenerUsuario($.cookie("nick"), function (usr) {
+            socket.emit("salirPartida", { usr, partida });
+            $("#partido").empty();
+            $("#navbar").removeClass("hidden");
+            $("#navBarBtn").removeClass("hidden");
+            $("#container").removeClass("hidden");
+            $("#GUI").empty();
+            cw.mostrarInicio();
           });
         }
       });
@@ -1022,6 +1025,7 @@ function ControlWeb() {
       socket.emit("joinRoom", partida.passCode);
       $("#partido").removeClass("hidden");
       $("#GUI").load("./cliente/juego/GUI.html", function () {
+        socket.emit("actualizarContadorEquipo", partida);
         //PASSCODE
         const passCodeDiv = document.getElementById("passCode");
         const passCode = `<h1 class="text-white leading-none tracking-tighter justify-end items-center flex font-bold mt-2 text-2xl mr-2">Código de la partida: <span class="inline-block animate__animated animate__zoomInDown ml-2 text-yellow-500 pointer-events-auto hover:text-yellow-700">${partida.passCode}</span>
@@ -1048,10 +1052,10 @@ function ControlWeb() {
         //ESPERANDO JUGADORES
         socket.on("cantidadJugadores", (partida) => {
           console.log("CANTIDAD JUGADORES CONTROL WEB", partida);
+          const waitingDiv = document.getElementById("waitingDiv");
           if (partida.estado === "esperando") {
-            const waitingDiv = document.getElementById("waitingDiv");
             const waiting = `<h1 class="text-white">Esperando jugadores... ${partida.jugadoresConectados} / ${partida.cantidadJugadores}</h1>`;
-            waitingDiv.innerHTML = waiting;
+            if (waitingDiv) waitingDiv.innerHTML = waiting;
           } else if (partida.estado === "completa")
             if (waitingDiv.innerHTML != "") {
               waitingDiv.innerHTML = "";
@@ -1059,6 +1063,7 @@ function ControlWeb() {
         });
         if (partida.estado === "esperando") {
           const waitingDiv = document.getElementById("waitingDiv");
+          console.log("waitingDiv ", waitingDiv);
           const waiting = `<h1 class="text-white">Esperando jugadores... ${partida.jugadoresConectados} / ${partida.cantidadJugadores}</h1>`;
           waitingDiv.innerHTML = waiting;
         }
@@ -1310,15 +1315,18 @@ function ControlWeb() {
           if (!obj) return;
           if (obj.equipos["equipoAzul"]) {
             const cantidadBlue = document.getElementById("cantidadBlue");
-            cantidadBlue.innerHTML =
-              "Jugadores: " +
-              Object.values(obj.equipos["equipoAzul"].jugadores).length;
+            console.log("cantidadBlueDiv", cantidadBlue);
+            if (cantidadBlue)
+              cantidadBlue.innerHTML =
+                "Jugadores: " +
+                Object.values(obj.equipos["equipoAzul"].jugadores).length;
           }
           if (obj.equipos["equipoRojo"]) {
             const cantidadRed = document.getElementById("cantidadRed");
-            cantidadRed.innerHTML =
-              "Jugadores: " +
-              Object.values(obj.equipos["equipoRojo"].jugadores).length;
+            if (cantidadRed)
+              cantidadRed.innerHTML =
+                "Jugadores: " +
+                Object.values(obj.equipos["equipoRojo"].jugadores).length;
           }
         });
 

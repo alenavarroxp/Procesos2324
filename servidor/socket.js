@@ -20,17 +20,17 @@ function WSServer() {
         console.log("Mensaje de bienvenida", obj);
         io.to(obj.partida.passCode).emit(
           "chatMessage",
-          "Se ha unido a la partida " + obj.user
+          "Se ha unido a la partida " + obj.user.nick
         );
       });
-      
-      
-
-
 
       socket.on("cantidadJugadores", (obj) => {
         console.log("Cantidad de jugadores", obj);
         io.to(obj.passCode).emit("cantidadJugadores", obj);
+      });
+
+      socket.on("actualizarContadorEquipo", (obj) => {
+        io.to(obj.passCode).emit("actualizarContadorEquipo", obj);
       });
 
       socket.on("obtenerPartidas", () => {
@@ -42,40 +42,54 @@ function WSServer() {
 
       socket.on("unirseAEquipo", (obj) => {
         sistema.unirseAEquipo(obj.partida, obj.usr, obj.equipo, function (obj) {
-          console.log("SOCKET UNIRSE A EQUIPO: ",obj)
-          io.to(obj.partida.passCode).emit("actualizarContadorEquipo", obj.partida);
+          console.log("SOCKET UNIRSE A EQUIPO: ", obj);
+          if (!obj.error)
+            io.to(obj.partida.passCode).emit(
+              "actualizarContadorEquipo",
+              obj.partida
+            );
         });
       });
 
       socket.on("playerCreado", (obj) => {
-        console.log("PLAYER CREADOSERVIDOOOOOOOOR", obj)
+        console.log("PLAYER CREADOSERVIDOOOOOOOOR", obj);
         io.to(obj.code).emit("playerCreado", obj);
       });
 
       socket.on("salirEquipo", (obj) => {
         sistema.salirEquipo(obj.partida, obj.usr, obj.equipo, function (obj) {
-          io.to(obj.partida.passCode).emit("actualizarContadorEquipo", obj.partida);
+          io.to(obj.partida.passCode).emit(
+            "actualizarContadorEquipo",
+            obj.partida
+          );
         });
       });
-      
+
       socket.on("salirPartida", (obj) => {
-        console.log("OBJETO", obj)
-        io.to(obj.partida.passCode).emit("chatMessage", "Se ha ido de la partida " + obj.usr.email);
+        console.log("OBJETO", obj);
+        io.to(obj.partida.passCode).emit(
+          "chatMessage",
+          "Se ha ido de la partida " + obj.usr.nick
+        );
         sistema.salirPartida(obj.partida, obj.usr, function (obj) {
-          io.to(obj.partida.passCode).emit("actualizarContadorEquipo", obj.partida);
-          console.log("OBJ", obj)
-          if(obj.partida) io.to(obj.partida.passCode).emit("cantidadJugadores", obj.partida);
+          console.log("OBJ", obj);
+          if (obj.partida) {
+            io.to(obj.partida.passCode).emit(
+              "actualizarContadorEquipo",
+              obj.partida
+            );
+            io.to(obj.partida.passCode).emit("cantidadJugadores", obj.partida);
+          }
           sistema.obtenerPartidas(function (obj) {
             console.log("OBJ", obj);
             socket.broadcast.emit("obtenerPartidas", obj);
-          });          
+          });
         });
       });
 
       socket.on("recargarPagina", (obj) => {
-        console.log("OBJETOasdasdasdasdasdasdrecarga", obj)
+        console.log("OBJETOasdasdasdasdasdasdrecarga", obj);
       });
-
     });
   };
 }
