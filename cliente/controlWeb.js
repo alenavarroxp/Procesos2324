@@ -1441,7 +1441,8 @@ function ControlWeb() {
           //QUiero mostrar un modal, que tenga un boton de cancelar y otro de empezar pero solo si algun equipo tiene 0 jugadores
           //Si no, que se empiece directamente
           if (
-            Object.values(partida.equipos["equipoAzul"].jugadores).length == 0 ||
+            Object.values(partida.equipos["equipoAzul"].jugadores).length ==
+              0 ||
             Object.values(partida.equipos["equipoRojo"].jugadores).length == 0
           ) {
             //Mostrar modal pero de advertencia de que hay un equipo sin jugadores
@@ -1456,13 +1457,46 @@ function ControlWeb() {
             </div>`;
             warningMessageDiv.innerHTML = warningMessage;
             info.appendChild(warningMessageDiv);
-            
+
             modal.showModal();
-            document.getElementById("cancelarBtn").addEventListener("click", function () {
-              modal.close();
-              setTimeout(() => {
-                info.innerHTML = "";
-              }, 500);
+            document
+              .getElementById("cancelarBtn")
+              .addEventListener("click", function () {
+                modal.close();
+                setTimeout(() => {
+                  info.innerHTML = "";
+                }, 500);
+              });
+          } else {
+            rest.obtenerUsuario($.cookie("nick"), function (usr) {
+              const modal = document.getElementById("modalStart");
+              console.log("MODAL", modal);
+              const isOpen = modal.open;
+              socket.emit("jugadorReady", {
+                usr: usr,
+                partida: partida,
+                isOpen: isOpen,
+              });
+
+              const startButton = document.getElementById("startButton");
+              startButton.disabled = true;
+              startButton.innerHTML = `<div class="flex flex-row items-center justify-center">
+              <p class="text-white">Esperando</p>
+              <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white ml-2 mr-1"></div>
+              </div>`;
+
+              const checkBlue = document.getElementById("checkbTeam");
+              const checkRed = document.getElementById("checkrTeam");
+              checkBlue.disabled = true;
+              checkRed.disabled = true;
+
+              const veribCheck = document.getElementById("veribCheck");
+              const verirCheck = document.getElementById("verirCheck");
+              //Quiero poner un candado en los checkbox de los equipos
+              veribCheck.classList.replace("left-2", "left-3");
+              verirCheck.classList.replace("left-2", "left-3");
+              veribCheck.innerHTML = `<i class="fas fa-lock text-3xl text-blue-500 animate__animated animate__jackInTheBox"></i>`;
+              verirCheck.innerHTML = `<i class="fas fa-lock text-3xl text-red-500 animate__animated animate__jackInTheBox"></i>`;
             });
           }
         });
@@ -1470,6 +1504,54 @@ function ControlWeb() {
         socket.on("playerCreado", function (obj) {
           console.log("PLAYER CREADOWEBBBBBBBBBB", obj);
           window.juego.addOtherPlayer(obj.player, obj.equipo, obj.position);
+        });
+
+        socket.on("jugadorReady", function (obj) {
+          console.log("JUGADOR READY", obj);
+          if (!obj.isOpen) {
+            const jugadoresReady = document.getElementById("jugadoresReady");
+            jugadoresReady.classList.remove("hidden");
+            //Quiero mostrar un div que aparezca la foto del jugador que está listo con un icono de un check verde abajo a la derecha
+            const jugadorReadyDiv = document.createElement("div");
+            jugadorReadyDiv.className = "avatar ml-2 mr-2";
+            const avatarContainer = document.createElement("div");
+            avatarContainer.className =
+              "w-14 h-14 rounded-full border-4 border-green-500 bg-gray-200 flex items-center justify-center";
+            if (obj.usr.photo) {
+              const div = document.createElement("div");
+              div.className = "items-center justify-center flex h-full";
+              const avatarImage = document.createElement("img");
+              avatarImage.src = obj.usr.photo;
+              div.appendChild(avatarImage);
+              avatarContainer.appendChild(div);
+            } else {
+              const div = document.createElement("div");
+              div.className = "items-center justify-center flex h-full";
+              const avatarImage = document.createElement("i");
+              avatarImage.className = "fas fa-user text-2xl relative";
+              div.appendChild(avatarImage);
+              avatarContainer.appendChild(div);
+            }
+            const checkReady = document.createElement("div");
+            checkReady.className = "absolute bottom-0 right-0";
+            checkReady.innerHTML = `<lottie-player src="./cliente/img/lottie/playerReady.json" background="transparent" speed="1"
+          class="w-8 h-8" autoplay></lottie-player>`;
+            avatarContainer.appendChild(checkReady);
+            jugadorReadyDiv.appendChild(avatarContainer);
+            jugadoresReady.appendChild(jugadorReadyDiv);
+          }
+
+          //SI todos los jugadores están ready que haya un contador de 5 segundos en el start button y que se empiece la partida
+          const startButton = document.getElementById("startButton");
+          const jugadoresReadyDiv = document.getElementById("jugadoresReady");
+
+          const jugadoresReady = jugadoresReadyDiv.childElementCount;
+          if (jugadoresReady == partida.cantidadJugadores) {
+            startButton.innerHTML = `<div class="flex flex-row items-center justify-center">
+                <lottie-player src="./cliente/img/lottie/countDown.json" background="transparent" speed="1" class="w-8 h-8" autoplay></lottie-player>
+                </div>`;
+
+          }
         });
       });
     });

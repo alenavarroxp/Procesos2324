@@ -51,6 +51,11 @@ function WSServer() {
         });
       });
 
+      socket.on("jugadorReady", (obj) => {
+        console.log("OBJ en servidor jugadorReady", obj)
+        io.to(obj.partida.passCode).emit("jugadorReady", obj);
+      });
+
       socket.on("playerCreado", (obj) => {
         console.log("PLAYER CREADOSERVIDOOOOOOOOR", obj);
         io.to(obj.code).emit("playerCreado", obj);
