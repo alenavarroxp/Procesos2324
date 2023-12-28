@@ -1010,6 +1010,7 @@ function ControlWeb() {
         if (e.eventPhase == 2) {
           rest.obtenerUsuario($.cookie("nick"), function (usr) {
             socket.emit("salirPartida", { usr, partida });
+            socket.emit("actualizarJugadoresReady", { partida });
             $("#partido").empty();
             $("#navbar").removeClass("hidden");
             $("#navBarBtn").removeClass("hidden");
@@ -1040,6 +1041,7 @@ function ControlWeb() {
         $("#salirBtn").on("click", function () {
           rest.obtenerUsuario($.cookie("nick"), function (usr) {
             socket.emit("salirPartida", { usr, partida });
+            socket.emit("actualizarJugadoresReady", { partida });
             $("#partido").empty();
             $("#navbar").removeClass("hidden");
             $("#navBarBtn").removeClass("hidden");
@@ -1337,6 +1339,82 @@ function ControlWeb() {
           }
         });
 
+        socket.on("actualizarJugadoresReady", function (obj) {
+          console.log("ACTUALIZAR JUGADORES READY", obj);
+          const jugadoresReady = document.getElementById("jugadoresReady");
+          console.log("JUGADORES READY", jugadoresReady);
+          if (jugadoresReady) jugadoresReady.innerHTML = "";
+
+          const veribCheck = document.getElementById("veribCheck");
+          const verirCheck = document.getElementById("verirCheck");
+          const checkbTeam = document.getElementById("checkbTeam");
+          const checkrTeam = document.getElementById("checkrTeam");
+          const startButton = document.getElementById("startButton");
+          const startText = document.getElementById("startText");
+
+          if (veriCheckB && veriCheckR && checkbTeam && checkrTeam) {
+            rest.obtenerUsuario($.cookie("nick"), function (usr) {
+              console.log("obj", obj.partida.equipos);
+              console.log("usr", usr);
+              if (
+                !obj.partida.equipos["equipoAzul"].jugadores[usr.nick] &&
+                !obj.partida.equipos["equipoRojo"].jugadores[usr.nick]
+              ) {
+                veribCheck.innerHTML = ``;
+                verirCheck.innerHTML = ``;
+                veribCheck.classList.replace("left-3", "left-2");
+                verirCheck.classList.replace("left-3", "left-2");
+                checkbTeam.disabled = false;
+                checkbTeam.checked = false;
+                checkrTeam.disabled = false;
+                checkrTeam.checked = false;
+
+                startButton.disabled = false;
+                startText.textContent = "EMPEZAR";
+                
+
+              }
+
+              const lockB = document.getElementById("lockB");
+              const lockR = document.getElementById("lockR");
+              console.log("lockB", lockB);
+              console.log("lockR", lockR);
+              if (lockB && lockR) {
+                if (obj.partida.equipos["equipoAzul"].jugadores[usr.nick]) {
+                  veribCheck.innerHTML = `<ion-icon name="checkmark-outline" class="text-4xl text-blue-500 animate__animated animate__jackInTheBox"></ion-icon>`;
+                  checkbTeam.disabled = false;
+                  checkbTeam.checked = true;
+                  veribCheck.classList.replace("left-3", "left-2");
+                  veriCheckR.innerHTML = `<ion-icon name="close-outline" class="text-4xl text-gray-500 animate__animated animate__jackInTheBox md hydrated" role="img"></ion-icon>`;
+                  checkrTeam.disabled = true;
+                  checkrTeam.checked = false;
+                  verirCheck.classList.replace("left-3", "left-2");
+                } else if (
+                  obj.partida.equipos["equipoRojo"].jugadores[usr.nick]
+                ) {
+                  verirCheck.innerHTML = `<ion-icon name="checkmark-outline" class="text-4xl text-red-500 animate__animated animate__jackInTheBox"></ion-icon>`;
+                  checkrTeam.disabled = false;
+                  checkrTeam.checked = true;
+                  verirCheck.classList.replace("left-3", "left-2");
+                  veriCheckB.innerHTML = `<ion-icon name="close-outline" class="text-4xl text-gray-500 animate__animated animate__jackInTheBox md hydrated" role="img"></ion-icon>`;
+                  checkbTeam.disabled = true;
+                  checkbTeam.checked = false;
+                  veribCheck.classList.replace("left-3", "left-2");
+                } else {
+                  veribCheck.innerHTML = ``;
+                  verirCheck.innerHTML = ``;
+                  veribCheck.classList.replace("left-3", "left-2");
+                  verirCheck.classList.replace("left-3", "left-2");
+                  checkbTeam.disabled = false;
+                  checkbTeam.checked = false;
+                  checkrTeam.disabled = false;
+                  checkrTeam.checked = false;
+                }
+              }
+            });
+          }
+        });
+
         socket.on("actualizarContadorEquipo", function (obj) {
           console.log("ACTUALIZAR CONTADOR EQUIPO", obj);
           partida = obj;
@@ -1431,6 +1509,7 @@ function ControlWeb() {
           console.log("JUGADORES EN EQUIPOS", jugadoresEnEquipos);
 
           let startButton = document.getElementById("startButton");
+          if (!startButton) return;
           if (jugadoresEnEquipos == obj.cantidadJugadores) {
             startButton.classList.remove("hidden");
           } else {
@@ -1481,7 +1560,7 @@ function ControlWeb() {
               const startButton = document.getElementById("startButton");
               startButton.disabled = true;
               startButton.innerHTML = `<div class="flex flex-row items-center justify-center">
-              <p class="text-white">Esperando</p>
+              <p id="startText" class="text-white">Esperando</p>
               <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white ml-2 mr-1"></div>
               </div>`;
 
@@ -1495,8 +1574,8 @@ function ControlWeb() {
               //Quiero poner un candado en los checkbox de los equipos
               veribCheck.classList.replace("left-2", "left-3");
               verirCheck.classList.replace("left-2", "left-3");
-              veribCheck.innerHTML = `<i class="fas fa-lock text-3xl text-blue-500 animate__animated animate__jackInTheBox"></i>`;
-              verirCheck.innerHTML = `<i class="fas fa-lock text-3xl text-red-500 animate__animated animate__jackInTheBox"></i>`;
+              veribCheck.innerHTML = `<i id="lockB" class="fas fa-lock text-3xl text-blue-500 animate__animated animate__jackInTheBox"></i>`;
+              verirCheck.innerHTML = `<i id="lockR" class="fas fa-lock text-3xl text-red-500 animate__animated animate__jackInTheBox"></i>`;
             });
           }
         });
@@ -1507,6 +1586,7 @@ function ControlWeb() {
         });
 
         socket.on("jugadorReady", function (obj) {
+          const startButton = document.getElementById("startButton");
           console.log("JUGADOR READY", obj);
           if (!obj.isOpen) {
             const jugadoresReady = document.getElementById("jugadoresReady");
@@ -1542,7 +1622,7 @@ function ControlWeb() {
           }
 
           //SI todos los jugadores están ready que haya un contador de 5 segundos en el start button y que se empiece la partida
-          const startButton = document.getElementById("startButton");
+
           const jugadoresReadyDiv = document.getElementById("jugadoresReady");
 
           const jugadoresReady = jugadoresReadyDiv.childElementCount;
@@ -1550,11 +1630,23 @@ function ControlWeb() {
             startButton.innerHTML = `<div class="flex flex-row items-center justify-center">
                 <lottie-player src="./cliente/img/lottie/countDown.json" background="transparent" speed="1" class="w-8 h-8" autoplay></lottie-player>
                 </div>`;
-
+            setTimeout(() => {
+              cw.ocultarDivs("salirDiv");
+              cw.ocultarDivs("waitingDiv");
+              cw.ocultarDivs("passCode");
+              cw.ocultarDivs("joinDiv");
+              const GUIContador = document.getElementById("GUIContador");
+              GUIContador.classList.remove("hidden");
+            }, 4500);
           }
         });
       });
     });
+  };
+
+  this.ocultarDivs = function (div) {
+    const divOcultar = document.getElementById(div);
+    divOcultar.classList.add("hidden");
   };
 
   this.mostrarLoadingGame = function (partida) {
