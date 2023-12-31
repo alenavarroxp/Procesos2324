@@ -1269,6 +1269,7 @@ function ControlWeb() {
         const checkboxR = document.getElementById("checkrTeam");
         const checkJoinR = document.getElementById("checkrJoin");
         const veriCheckR = document.getElementById("verirCheck");
+        const startButton = document.getElementById("startButton");
 
         checkboxB.addEventListener("change", function () {
           if (checkboxB.checked) {
@@ -1280,7 +1281,7 @@ function ControlWeb() {
                 equipo: "equipoAzul",
               });
             });
-
+            startButton.disabled = true;
             checkboxR.disabled = true;
             veriCheckR.innerHTML = `<ion-icon name="close-outline" class="text-4xl text-gray-500 animate__animated animate__jackInTheBox"></ion-icon>`;
             checkJoinB.classList.remove("hidden");
@@ -1288,6 +1289,7 @@ function ControlWeb() {
             setTimeout(() => {
               checkJoinB.classList.add("hidden");
               checkboxB.disabled = false;
+              startButton.disabled = false;
               veriCheckB.innerHTML = `<ion-icon name="checkmark-outline" class="text-4xl text-blue-500 animate__animated animate__jackInTheBox"></ion-icon>`;
             }, 2500);
           } else {
@@ -1315,6 +1317,7 @@ function ControlWeb() {
                 equipo: "equipoRojo",
               });
             });
+            startButton.disabled = true;
             checkboxB.disabled = true;
             veriCheckB.innerHTML = `<ion-icon name="close-outline" class="text-4xl text-gray-500 animate__animated animate__jackInTheBox"></ion-icon>`;
             checkJoinR.classList.remove("hidden");
@@ -1322,6 +1325,7 @@ function ControlWeb() {
             setTimeout(() => {
               checkJoinR.classList.add("hidden");
               checkboxR.disabled = false;
+              startButton.disabled = false;
               veriCheckR.innerHTML = `<ion-icon name="checkmark-outline" class="text-4xl text-red-500 animate__animated animate__jackInTheBox"></ion-icon>`;
             }, 2500);
           } else {
@@ -1351,6 +1355,7 @@ function ControlWeb() {
           const checkrTeam = document.getElementById("checkrTeam");
           const startButton = document.getElementById("startButton");
           const startText = document.getElementById("startText");
+          const spin = document.getElementById("spin");
 
           if (veriCheckB && veriCheckR && checkbTeam && checkrTeam) {
             rest.obtenerUsuario($.cookie("nick"), function (usr) {
@@ -1371,8 +1376,8 @@ function ControlWeb() {
 
                 startButton.disabled = false;
                 startText.textContent = "EMPEZAR";
-                
-
+                //Eliminar el spinner
+                spin.parentNode.removeChild(spin);
               }
 
               const lockB = document.getElementById("lockB");
@@ -1410,6 +1415,9 @@ function ControlWeb() {
                   checkrTeam.disabled = false;
                   checkrTeam.checked = false;
                 }
+                startButton.disabled = false;
+                startText.textContent = "EMPEZAR";
+                spin.parentNode.removeChild(spin);
               }
             });
           }
@@ -1561,7 +1569,7 @@ function ControlWeb() {
               startButton.disabled = true;
               startButton.innerHTML = `<div class="flex flex-row items-center justify-center">
               <p id="startText" class="text-white">Esperando</p>
-              <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white ml-2 mr-1"></div>
+              <div id="spin" class="animate-spin rounded-full h-4 w-4 border-b-2 border-white ml-2 mr-1"></div>
               </div>`;
 
               const checkBlue = document.getElementById("checkbTeam");
