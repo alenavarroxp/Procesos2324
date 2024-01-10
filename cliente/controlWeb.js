@@ -994,6 +994,19 @@ function ControlWeb() {
 
     modalUnirse.showModal();
   };
+  this.removeBabylonScripts = function () {
+    var babylonScript = document.querySelector(
+      'script[src="https://cdnjs.cloudflare.com/ajax/libs/babylonjs/6.36.1/babylon.js"]'
+    );
+    var loadersScript = document.querySelector(
+      'script[src="https://cdn.babylonjs.com/loaders/babylonjs.loaders.min.js"]'
+    );
+
+    if (babylonScript && loadersScript) {
+      babylonScript.parentNode.removeChild(babylonScript);
+      loadersScript.parentNode.removeChild(loadersScript);
+    }
+  };
 
   this.mostrarPartido = function (partida) {
     console.log("MOSTRAR PARTIDO", partida);
@@ -1039,6 +1052,7 @@ function ControlWeb() {
         salirDiv.innerHTML = salir;
 
         $("#salirBtn").on("click", function () {
+          cw.removeBabylonScripts();
           rest.obtenerUsuario($.cookie("nick"), function (usr) {
             socket.emit("salirPartida", { usr, partida });
             socket.emit("actualizarJugadoresReady", { partida });
@@ -1048,6 +1062,7 @@ function ControlWeb() {
             $("#container").removeClass("hidden");
             $("#GUI").empty();
             cw.mostrarInicio();
+            location.reload(true)
           });
         });
 

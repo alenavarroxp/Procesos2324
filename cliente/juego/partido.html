@@ -1,14 +1,29 @@
 <div class="relative">
     <div id="loading" class="absolute z-10 w-screen h-screen animate__animated"></div>
     <div id="GUI" class="absolute z-0 w-screen h-screen pointer-events-none"></div>
-    <div id="juego" class="w-screen h-screen"></div>
+    <canvas id="juego" class="w-screen h-screen"></canvas>
 </div>
 
+
 <script type="module" src="./cliente/juego/juego.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/babylonjs/6.36.1/babylon.js"
-        integrity="sha512-XoT/FpkDjE86dUt1FIszn5+UNEIEpZupAcufRB6SumNuDse+djx0wF/Q40fb1cTKaBJtOH8S5PR/JFMXsnWFYg=="
-        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
 <script>
-   
+    function loadScript(src, callback) {
+        var script = document.createElement('script');
+        script.type = 'text/javascript';
+        script.src = src;
+        script.onload = callback;
+        document.head.appendChild(script);
+    }
+
+    loadScript('https://cdnjs.cloudflare.com/ajax/libs/babylonjs/6.36.1/babylon.js', function () {
+        loadScript('https://cdn.babylonjs.com/loaders/babylonjs.loaders.min.js', function () {
+            // Tu código que depende de Babylon.js y sus loaders
+        });
+    });
+</script>
+
+
+<script>
+
 </script>
