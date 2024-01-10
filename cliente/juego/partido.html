@@ -5,7 +5,6 @@
 </div>
 
 
-<script type="module" src="./cliente/juego/juego.js"></script>
 
 <script>
     function loadScript(src, callback) {
@@ -18,11 +17,14 @@
 
     loadScript('https://cdnjs.cloudflare.com/ajax/libs/babylonjs/6.36.1/babylon.js', function () {
         loadScript('https://cdn.babylonjs.com/loaders/babylonjs.loaders.min.js', function () {
+            loadScript('https://cdn.babylonjs.com/havok/HavokPhysics_umd.js', function () {
+            })
             // Tu código que depende de Babylon.js y sus loaders
         });
     });
 </script>
 
+<script type="module" src="./cliente/juego/juego.js"></script>
 
 <script>
 

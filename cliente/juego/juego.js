@@ -8,11 +8,12 @@ export default class Juego {
     this._scene = null;
     this._camera = null;
     this._light = null;
+    this._players = {};
   }
 
-  initGame = function () {
+  initGame = async function () {
     this._canvas = document.getElementById("juego");
-    console.log("CANVAS", this._canvas)
+    console.log("CANVAS", this._canvas);
     this._engine = new BABYLON.Engine(this._canvas, true);
     this._scene = new BABYLON.Scene(this._engine);
     this._camera = new BABYLON.ArcRotateCamera(
@@ -23,12 +24,12 @@ export default class Juego {
       BABYLON.Vector3.Zero(),
       this._scene
     );
-    console.log("CANVAS, ENGINE, SCENE, CAMERA", this._canvas, this._engine, this._scene, this._camera )
     this._camera.attachControl(this._canvas, true);
     this._camera.upperBetaLimit = Math.PI / 2.15;
 
-    this._camera.position.set(0, 450, 0);
-    this._camera.rotation.set(-Math.PI / 2, 0, -Math.PI / 2);
+    this._camera.position = new BABYLON.Vector3(0, 50, 0);
+    this._camera.target = new BABYLON.Vector3(0, 0, 0); // Ajusta el punto al que la cámara apunta
+
     console.log("CAMERA", this._camera);
 
     this._light = new BABYLON.HemisphericLight(
@@ -36,6 +37,11 @@ export default class Juego {
       new BABYLON.Vector3(0, 1, 0),
       this._scene
     );
+
+    const havokInstance = await HavokPhysics();
+    this._hk = new BABYLON.HavokPlugin(true, havokInstance);
+    console.log("Havok", this._hk);
+    this._scene.enablePhysics(new BABYLON.Vector3(0, -9.81, 0), this._hk);
   };
 
   startRenderingLoop = function () {
@@ -49,42 +55,16 @@ export default class Juego {
   };
 
   addPlayer = function (code, player, equipo) {
-    let playerModel;
-    console.log("this.players", this.players);
-    for (let clave of this.players) {
-      console.log("clave", clave);
-      console.log("player", player);
-      if (clave.player.email === player.email) {
-        console.log("ENCONTRO UN PLAYER");
-        playerModel = clave.model;
-      }
-    }
-    console.log("this.players", this.players);
+    const character = new Player();
+    character.initPlayer(this, player, equipo);
 
-    if (!playerModel) {
-      console.log("CREO UN NUEVO PLAYER");
-      playerModel = new Player();
-    }
-
-    playerModel.initPlayer(this, code, player, equipo);
     const playerObj = {
-      player: player,
-      model: playerModel
+      user: player,
+      character: character,
     };
 
-    // for (let clave of this.players) {
-    //   console.log("clave", clave);
-    //   console.log("player", player);
-    //   if (clave.player != player) {
-    //     this.players.push(playerObj);
-    //     break;
-    //   }
-    // }
-    if (this.players.length == 0) {
-      console.log("IF PLAYERS", this.players);
-      this.players.push(playerObj);
-    }
-    console.log("this.players INIT PLAYER", this.players);
+    this._players[player.email] = playerObj;
+    console.log("THIS PLAYERS", this._players)
   };
 
   addOtherPlayer = function (player, equipo, position) {
@@ -107,7 +87,7 @@ export default class Juego {
     playerModel.renderOtherPlayer(this, player, position, equipo);
     const playerObj = {
       player: player,
-      model: playerModel
+      model: playerModel,
     };
     this.players.push(playerObj);
     console.log("this.players OTHER PLAYERS", this.players);
@@ -122,23 +102,20 @@ export default class Juego {
     }
     console.log("THIS PLAYER REMOVE PLAYER", this.players);
   };
-
-
-   
-  
 }
 window.addEventListener("resize", function () {
   juego._engine.resize();
 });
 
-
 const juego = new Juego();
-juego.initGame();
-juego.startRenderingLoop();
-window.juego = juego;
+setTimeout(() => {
+  juego.initGame();
+  juego.startRenderingLoop();
+  window.juego = juego;
 
-const mapa = new Mapa();
-mapa.initMap(juego._scene);
+  const mapa = new Mapa();
+  mapa.initMap(juego._scene);
+}, 1000);
 
 // const ball = new FBXLoader();
 // ball.load("./cliente/juego/public/ball.fbx", function (object) {

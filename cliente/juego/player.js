@@ -1,93 +1,36 @@
-import * as THREE from "https://unpkg.com/three@0.126.1/build/three.module.js";
-import { FBXLoader } from "https://unpkg.com/three@0.126.1/examples/jsm/loaders/FBXLoader.js";
 class Player {
   constructor() {
-    this._player = null;
-    this._model = null;
-    this._mixer = null;
-    this._savePosition = {};
-    this._direction = new THREE.Vector3(0, 0, -1);
-    this._movementSpeed = 0.002;
-    this._rotationSpeed = 0.0001;
-    this._euler = new THREE.Euler(0, 0, 0, "YXZ");
-    this._keysPressed = {};
-    this._animationRunning = false;
-    this._isPlayerRunning = false;
-    this._prevTime = null;
+    this._character = null;
+    this._savePosition = null;
   }
 
-  initPlayer = (juego, code, player, equipo) => {
-    this._player = player;
-    this._model = new FBXLoader();
-    this._model.load(
-      "./cliente/juego/public/models/playerIdle.fbx",
-      (object) => {
-        object.scale.set(0.1, 0.1, 0.1);
+  initPlayer = (juego, player, equipo) => {
+    console.log("PLAYER JUEGO CODIGO PLAYER EQUIPO", juego, player, equipo);
+    BABYLON.SceneLoader.ImportMesh(
+      "",
+      "./cliente/juego/public/models/",
+      "Man.glb",
+      juego._scene,
+      (newMeshes, particleSystems, skeletons) => {
+        console.log("mesheshuman", newMeshes);
+        const object = newMeshes[0];
+        object.scaling = new BABYLON.Vector3(0.35, 0.35, 0.35);
+        
+        if (!this._savePosition) {
+          const randomPositionX = Math.floor(Math.random() * 10) + 1;
+          const randomPositionZ = Math.floor(Math.random() * 10) + 1;
+          if (equipo == "equipoAzul") {
+            object.position = new BABYLON.Vector3(
+              randomPositionX,
+              0.75,
+              randomPositionZ
+            );
+          }
+        }
 
-        if (equipo == "equipoAzul") {
-          object.rotation.set(0, Math.PI / 2, 0);
-          if (
-            this._savePosition.equipoAzul &&
-            this._savePosition.equipoAzul.equipo == equipo
-          ) {
-            object.position.set(
-              this._savePosition.equipoAzul.position.x,
-              this._savePosition.equipoAzul.position.y,
-              this._savePosition.equipoAzul.position.z
-            );
-          } else {
-            let x = Math.floor(Math.random() * (-10 - -165) + -165);
-            let z = Math.floor(Math.random() * (90 - -90) + -90);
-            object.position.set(x, 0, z);
-            const saveB = { equipo: equipo, position: object.position };
-            this._savePosition.equipoAzul = saveB;
-          }
-        } else if (equipo == "equipoRojo") {
-          object.rotation.set(0, -Math.PI / 2, 0);
-          if (
-            this._savePosition.equipoRojo &&
-            this._savePosition.equipoRojo.equipo == equipo
-          ) {
-            object.position.set(
-              this._savePosition.equipoRojo.position.x,
-              this._savePosition.equipoRojo.position.y,
-              this._savePosition.equipoRojo.position.z
-            );
-          } else {
-            //Quiero que vaya la X de 10 a 165
-            //Quiero que vaya la Z de -90 a 90
-            let x = Math.floor(Math.random() * (165 - 10) + 10);
-            let z = Math.floor(Math.random() * (90 - -90) + -90);
-            object.position.set(x, 0, z);
-            const saveR = { equipo: equipo, position: object.position };
-            this._savePosition.equipoRojo = saveR;
-          }
-        }
-        // console.log(object);
-        const animation = object.animations.find(
-          (anim) => anim.name === "mixamo.com"
-        );
-        // console.log(animation);
-        this._mixer = new THREE.AnimationMixer(object);
-        const action = this._mixer.clipAction(animation);
-        // console.log("action", action);
-        action.play();
-        this._model = object;
-        console.log("PLAYER", this);
-        console.log("CODE", code);
-        let player = this;
-        console.log("player", player._model);
         try {
-          socket.emit("playerCreado", {
-            code: code,
-            player: player._player,
-            position: player._model.position,
-            equipo: equipo,
-          });
-        } catch (e) {
-          console.log("error", e);
-        }
-        juego.addToScene(object);
+          juego.addToScene(object);
+        } catch (err) {}
       }
     );
   };

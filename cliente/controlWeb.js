@@ -1680,7 +1680,7 @@ function ControlWeb() {
         setTimeout(function () {
           $("#loading").addClass("hidden");
         }, 1000);
-      }, 5000);
+      }, 50);
     });
   };
 
