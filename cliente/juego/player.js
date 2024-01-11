@@ -34,7 +34,8 @@ class Player {
               if (equipo == "equipoAzul") {
                 const randomPositionX =
                   Math.floor(Math.random() * (8 - -8 + 1)) + -8;
-                const randomPositionZ = Math.floor(Math.random() * 18) + 1;
+                  const randomPositionZ = Math.floor(Math.random() * (18 - 2 + 1)) + 2;
+
                 material.diffuseColor = new BABYLON.Color3.FromHexString(
                   "#00bfff"
                 );
@@ -53,8 +54,8 @@ class Player {
               if (equipo == "equipoRojo") {
                 const randomPositionX =
                   Math.floor(Math.random() * (8 - -8 + 1)) + -8;
-                const randomPositionZ =
-                  Math.floor(Math.random() * (-18 - 1 + 1)) + 1;
+                const randomPositionZ = Math.floor(Math.random() * (-18 - 2 + 1)) + 2;
+
                 material.diffuseColor = new BABYLON.Color3.FromHexString(
                   "#d60909"
                 );
@@ -175,6 +176,7 @@ class Player {
               material.diffuseColor = new BABYLON.Color3.FromHexString(
                 "#d60909"
               );
+              this._mesh.rotation = new BABYLON.Vector3(0, 0, 0);
               this._savePosition.equipoRojo = {
                 position: position,
               };

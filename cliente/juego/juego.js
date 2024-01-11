@@ -9,6 +9,7 @@ export default class Juego {
     this._camera = null;
     this._light = null;
     this._players = {};
+    this._isLookingAtPlayer = false;
   }
 
   initGame = async function () {
@@ -24,11 +25,20 @@ export default class Juego {
       BABYLON.Vector3.Zero(),
       this._scene
     );
+    this._camera.inputs.attached.pointers.buttons = [0];
+    this._camera.inputs.attached.pointers.disableRightClick = true;
+    this._camera.inputs.attached.pointers.multiTouchPanAndZoom = false;
+    this._camera.inputs.attached.pointers.multiTouchPanning = false;
+    this._camera.inputs.attached.pointers.pinchInwards = false;
+    this._camera.inputs.attached.pointers.pinchZoom = false;
+    this._camera.inputs.attached.keyboard.useAltToZoom = false;
     this._camera.attachControl(this._canvas, true);
     this._camera.upperBetaLimit = Math.PI / 2.15;
 
     this._camera.position = new BABYLON.Vector3(0, 50, 0);
     this._camera.target = new BABYLON.Vector3(0, 0, 0); // Ajusta el punto al que la cámara apunta
+    this._camera.alpha += Math.PI; // Rota la cámara 180 grados
+    this._camera.lowerRadiusLimit = 5; // Establece la distancia mínima a la que la cámara puede alejarse del objetivo
 
     console.log("CAMERA", this._camera);
 
@@ -90,11 +100,9 @@ export default class Juego {
     if (!this._players[player.email]) {
       console.log("NO TABA");
       character = new Player();
-      
     } else {
       console.log("SI TABA");
       character = this._players[player.email].character;
-      
     }
 
     character.addPlayer(this, player, equipo, position);
@@ -131,9 +139,106 @@ export default class Juego {
       console.log("scene meshes", Object.keys(this._scene.meshes).length);
     }
   };
+
+  zoomCamera = function (usr, equipo) {
+    if (this._players[usr.email]) {
+      this._isLookingAtPlayer = true;
+      const targetPosition = this._players[usr.email].character._actualPosition;
+      const targetRadius = 8;
+      const targetBeta = Math.PI / 5.5; // Puedes ajustar este valor según tus preferencias
+
+      var targetAlpha;
+      switch (equipo) {
+        case "equipoAzul":
+          targetAlpha = Math.PI / 2;
+          break;
+        case "equipoRojo":
+          targetAlpha = -Math.PI / 2;
+          break;
+        default:
+          break;
+      }
+
+      juego.animacion(
+        "zoomAnimation",
+        this._camera,
+        "radius",
+        60,
+        120,
+        this._camera.radius,
+        targetRadius
+      );
+      juego.animacion(
+        "positionAnimation",
+        this._camera,
+        "target",
+        60,
+        120,
+        this._camera.target,
+        targetPosition
+      );
+      juego.animacion(
+        "betaAnimation",
+        this._camera,
+        "beta",
+        60,
+        120,
+        this._camera.beta,
+        targetBeta
+      );
+      juego.animacion(
+        "alphaAnimation",
+        this._camera,
+        "alpha",
+        60,
+        120,
+        this._camera.alpha,
+        targetAlpha
+      );
+    }
+  };
+  cambiarTarget = function (usr) {
+    this._isLookingAtPlayer = !this._isLookingAtPlayer;
+    if (this._isLookingAtPlayer && this._players[usr.email] ) {
+      this._camera.target = this._players[usr.email].character._actualPosition;
+    } else {
+      this._camera.target = new BABYLON.Vector3(0, 0, 0);
+    }
+  };
+
+  animacion = function (
+    nombre,
+    objective,
+    propiedad,
+    velocidad,
+    fotogramas,
+    valorInicial,
+    valorFinal
+  ) {
+    BABYLON.Animation.CreateAndStartAnimation(
+      nombre, // Nombre de la animación
+      objective, // Objetivo de la animación
+      propiedad, // Propiedad que se animará
+      velocidad, // Velocidad de fotogramas
+      fotogramas, // Número total de fotogramas
+      valorInicial, // Valor inicial
+      valorFinal, // Valor final
+      BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT, // Modo de bucle
+      new BABYLON.QuadraticEase() // Función de interpolación (ease)
+    );
+  };
 }
 window.addEventListener("resize", function () {
-  juego._engine.resize();
+  if (juego._engine) juego._engine.resize();
+});
+
+//CLICK derecho
+window.addEventListener("contextmenu", function (evt) {
+  evt.preventDefault();
+  console.log("CLICK DERECHO");
+  rest.obtenerUsuario($.cookie("nick"), function (usr) {
+    juego.cambiarTarget(usr);
+  });
 });
 
 const juego = new Juego();

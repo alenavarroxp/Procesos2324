@@ -1345,7 +1345,7 @@ function ControlWeb() {
             }, 2500);
           } else {
             rest.obtenerUsuario($.cookie("nick"), function (usr) {
-              window.juego.removePlayer(partida.passCode,usr, "equipoRojo");
+              window.juego.removePlayer(partida.passCode, usr, "equipoRojo");
               socket.emit("salirEquipo", {
                 partida: partida,
                 usr: usr,
@@ -1667,11 +1667,37 @@ function ControlWeb() {
               cw.ocultarDivs("joinDiv");
               const GUIContador = document.getElementById("GUIContador");
               GUIContador.classList.remove("hidden");
+
+              obj.partida.estado = "jugando";
+              rest.obtenerUsuario($.cookie("nick"), function (usr) {
+                const equipo = cw.getEquipoUsuario(partida, usr);
+                window.juego.zoomCamera(usr, equipo);
+              });
             }, 4500);
           }
         });
       });
     });
+  };
+
+  this.getEquipoUsuario = function (partida, usuario) {
+    for (const equipoKey in partida.equipos) {
+      const equipo = partida.equipos[equipoKey];
+
+      // Convertir los valores del objeto de jugadores en un array
+      const jugadoresArray = Object.values(equipo.jugadores);
+
+      // Verificar si el usuario está en el equipo actual
+      const usuarioEnEquipo = jugadoresArray.find(
+        (e) => e.email === usuario.email
+      );
+
+      if (usuarioEnEquipo) {
+        return equipoKey; // Devolver el nombre del equipo
+      }
+    }
+
+    return null; // El usuario no está en ningún equipo
   };
 
   this.ocultarDivs = function (div) {
