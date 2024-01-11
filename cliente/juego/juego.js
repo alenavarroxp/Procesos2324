@@ -63,24 +63,25 @@ export default class Juego {
       console.log("character", character);
     }
 
-    await character.initPlayer(this, player, equipo);
-    console.log("character", character);
-    const playerObj = {
-      user: player,
-      character: character,
-    };
-
-    this._players[player.email] = playerObj;
-    console.log("THIS PLAYERS", this._players);
-    console.log("PLAYER OBJ", playerObj.character);
-    //ENVIO POR SOCKET
-    socket.emit("playerCreado", {
-      code: code,
-      player: player,
-      equipo: equipo,
-      //TODO: enviar la posicion del jugador
-      position: this._players[player.email].character._actualPosition,
+    await character.initPlayer(this, player, equipo, function (obj) {
+      console.log("OBJETO", obj);
+      const playerObj = {
+        user: player,
+        character: character,
+      };
+  
+      juego._players[player.email] = playerObj;
+      console.log("THIS PLAYERS", juego._players);
+      console.log("PLAYER OBJ", playerObj.character);
+      socket.emit("playerCreado", {
+        code: code,
+        player: player,
+        equipo: equipo,
+        position: juego._players[player.email].character._actualPosition,
+      });
     });
+   
+    
   };
 
   addOtherPlayer = function (player, equipo, position) {
@@ -115,14 +116,23 @@ export default class Juego {
     console.log("THIS PLAYERS", this._players);
   };
 
-  removePlayer = function (player, equipo) {
+  removePlayer = function (code,player, equipo) {
     console.log("REMOVE PLAYER", this._players);
     console.log("PLAYER", player);
     if (this._players[player.email]) {
-      console.log("ELIMINANDO",Object.values(this._scene.meshes).length)
       this._players[player.email].character.remove();
-      console.log("ELIMINADO",Object.values(this._scene.meshes).length)
-      console.log("Las meshes",this._scene.meshes)
+      socket.emit("playerEliminado", {
+        code: code,
+        player: player,
+        equipo: equipo})
+    }
+  };
+
+  removeOtherPlayer = function (player, equipo) {
+    console.log("REMOVE OTHER PLAYER", this._players);
+    console.log("PLAYER", player);
+    if (this._players[player.email]) {
+      this._players[player.email].character.remove();
     }
   };
 }

@@ -66,6 +66,11 @@ function WSServer() {
         io.to(obj.code).emit("playerCreado", obj);
       });
 
+      socket.on("playerEliminado", (obj) => {
+        console.log("PLAYER ELIMINADOSERVIDOOOOOOOOR", obj);
+        io.to(obj.code).emit("playerEliminado", obj);
+      });
+
       socket.on("salirEquipo", (obj) => {
         sistema.salirEquipo(obj.partida, obj.usr, obj.equipo, function (obj) {
           io.to(obj.partida.passCode).emit(

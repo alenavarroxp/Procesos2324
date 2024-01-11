@@ -5,9 +5,10 @@ class Player {
     this._animations = {};
     this._mesh = null;
     this._meshes = null;
+    this._actualPosition = null;
   }
 
-  initPlayer = (juego, player, equipo) => {
+  initPlayer = (juego, player, equipo, callback) => {
     return new Promise((resolve, reject) => {
       console.log("PLAYER JUEGO CODIGO PLAYER EQUIPO", juego, player, equipo);
       BABYLON.SceneLoader.ImportMesh(
@@ -44,8 +45,10 @@ class Player {
                 this._savePosition.equipoAzul = {
                   position: this._mesh.position,
                 };
+                this._actualPosition = this._mesh.position;
               }
-            } else if (!this._savePosition.equipoRojo) {
+            }
+            if (!this._savePosition.equipoRojo) {
               if (equipo == "equipoRojo") {
                 const randomPositionX =
                   Math.floor(Math.random() * (8 - -8 + 1)) + -8;
@@ -64,6 +67,7 @@ class Player {
                 this._savePosition.equipoRojo = {
                   position: this._mesh.position,
                 };
+                this._actualPosition = this._mesh.position;
               }
             }
             switch (equipo) {
@@ -127,6 +131,9 @@ class Player {
             console.log("ERROR", err);
           }
           resolve();
+          if (callback) {
+            callback(this);
+          }
         }
       );
     });
@@ -196,54 +203,11 @@ class Player {
     );
   };
 
-  remove = function(){
+  remove = function () {
     this._meshes.forEach((mesh) => {
       console.warn("mesh", mesh);
       mesh.dispose();
     });
-  }
-
-  renderOtherPlayer = function (juego, player, position, equipo) {
-    this._player = player;
-    this._model = new FBXLoader();
-    this._model.load(
-      "./cliente/juego/public/models/playerIdle.fbx",
-      (object) => {
-        object.scale.set(0.1, 0.1, 0.1);
-        if (!position) return;
-        if (equipo == "equipoAzul") {
-          object.rotation.set(0, Math.PI / 2, 0);
-          object.position.set(position.x, position.y, position.z);
-        } else if (equipo == "equipoRojo") {
-          object.rotation.set(0, -Math.PI / 2, 0);
-          object.position.set(position.x, position.y, position.z);
-        }
-
-        const animation = object.animations.find(
-          (anim) => anim.name === "mixamo.com"
-        );
-        this._mixer = new THREE.AnimationMixer(object);
-        const action = this._mixer.clipAction(animation);
-        action.play();
-        this._model = object;
-        juego.addToScene(object);
-      }
-    );
-  };
-
-  removeModel = function (scene, equipo) {
-    if (this._model) {
-      console.log("removeModel", this._model);
-      console.log("equipo", equipo);
-      if (equipo == "equipoAzul") {
-        console.log("savePositionAzul", this._savePosition);
-        this._savePosition.equipoAzul.position = this._model.position;
-      } else if (equipo == "equipoRojo") {
-        console.log("savePositionRojo", this._savePosition);
-        this._savePosition.equipoRojo.position = this._model.position;
-      }
-      scene.remove(this._model);
-    }
   };
 
   movePlayer = function (player) {

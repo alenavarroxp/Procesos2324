@@ -1309,7 +1309,7 @@ function ControlWeb() {
             }, 2500);
           } else {
             rest.obtenerUsuario($.cookie("nick"), function (usr) {
-              window.juego.removePlayer(usr, "equipoAzul");
+              window.juego.removePlayer(partida.passCode, usr, "equipoAzul");
               socket.emit("salirEquipo", {
                 partida: partida,
                 usr: usr,
@@ -1345,7 +1345,7 @@ function ControlWeb() {
             }, 2500);
           } else {
             rest.obtenerUsuario($.cookie("nick"), function (usr) {
-              window.juego.removePlayer(usr, "equipoRojo");
+              window.juego.removePlayer(partida.passCode,usr, "equipoRojo");
               socket.emit("salirEquipo", {
                 partida: partida,
                 usr: usr,
@@ -1608,6 +1608,11 @@ function ControlWeb() {
         socket.on("playerCreado", function (obj) {
           console.log("PLAYER CREADOWEBBBBBBBBBB", obj);
           window.juego.addOtherPlayer(obj.player, obj.equipo, obj.position);
+        });
+
+        socket.on("playerEliminado", function (obj) {
+          console.log("PLAYER ELIMINADO", obj);
+          window.juego.removeOtherPlayer(obj.player);
         });
 
         socket.on("jugadorReady", function (obj) {
