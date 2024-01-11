@@ -1062,7 +1062,7 @@ function ControlWeb() {
             $("#container").removeClass("hidden");
             $("#GUI").empty();
             cw.mostrarInicio();
-            location.reload(true)
+            location.reload(true);
           });
         });
 
@@ -1389,8 +1389,10 @@ function ControlWeb() {
                 checkrTeam.disabled = false;
                 checkrTeam.checked = false;
 
-                startButton.disabled = false;
-                startText.textContent = "EMPEZAR";
+                if (startText) {
+                  startButton.disabled = false;
+                  startText.textContent = "EMPEZAR";
+                }
                 //Eliminar el spinner
                 spin.parentNode.removeChild(spin);
               }

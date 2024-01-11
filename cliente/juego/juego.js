@@ -41,7 +41,7 @@ export default class Juego {
     const havokInstance = await HavokPhysics();
     this._hk = new BABYLON.HavokPlugin(true, havokInstance);
     console.log("Havok", this._hk);
-    this._scene.enablePhysics(new BABYLON.Vector3(0, -9.81, 0), this._hk);
+    this._scene.enablePhysics(new BABYLON.Vector3(0, -9.8, 0), this._hk);
   };
 
   startRenderingLoop = function () {
@@ -54,9 +54,57 @@ export default class Juego {
     this._scene.add(object);
   };
 
-  addPlayer = function (code, player, equipo) {
-    const character = new Player();
-    character.initPlayer(this, player, equipo);
+  addPlayer = async function (code, player, equipo) {
+    let character;
+    if (!this._players[player.email]) {
+      character = new Player();
+    } else {
+      character = this._players[player.email].character;
+      console.log("character", character);
+    }
+
+    await character.initPlayer(this, player, equipo);
+    console.log("character", character);
+    const playerObj = {
+      user: player,
+      character: character,
+    };
+
+    this._players[player.email] = playerObj;
+    console.log("THIS PLAYERS", this._players);
+    console.log("PLAYER OBJ", playerObj.character);
+    //ENVIO POR SOCKET
+    socket.emit("playerCreado", {
+      code: code,
+      player: player,
+      equipo: equipo,
+      //TODO: enviar la posicion del jugador
+      position: this._players[player.email].character._actualPosition,
+    });
+  };
+
+  addOtherPlayer = function (player, equipo, position) {
+    
+    console.log(
+      "PLAYERAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+      player,
+      equipo,
+      position
+    );
+    console.log("AISDJIASJDIAJSIDJAISDIJASD", this._players);
+    console.log("!this._players[player.email]", !this._players[player.email]);
+    let character;
+    if (!this._players[player.email]) {
+      console.log("NO TABA");
+      character = new Player();
+      character.addPlayer(this, player, equipo, position);
+    } else {
+      console.log("SI TABA");
+      character = this._players[player.email].character;
+    }
+
+    
+    console.log("CHARACTER", character);
 
     const playerObj = {
       user: player,
@@ -64,43 +112,18 @@ export default class Juego {
     };
 
     this._players[player.email] = playerObj;
-    console.log("THIS PLAYERS", this._players)
-  };
-
-  addOtherPlayer = function (player, equipo, position) {
-    for (let clave of this.players) {
-      console.log("claveOTHER", clave);
-      console.log("playerOTHER", player);
-      if (
-        clave.player.email == player.email &&
-        clave.player.nick == player.nick
-      ) {
-        console.log("ENCONTRO UN PLAYER");
-        return;
-      }
-    }
-    console.log("CREO UN NUEVO PLAYER");
-    console.log("position", position);
-    console.log("equipo", equipo);
-
-    let playerModel = new Player();
-    playerModel.renderOtherPlayer(this, player, position, equipo);
-    const playerObj = {
-      player: player,
-      model: playerModel,
-    };
-    this.players.push(playerObj);
-    console.log("this.players OTHER PLAYERS", this.players);
+    console.log("THIS PLAYERS", this._players);
   };
 
   removePlayer = function (player, equipo) {
-    for (let clave of this.players) {
-      console.log("REMOVE PLAYER", clave.player.email, player.email);
-      if (clave.player.email === player.email) {
-        clave.model.removeModel(this._scene, equipo);
-      }
+    console.log("REMOVE PLAYER", this._players);
+    console.log("PLAYER", player);
+    if (this._players[player.email]) {
+      console.log("ELIMINANDO",Object.values(this._scene.meshes).length)
+      this._players[player.email].character.remove();
+      console.log("ELIMINADO",Object.values(this._scene.meshes).length)
+      console.log("Las meshes",this._scene.meshes)
     }
-    console.log("THIS PLAYER REMOVE PLAYER", this.players);
   };
 }
 window.addEventListener("resize", function () {

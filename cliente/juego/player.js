@@ -1,39 +1,207 @@
 class Player {
   constructor() {
     this._character = null;
-    this._savePosition = null;
+    this._savePosition = { equipoAzul: null, equipoRojo: null };
+    this._animations = {};
+    this._mesh = null;
+    this._meshes = null;
   }
 
   initPlayer = (juego, player, equipo) => {
-    console.log("PLAYER JUEGO CODIGO PLAYER EQUIPO", juego, player, equipo);
+    return new Promise((resolve, reject) => {
+      console.log("PLAYER JUEGO CODIGO PLAYER EQUIPO", juego, player, equipo);
+      BABYLON.SceneLoader.ImportMesh(
+        "",
+        "./cliente/juego/public/models/",
+        "Man.glb",
+        juego._scene,
+        (newMeshes, particleSystems, skeletons) => {
+          try {
+            console.log("mesheshuman", newMeshes);
+            this._meshes = newMeshes;
+            this._mesh = newMeshes[0];
+            this._mesh.scaling = new BABYLON.Vector3(0.35, 0.35, 0.35);
+            this._mesh.name = player.nick;
+
+            const material = new BABYLON.StandardMaterial(
+              "material",
+              juego._scene
+            );
+
+            if (!this._savePosition.equipoAzul) {
+              if (equipo == "equipoAzul") {
+                const randomPositionX =
+                  Math.floor(Math.random() * (8 - -8 + 1)) + -8;
+                const randomPositionZ = Math.floor(Math.random() * 18) + 1;
+                material.diffuseColor = new BABYLON.Color3.FromHexString(
+                  "#00bfff"
+                );
+                this._mesh.position = new BABYLON.Vector3(
+                  randomPositionX,
+                  0.75,
+                  randomPositionZ
+                );
+                this._savePosition.equipoAzul = {
+                  position: this._mesh.position,
+                };
+              }
+            } else if (!this._savePosition.equipoRojo) {
+              if (equipo == "equipoRojo") {
+                const randomPositionX =
+                  Math.floor(Math.random() * (8 - -8 + 1)) + -8;
+                const randomPositionZ =
+                  Math.floor(Math.random() * (-18 - 1 + 1)) + 1;
+                material.diffuseColor = new BABYLON.Color3.FromHexString(
+                  "#d60909"
+                );
+                this._mesh.position = new BABYLON.Vector3(
+                  randomPositionX,
+                  0.75,
+                  randomPositionZ
+                );
+                this._mesh.rotation = new BABYLON.Vector3(0, 0, 0);
+                console.log("rotation", this._mesh.rotation);
+                this._savePosition.equipoRojo = {
+                  position: this._mesh.position,
+                };
+              }
+            }
+            switch (equipo) {
+              case "equipoAzul":
+                var position = this._savePosition.equipoAzul.position;
+                this._mesh.position = position;
+                material.diffuseColor = new BABYLON.Color3.FromHexString(
+                  "#00bfff"
+                );
+                this._actualPosition = position;
+                break;
+              case "equipoRojo":
+                var position = this._savePosition.equipoRojo.position;
+                this._mesh.position = position;
+                this._mesh.rotation = new BABYLON.Vector3(0, 0, 0);
+                material.diffuseColor = new BABYLON.Color3.FromHexString(
+                  "#d60909"
+                );
+                this._actualPosition = position;
+                break;
+              default:
+                break;
+            }
+
+            juego._scene.animationGroups.forEach((animationGroup) => {
+              this._animations[animationGroup] = animationGroup;
+              animationGroup.stop();
+            });
+
+            const IdleAnimation = juego._scene.getAnimationGroupByName(
+              "HumanArmature|Man_Idle"
+            );
+            IdleAnimation.start(
+              true,
+              1.0,
+              IdleAnimation.from,
+              IdleAnimation.to
+            );
+
+            this._mesh.getChildMeshes().forEach((mesh) => {
+              if (mesh.name == "BaseHuman_primitive0") mesh.material = material;
+            });
+            // var dummyPhysicsRoot = BABYLON.MeshBuilder.CreateCapsule(
+            //   "dummyPhysicsRoot",
+            //   { height: 2 },
+            //   juego._scene
+            // );
+            // // object.position.y += dummyPhysicsRoot.scaling.y / 2;
+            // dummyPhysicsRoot.position = object.position
+            // dummyPhysicsRoot.visibility = 1;
+
+            // var dummyAggregate = new BABYLON.PhysicsAggregate(
+            //   dummyPhysicsRoot,
+            //   BABYLON.PhysicsShapeType.CAPSULE,
+            //   { mass: 50 },
+            //   juego._scene
+            // );
+
+            juego.addToScene(this._mesh);
+          } catch (err) {
+            console.log("ERROR", err);
+          }
+          resolve();
+        }
+      );
+    });
+  };
+
+  addPlayer = function (juego, player, equipo, position) {
+    console.log("ADDPLAYER EN PLAYYER JS", juego, player, equipo, position);
     BABYLON.SceneLoader.ImportMesh(
       "",
       "./cliente/juego/public/models/",
       "Man.glb",
       juego._scene,
       (newMeshes, particleSystems, skeletons) => {
-        console.log("mesheshuman", newMeshes);
-        const object = newMeshes[0];
-        object.scaling = new BABYLON.Vector3(0.35, 0.35, 0.35);
-        
-        if (!this._savePosition) {
-          const randomPositionX = Math.floor(Math.random() * 10) + 1;
-          const randomPositionZ = Math.floor(Math.random() * 10) + 1;
-          if (equipo == "equipoAzul") {
-            object.position = new BABYLON.Vector3(
-              randomPositionX,
-              0.75,
-              randomPositionZ
-            );
-          }
-        }
-
         try {
-          juego.addToScene(object);
+          this._meshes = newMeshes;
+          this._mesh = newMeshes[0];
+          this._mesh.scaling = new BABYLON.Vector3(0.35, 0.35, 0.35);
+          this._mesh.name = player.nick;
+          const material = new BABYLON.StandardMaterial(
+            "material",
+            juego._scene
+          );
+
+          switch (equipo) {
+            case "equipoAzul":
+              material.diffuseColor = new BABYLON.Color3.FromHexString(
+                "#00bfff"
+              );
+              this._savePosition.equipoAzul = {
+                position: position,
+              };
+              break;
+            case "equipoRojo":
+              material.diffuseColor = new BABYLON.Color3.FromHexString(
+                "#d60909"
+              );
+              this._savePosition.equipoRojo = {
+                position: position,
+              };
+              break;
+            default:
+              break;
+          }
+          this._mesh.position = {
+            _x: position._x,
+            _y: position._y,
+            _z: position._z,
+          };
+          this._actualPosition = position;
+
+          juego._scene.animationGroups.forEach((animationGroup) => {
+            this._animations[animationGroup] = animationGroup;
+            animationGroup.stop();
+          });
+
+          const IdleAnimation = juego._scene.getAnimationGroupByName(
+            "HumanArmature|Man_Idle"
+          );
+          IdleAnimation.start(true, 1.0, IdleAnimation.from, IdleAnimation.to);
+
+          this._mesh.getChildMeshes().forEach((mesh) => {
+            if (mesh.name == "BaseHuman_primitive0") mesh.material = material;
+          });
+          juego.addToScene(this._mesh);
         } catch (err) {}
       }
     );
   };
+
+  remove = function(){
+    this._meshes.forEach((mesh) => {
+      console.warn("mesh", mesh);
+      mesh.dispose();
+    });
+  }
 
   renderOtherPlayer = function (juego, player, position, equipo) {
     this._player = player;
