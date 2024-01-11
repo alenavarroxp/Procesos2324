@@ -37,11 +37,6 @@ export default class Juego {
       new BABYLON.Vector3(0, 1, 0),
       this._scene
     );
-
-    const havokInstance = await HavokPhysics();
-    this._hk = new BABYLON.HavokPlugin(true, havokInstance);
-    console.log("Havok", this._hk);
-    this._scene.enablePhysics(new BABYLON.Vector3(0, -9.8, 0), this._hk);
   };
 
   startRenderingLoop = function () {
@@ -69,7 +64,7 @@ export default class Juego {
         user: player,
         character: character,
       };
-  
+
       juego._players[player.email] = playerObj;
       console.log("THIS PLAYERS", juego._players);
       console.log("PLAYER OBJ", playerObj.character);
@@ -80,12 +75,9 @@ export default class Juego {
         position: juego._players[player.email].character._actualPosition,
       });
     });
-   
-    
   };
 
   addOtherPlayer = function (player, equipo, position) {
-    
     console.log(
       "PLAYERAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
       player,
@@ -98,25 +90,27 @@ export default class Juego {
     if (!this._players[player.email]) {
       console.log("NO TABA");
       character = new Player();
-      character.addPlayer(this, player, equipo, position);
+      
     } else {
       console.log("SI TABA");
       character = this._players[player.email].character;
+      
     }
 
-    
+    character.addPlayer(this, player, equipo, position);
+
     console.log("CHARACTER", character);
 
     const playerObj = {
       user: player,
       character: character,
     };
-
+    console.log("THIS PLAYERS ANtes", this._players);
     this._players[player.email] = playerObj;
-    console.log("THIS PLAYERS", this._players);
+    console.log("THIS PLAYERS Despues", this._players);
   };
 
-  removePlayer = function (code,player, equipo) {
+  removePlayer = function (code, player, equipo) {
     console.log("REMOVE PLAYER", this._players);
     console.log("PLAYER", player);
     if (this._players[player.email]) {
@@ -124,7 +118,8 @@ export default class Juego {
       socket.emit("playerEliminado", {
         code: code,
         player: player,
-        equipo: equipo})
+        equipo: equipo,
+      });
     }
   };
 
@@ -133,6 +128,7 @@ export default class Juego {
     console.log("PLAYER", player);
     if (this._players[player.email]) {
       this._players[player.email].character.remove();
+      console.log("scene meshes", Object.keys(this._scene.meshes).length);
     }
   };
 }

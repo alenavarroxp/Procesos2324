@@ -18,6 +18,7 @@ class Player {
         juego._scene,
         (newMeshes, particleSystems, skeletons) => {
           try {
+            console.log("CREANDO MESHES EN INITPLAYER");
             console.log("mesheshuman", newMeshes);
             this._meshes = newMeshes;
             this._mesh = newMeshes[0];
@@ -140,6 +141,9 @@ class Player {
   };
 
   addPlayer = function (juego, player, equipo, position) {
+    //Comprobar si la mesh está en la escena y si lo está, no crearla
+    if(juego._scene.getMeshByName(player.nick)) return;
+
     console.log("ADDPLAYER EN PLAYYER JS", juego, player, equipo, position);
     BABYLON.SceneLoader.ImportMesh(
       "",
@@ -148,6 +152,7 @@ class Player {
       juego._scene,
       (newMeshes, particleSystems, skeletons) => {
         try {
+          console.log("CREANDO MESHES EN ADDPLAYER");
           this._meshes = newMeshes;
           this._mesh = newMeshes[0];
           this._mesh.scaling = new BABYLON.Vector3(0.35, 0.35, 0.35);
