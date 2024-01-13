@@ -32,13 +32,13 @@ function Mapa() {
           ground.isVisible = false;
           
 
-          const groundAggregate = new BABYLON.PhysicsAggregate(
-            ground,
-            BABYLON.PhysicsShapeType.MESH,
-            { mass: 0, restitution: 1 },
-            scene
-          );
-          object.physicsImpostor = groundAggregate;
+          // const groundAggregate = new BABYLON.PhysicsAggregate(
+          //   ground,
+          //   BABYLON.PhysicsShapeType.MESH,
+          //   { mass: 0, restitution: 1 },
+          //   scene
+          // );
+          // object.physicsImpostor = groundAggregate;
         } catch (err) {
           console.log("Error", err);
         }

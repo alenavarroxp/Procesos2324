@@ -1017,6 +1017,12 @@ function ControlWeb() {
 
     $("#partido").load("./cliente/juego/partido.html", function () {
       const user = $.cookie("nick");
+      setTimeout(()=>{
+        if(window.juego)
+        window.juego.setPassCode(partida.passCode);
+        console.log("WINDOW JUEGO",window.juego)
+      },2500)
+      
       window.addEventListener("beforeunload", async function (e) {
         e.preventDefault();
 
@@ -1029,6 +1035,8 @@ function ControlWeb() {
             $("#navBarBtn").removeClass("hidden");
             $("#container").removeClass("hidden");
             $("#GUI").empty();
+            const equipo = cw.getEquipoUsuario(usr, partida);
+            window.juego.removePlayer(partida.passCode, usr, equipo);
             cw.mostrarInicio();
           });
         }
@@ -1062,6 +1070,8 @@ function ControlWeb() {
             $("#container").removeClass("hidden");
             $("#GUI").empty();
             cw.mostrarInicio();
+            const equipo = cw.getEquipoUsuario(usr, partida);
+            window.juego.removePlayer(partida.passCode, usr, equipo);
             location.reload(true);
           });
         });

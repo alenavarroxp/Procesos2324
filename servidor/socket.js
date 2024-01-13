@@ -1,4 +1,5 @@
 function WSServer() {
+  this.players = {};
   this.lanzarServidor = function (io, sistema) {
     io.on("connection", (socket) => {
       console.log("Nuevo cliente conectado", socket.id);
@@ -52,17 +53,53 @@ function WSServer() {
       });
 
       socket.on("jugadorReady", (obj) => {
-        console.log("OBJ en servidor jugadorReady", obj)
+        console.log("OBJ en servidor jugadorReady", obj);
         io.to(obj.partida.passCode).emit("jugadorReady", obj);
       });
 
       socket.on("actualizarJugadoresReady", (obj) => {
-        console.log("OBJ en servidor actualizarJugadoresReady", obj)
+        console.log("OBJ en servidor actualizarJugadoresReady", obj);
         io.to(obj.partida.passCode).emit("actualizarJugadoresReady", obj);
-      })
+      });
+
+      socket.on("recuperarPlayers", (obj) => {
+        const players = this.players[obj];
+        socket.emit("recuperarPlayers", players);
+      });
 
       socket.on("playerCreado", (obj) => {
         console.log("PLAYER CREADOSERVIDOOOOOOOOR", obj);
+        const playerData = {
+          player: obj.player,
+          equipo: obj.equipo,
+          position: obj.position,
+        };
+
+        if (!this.players[obj.code]) {
+          this.players[obj.code] = [];
+        }
+
+        const existingPlayerIndex = this.players[obj.code].findIndex(
+          (player) => player.player.email === obj.player.email
+        );
+
+        // Verificar si el jugador ya existe por su email
+        if (existingPlayerIndex !== -1) {
+          // Si existe, reemplazar el objeto existente
+          this.players[obj.code][existingPlayerIndex] = {
+            player: obj.player,
+            equipo: obj.equipo,
+            position: obj.position,
+          };
+        } else {
+          // Si no existe, agregar un nuevo objeto al array
+          this.players[obj.code].push({
+            player: obj.player,
+            equipo: obj.equipo,
+            position: obj.position,
+          });
+        }
+        console.log("PLAYERS", this.players);
         io.to(obj.code).emit("playerCreado", obj);
       });
 

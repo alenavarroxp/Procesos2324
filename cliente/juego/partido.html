@@ -14,13 +14,14 @@
         script.onload = callback;
         document.head.appendChild(script);
     }
-
-    loadScript('https://cdnjs.cloudflare.com/ajax/libs/babylonjs/6.36.1/babylon.js', function () {
-        loadScript('https://cdn.babylonjs.com/loaders/babylonjs.loaders.min.js', function () {
-            
-            // Tu código que depende de Babylon.js y sus loaders
+    try {
+        loadScript('https://cdnjs.cloudflare.com/ajax/libs/babylonjs/6.38.0/babylon.js', function () {
+            loadScript('https://cdn.babylonjs.com/loaders/babylonjs.loaders.js', function () {
+            });
         });
-    });
+    } catch (e) {
+        console.warn(e);
+    }
 </script>
 
 <script type="module" src="./cliente/juego/juego.js"></script>

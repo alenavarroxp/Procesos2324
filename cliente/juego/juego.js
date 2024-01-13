@@ -10,7 +10,36 @@ export default class Juego {
     this._light = null;
     this._players = {};
     this._isLookingAtPlayer = false;
+    this._canMove = false;
+    this._keys = {
+      W: false,
+      A: false,
+      S: false,
+      D: false,
+    };
+    this._usr = null;
+    this._principalCharacter = null;
+    this._passCode = null;
   }
+
+  getUser = function () {
+    rest.obtenerUsuario($.cookie("nick"), function (usr) {
+      juego._usr = usr;
+    });
+  };
+
+  getPlayers = function () {
+    console.log("PLAYYERS EN GET PLAYERS", this._players);
+    return this._players;
+  };
+
+  setPlayers = function (players) {
+    this._players = players;
+  };
+
+  setPassCode = function (code) {
+    this._passCode = code;
+  };
 
   initGame = async function () {
     this._canvas = document.getElementById("juego");
@@ -47,16 +76,38 @@ export default class Juego {
       new BABYLON.Vector3(0, 1, 0),
       this._scene
     );
+    this.getUser();
   };
 
   startRenderingLoop = function () {
+    if (!this._engine) return;
     this._engine.runRenderLoop(() => {
+      if (juego) juego.manejarMovimiento();
       this._scene.render();
     });
   };
 
+  manejarMovimiento = function () {
+    if (!this._canMove) {
+      if (this._principalCharacter) {
+        if (this._keys.W) {
+          this._principalCharacter.moveForward(this._players, this);
+        }
+        if (this._keys.A) {
+          this._principalCharacter.moveLeft(this._players, this);
+        }
+        if (this._keys.S) {
+          this._principalCharacter.moveBackward(this._players, this);
+        }
+        if (this._keys.D) {
+          this._principalCharacter.moveRight(this._players, this);
+        }
+      }
+    }
+  };
+
   addToScene = function (object) {
-    this._scene.add(object);
+    juego._scene.add(object);
   };
 
   addPlayer = async function (code, player, equipo) {
@@ -70,14 +121,17 @@ export default class Juego {
 
     await character.initPlayer(this, player, equipo, function (obj) {
       console.log("OBJETO", obj);
+      character.setEquipo(equipo);
       const playerObj = {
         user: player,
         character: character,
       };
 
+      juego._principalCharacter = character;
       juego._players[player.email] = playerObj;
       console.log("THIS PLAYERS", juego._players);
       console.log("PLAYER OBJ", playerObj.character);
+
       socket.emit("playerCreado", {
         code: code,
         player: player,
@@ -108,14 +162,14 @@ export default class Juego {
     character.addPlayer(this, player, equipo, position);
 
     console.log("CHARACTER", character);
+    character.setEquipo(equipo);
 
     const playerObj = {
       user: player,
       character: character,
     };
-    console.log("THIS PLAYERS ANtes", this._players);
+    juego._principalCharacter = character;
     this._players[player.email] = playerObj;
-    console.log("THIS PLAYERS Despues", this._players);
   };
 
   removePlayer = function (code, player, equipo) {
@@ -142,7 +196,11 @@ export default class Juego {
 
   zoomCamera = function (usr, equipo) {
     if (this._players[usr.email]) {
+      this._canMove = true;
       this._isLookingAtPlayer = true;
+
+      this._players[usr.email].character.setEquipo(equipo);
+
       const targetPosition = this._players[usr.email].character._actualPosition;
       const targetRadius = 8;
       const targetBeta = Math.PI / 5.5; // Puedes ajustar este valor según tus preferencias
@@ -199,11 +257,12 @@ export default class Juego {
   };
   cambiarTarget = function (usr) {
     this._isLookingAtPlayer = !this._isLookingAtPlayer;
-    if (this._isLookingAtPlayer && this._players[usr.email] ) {
+    if (this._isLookingAtPlayer && this._players[usr.email]) {
       this._camera.target = this._players[usr.email].character._actualPosition;
     } else {
       this._camera.target = new BABYLON.Vector3(0, 0, 0);
     }
+    this._camera.upperRadiusLimit = 10;
   };
 
   animacion = function (
@@ -227,6 +286,20 @@ export default class Juego {
       new BABYLON.QuadraticEase() // Función de interpolación (ease)
     );
   };
+
+  handleKeyUp = function (event) {
+    const key = event.key.toUpperCase();
+    if (this._keys.hasOwnProperty(key)) {
+      this._keys[key] = false;
+    }
+  };
+
+  handleKeyDown = function (event) {
+    const key = event.key.toUpperCase();
+    if (this._keys.hasOwnProperty(key)) {
+      this._keys[key] = true;
+    }
+  };
 }
 window.addEventListener("resize", function () {
   if (juego._engine) juego._engine.resize();
@@ -235,10 +308,17 @@ window.addEventListener("resize", function () {
 //CLICK derecho
 window.addEventListener("contextmenu", function (evt) {
   evt.preventDefault();
-  console.log("CLICK DERECHO");
-  rest.obtenerUsuario($.cookie("nick"), function (usr) {
-    juego.cambiarTarget(usr);
-  });
+  juego.cambiarTarget(juego._usr);
+});
+
+// Manejador de evento para cuando se presiona una tecla
+window.addEventListener("keydown", function (evt) {
+  juego.handleKeyDown(evt);
+});
+
+// Manejador de evento para cuando se suelta una tecla
+window.addEventListener("keyup", function (evt) {
+  juego.handleKeyUp(evt);
 });
 
 const juego = new Juego();
@@ -249,7 +329,21 @@ setTimeout(() => {
 
   const mapa = new Mapa();
   mapa.initMap(juego._scene);
+
+  setTimeout(() => {
+    socket.emit("recuperarPlayers", juego._passCode);
+  }, 1100);
 }, 1000);
+
+socket.on("recuperarPlayers", (obj) => {
+  console.log("EN JUEGO RECUPERAR PLAYERS", obj);
+  for (const key in obj) {
+    if (obj.hasOwnProperty(key)) {
+      const player = obj[key];
+      juego.addOtherPlayer(player.player, player.equipo, player.position);
+    }
+  }
+});
 
 // const ball = new FBXLoader();
 // ball.load("./cliente/juego/public/ball.fbx", function (object) {

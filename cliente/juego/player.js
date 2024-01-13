@@ -6,6 +6,8 @@ class Player {
     this._mesh = null;
     this._meshes = null;
     this._actualPosition = null;
+    this._speed = 0.1;
+    this._actualEquipo = null;
   }
 
   initPlayer = (juego, player, equipo, callback) => {
@@ -34,7 +36,8 @@ class Player {
               if (equipo == "equipoAzul") {
                 const randomPositionX =
                   Math.floor(Math.random() * (8 - -8 + 1)) + -8;
-                  const randomPositionZ = Math.floor(Math.random() * (18 - 2 + 1)) + 2;
+                const randomPositionZ =
+                  Math.floor(Math.random() * (18 - 2 + 1)) + 2;
 
                 material.diffuseColor = new BABYLON.Color3.FromHexString(
                   "#00bfff"
@@ -54,7 +57,8 @@ class Player {
               if (equipo == "equipoRojo") {
                 const randomPositionX =
                   Math.floor(Math.random() * (8 - -8 + 1)) + -8;
-                const randomPositionZ = Math.floor(Math.random() * (-18 - 2 + 1)) + 2;
+                const randomPositionZ =
+                  Math.floor(Math.random() * (-18 - 2 + 1)) + 2;
 
                 material.diffuseColor = new BABYLON.Color3.FromHexString(
                   "#d60909"
@@ -130,7 +134,6 @@ class Player {
 
             juego.addToScene(this._mesh);
           } catch (err) {
-            console.log("ERROR", err);
           }
           resolve();
           if (callback) {
@@ -143,7 +146,7 @@ class Player {
 
   addPlayer = function (juego, player, equipo, position) {
     //Comprobar si la mesh está en la escena y si lo está, no crearla
-    if(juego._scene.getMeshByName(player.nick)) return;
+    if (juego._scene.getMeshByName(player.nick)) return;
 
     console.log("ADDPLAYER EN PLAYYER JS", juego, player, equipo, position);
     BABYLON.SceneLoader.ImportMesh(
@@ -217,78 +220,120 @@ class Player {
     });
   };
 
-  movePlayer = function (player) {
-    if (this._player == player) {
-      this._prevTime = performance.now();
-      const handleKeyDown = (event) => {
-        this._keysPressed[event.code] = true;
-        if (!this._animationRunning) {
-          this._animationRunning = true;
-          this._prevTime = performance.now();
-          requestAnimationFrame(update);
-        }
-        if (event.code == "ShiftLeft") {
-          this._isPlayerRunning = true;
-        }
-      };
+  setEquipo = function (equipo) {
+    this._actualEquipo = equipo;
+  };
 
-      const handleKeyUp = (event) => {
-        this._keysPressed[event.code] = false;
-        // Puedes detener la animación cuando todas las teclas están liberadas
-        if (
-          !this._keysPressed["KeyW"] &&
-          !this._keysPressed["KeyA"] &&
-          !this._keysPressed["KeyS"] &&
-          !this._keysPressed["KeyD"]
-        ) {
-          this._animationRunning = false;
-        }
-        if (event.code == "ShiftLeft") {
-          this._isPlayerRunning = false;
-        }
-      };
+  moveForward = function (characters, juego) {
+    const newPosition = this._mesh.position.clone();
+    newPosition.z += this._speed;
 
-      document.addEventListener("keydown", handleKeyDown);
-      document.addEventListener("keyup", handleKeyUp);
-
-      const update = (currentTime) => {
-        if (this._animationRunning) {
-          let deltaTime = (currentTime - this._prevTime) / 1000;
-          this._prevTime = currentTime;
-          if (deltaTime == 0) return;
-          if (this._isPlayerRunning) deltaTime += 275;
-          else deltaTime += 100;
-
-          if (this._keysPressed["KeyW"]) {
-            this._model.translateOnAxis(
-              this._direction,
-              -this._movementSpeed * deltaTime
-            );
-          }
-          if (this._keysPressed["KeyS"]) {
-            this._model.translateOnAxis(
-              this._direction,
-              this._movementSpeed * deltaTime
-            );
-          }
-          if (this._keysPressed["KeyA"]) {
-            this._euler.setFromQuaternion(this._model.quaternion);
-            this._euler.y += this._rotationSpeed * deltaTime;
-            this._model.setRotationFromEuler(this._euler);
-          }
-          if (this._keysPressed["KeyD"]) {
-            this._euler.setFromQuaternion(this._model.quaternion);
-            this._euler.y -= this._rotationSpeed * deltaTime;
-            this._model.setRotationFromEuler(this._euler);
-          }
-
-          // Si hay teclas presionadas, sigue ejecutando el bucle
-          requestAnimationFrame((time) => update(time));
-        }
-      };
-
-      update(performance.now());
+    if (this.checkCollisions(newPosition, characters)) {
+      this._mesh.position.z = newPosition.z;
+      this.smoothRotation(Math.PI, juego);
     }
   };
+
+  moveBackward = function (characters, juego) {
+    const newPosition = this._mesh.position.clone();
+    newPosition.z -= this._speed;
+
+    if (this.checkCollisions(newPosition, characters)) {
+      this._mesh.position.z = newPosition.z;
+      this.smoothRotation(0, juego);
+    }
+  };
+
+  moveLeft = function (characters, juego) {
+    const newPosition = this._mesh.position.clone();
+    newPosition.x -= this._speed;
+
+    if (this.checkCollisions(newPosition, characters)) {
+      this._mesh.position.x = newPosition.x;
+      this.smoothRotation(Math.PI / 2, juego);
+    }
+  };
+
+  moveRight = function (characters, juego) {
+    const newPosition = this._mesh.position.clone();
+    newPosition.x += this._speed;
+
+    if (this.checkCollisions(newPosition, characters)) {
+      console.log("NEW POSITION", this._mesh.position);
+      this._mesh.position.x = newPosition.x;
+      console.log("NEW POSITION d", this._mesh.position);
+      this.smoothRotation(-Math.PI / 2, juego);
+    }
+  };
+
+  //Colisiones
+  checkCollisions = function (newPosition, characters) {
+    // Verificar colisiones con el plano
+    if (newPosition.y < 0) return true; // Colisión con el suelo, no permitir mover más abajo
+
+    console.log("CHARACTERS COLISSIONES", characters);
+    // Verificar colisiones con otros personajes
+    for (const character in characters) {
+      console.log("CHARACTER", character);
+      if (
+        characters.hasOwnProperty(character) &&
+        this._mesh.name != characters[character].nick
+      ) {
+        const valor = characters[character];
+        console.log("VALOR", valor);
+        const distanceVector = newPosition.subtract(
+          valor.character._mesh.position
+        );
+        const distance = distanceVector.length();
+
+        // Detener el movimiento si hay colisión con otro personaje
+        if (distance < 1.5) {
+          return true;
+        }
+      }
+    }
+    return false; // No hay colisiones
+  };
+
+  //Rotación suave
+  smoothRotation = function (targetRotation,juego) {
+    this._meshes.forEach((mesh) => {
+      const currentRotation = mesh.rotation.z * (180 / Math.PI); // Convertir radianes a grados
+      const targetRotationDegrees = targetRotation * (180 / Math.PI);
+
+      const shortestDistance = this.shortestAngleDistance(
+        currentRotation,
+        targetRotationDegrees
+      );
+      const lerpedRotation = this.lerpAngle(
+        currentRotation,
+        currentRotation + shortestDistance,
+        0.1
+      );
+
+      mesh.rotation.z = lerpedRotation * (Math.PI / 180); // Convertir grados a radianes
+    });
+  };
+  shortestAngleDistance = function (a, b) {
+    const maxAngle = 360; // El máximo valor para ángulos en grados
+    const angleDiff = (b - a + maxAngle) % maxAngle;
+    return angleDiff > 180 ? angleDiff - maxAngle : angleDiff;
+  };
+
+  lerpAngle = function (a, b, t) {
+    const angleDiff = b - a;
+
+    // Ajustar el ángulo a un rango [-PI, PI]
+    if (angleDiff > Math.PI) {
+      b -= 2 * Math.PI;
+    } else if (angleDiff < -Math.PI) {
+      b += 2 * Math.PI;
+    }
+
+    // Realizar la interpolación lineal
+    return a + t * (b - a);
+  };
+  
+
 }
 export default Player;
