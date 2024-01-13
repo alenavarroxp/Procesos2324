@@ -102,6 +102,15 @@ export default class Juego {
         if (this._keys.D) {
           this._principalCharacter.moveRight(this._players, this);
         }
+
+        if (this._keys.W || this._keys.A || this._keys.S || this._keys.D) {
+          socket.emit("playerMovido", {
+            code: this._passCode,
+            player: this._usr,
+            position: this._principalCharacter._actualPosition,
+            rotation: this._principalCharacter._actualRotation,
+          });
+        }
       }
     }
   };
@@ -168,7 +177,7 @@ export default class Juego {
       user: player,
       character: character,
     };
-    juego._principalCharacter = character;
+
     this._players[player.email] = playerObj;
   };
 
@@ -343,6 +352,17 @@ socket.on("recuperarPlayers", (obj) => {
       juego.addOtherPlayer(player.player, player.equipo, player.position);
     }
   }
+});
+
+socket.on("playerMovido", (obj) => {
+  console.log("OBJETO EN PLAYER MOVIDO", obj);
+  if (obj.player.email == juego._usr.email) return;
+
+  const character = juego._players[obj.player.email].character
+  character.moverPersonaje(
+    obj.position,
+    obj.rotation
+  );
 });
 
 // const ball = new FBXLoader();

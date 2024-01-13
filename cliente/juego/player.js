@@ -6,6 +6,7 @@ class Player {
     this._mesh = null;
     this._meshes = null;
     this._actualPosition = null;
+    this._actualRotation = null;
     this._speed = 0.1;
     this._actualEquipo = null;
   }
@@ -56,9 +57,9 @@ class Player {
             if (!this._savePosition.equipoRojo) {
               if (equipo == "equipoRojo") {
                 const randomPositionX =
-                  Math.floor(Math.random() * (8 - -8 + 1)) + -8;
+                  -1 * (Math.floor(Math.random() * (8 - -8 + 1)) + -8);
                 const randomPositionZ =
-                  Math.floor(Math.random() * (-18 - 2 + 1)) + 2;
+                  -1 * (Math.floor(Math.random() * (18 - 2 + 1)) + 2);
 
                 material.diffuseColor = new BABYLON.Color3.FromHexString(
                   "#d60909"
@@ -68,7 +69,6 @@ class Player {
                   0.75,
                   randomPositionZ
                 );
-                this._mesh.rotation = new BABYLON.Vector3(0, 0, 0);
                 console.log("rotation", this._mesh.rotation);
                 this._savePosition.equipoRojo = {
                   position: this._mesh.position,
@@ -80,19 +80,35 @@ class Player {
               case "equipoAzul":
                 var position = this._savePosition.equipoAzul.position;
                 this._mesh.position = position;
+
+                this._mesh.rotationQuaternion = new BABYLON.Quaternion(
+                  0,
+                  1,
+                  0,
+                  0
+                );
+
                 material.diffuseColor = new BABYLON.Color3.FromHexString(
                   "#00bfff"
                 );
                 this._actualPosition = position;
+                this._actualRotation = this._mesh.rotation;
                 break;
               case "equipoRojo":
                 var position = this._savePosition.equipoRojo.position;
                 this._mesh.position = position;
-                this._mesh.rotation = new BABYLON.Vector3(0, 0, 0);
+                this._mesh.rotationQuaternion = new BABYLON.Quaternion(
+                  0,
+                  0,
+                  0,
+                  0
+                );
+
                 material.diffuseColor = new BABYLON.Color3.FromHexString(
                   "#d60909"
                 );
                 this._actualPosition = position;
+                this._actualRotation = this._mesh.rotation;
                 break;
               default:
                 break;
@@ -133,8 +149,7 @@ class Player {
             // );
 
             juego.addToScene(this._mesh);
-          } catch (err) {
-          }
+          } catch (err) {}
           resolve();
           if (callback) {
             callback(this);
@@ -174,12 +189,23 @@ class Player {
               this._savePosition.equipoAzul = {
                 position: position,
               };
+              this._mesh.rotationQuaternion = new BABYLON.Quaternion(
+                0,
+                1,
+                0,
+                0
+              );
               break;
             case "equipoRojo":
               material.diffuseColor = new BABYLON.Color3.FromHexString(
                 "#d60909"
               );
-              this._mesh.rotation = new BABYLON.Vector3(0, 0, 0);
+              this._mesh.rotationQuaternion = new BABYLON.Quaternion(
+                0,
+                0,
+                0,
+                0
+              );
               this._savePosition.equipoRojo = {
                 position: position,
               };
@@ -193,7 +219,7 @@ class Player {
             _z: position._z,
           };
           this._actualPosition = position;
-
+          this._actualRotation = this._mesh.rotation;
           juego._scene.animationGroups.forEach((animationGroup) => {
             this._animations[animationGroup] = animationGroup;
             animationGroup.stop();
@@ -225,12 +251,21 @@ class Player {
   };
 
   moveForward = function (characters, juego) {
+    console.log("this", this);
     const newPosition = this._mesh.position.clone();
     newPosition.z += this._speed;
 
     if (this.checkCollisions(newPosition, characters)) {
       this._mesh.position.z = newPosition.z;
-      this.smoothRotation(Math.PI, juego);
+
+      let angle;
+      if (this._actualEquipo == "equipoAzul") {
+        angle = Math.PI;
+      } else if (this._actualEquipo == "equipoRojo") {
+        angle = 0;
+      }
+
+      this.smoothRotation(angle, juego);
     }
   };
 
@@ -240,7 +275,14 @@ class Player {
 
     if (this.checkCollisions(newPosition, characters)) {
       this._mesh.position.z = newPosition.z;
-      this.smoothRotation(0, juego);
+
+      let angle;
+      if (this._actualEquipo == "equipoAzul") {
+        angle = 0;
+      } else if (this._actualEquipo == "equipoRojo") {
+        angle = Math.PI;
+      }
+      this.smoothRotation(angle, juego);
     }
   };
 
@@ -250,7 +292,15 @@ class Player {
 
     if (this.checkCollisions(newPosition, characters)) {
       this._mesh.position.x = newPosition.x;
-      this.smoothRotation(Math.PI / 2, juego);
+
+      let angle;
+      if (this._actualEquipo == "equipoAzul") {
+        angle = Math.PI / 2;
+      } else if (this._actualEquipo == "equipoRojo") {
+        angle = -Math.PI / 2;
+      }
+
+      this.smoothRotation(angle, juego);
     }
   };
 
@@ -259,10 +309,16 @@ class Player {
     newPosition.x += this._speed;
 
     if (this.checkCollisions(newPosition, characters)) {
-      console.log("NEW POSITION", this._mesh.position);
       this._mesh.position.x = newPosition.x;
-      console.log("NEW POSITION d", this._mesh.position);
-      this.smoothRotation(-Math.PI / 2, juego);
+
+      let angle;
+      if (this._actualEquipo == "equipoAzul") {
+        angle = -Math.PI / 2;
+      } else if (this._actualEquipo == "equipoRojo") {
+        angle = Math.PI / 2;
+      }
+
+      this.smoothRotation(angle, juego);
     }
   };
 
@@ -296,7 +352,8 @@ class Player {
   };
 
   //Rotación suave
-  smoothRotation = function (targetRotation,juego) {
+  // Rotación suave
+  smoothRotation = function (targetRotation, juego) {
     this._meshes.forEach((mesh) => {
       const currentRotation = mesh.rotation.z * (180 / Math.PI); // Convertir radianes a grados
       const targetRotationDegrees = targetRotation * (180 / Math.PI);
@@ -311,9 +368,17 @@ class Player {
         0.1
       );
 
-      mesh.rotation.z = lerpedRotation * (Math.PI / 180); // Convertir grados a radianes
+      // Limitar la rotación a un máximo de 360 grados
+      const limitedRotation = lerpedRotation % 360;
+
+      mesh.rotation.z =
+        (limitedRotation < 0 ? limitedRotation + 360 : limitedRotation) *
+        (Math.PI / 180); // Convertir grados a radianes
     });
+
+    this._actualRotation = this._mesh.rotation;
   };
+
   shortestAngleDistance = function (a, b) {
     const maxAngle = 360; // El máximo valor para ángulos en grados
     const angleDiff = (b - a + maxAngle) % maxAngle;
@@ -333,7 +398,28 @@ class Player {
     // Realizar la interpolación lineal
     return a + t * (b - a);
   };
-  
 
+  moverPersonaje = function (position, rotation) {
+    // Verifica si la malla existe
+    if (this._mesh) {
+      // Asigna la nueva posición
+      this._mesh.position = new BABYLON.Vector3(
+        position._x,
+        position._y,
+        position._z
+      );
+
+      // Gira el personaje directamente hacia el ángulo recibido
+      this.setTargetRotation(rotation._z);
+    }
+  };
+
+  setTargetRotation = function (targetRotation) {
+    this._meshes.forEach((mesh) => {
+      mesh.rotation.z = targetRotation;
+    });
+
+    this._actualRotation = this._mesh.rotation;
+  };
 }
 export default Player;

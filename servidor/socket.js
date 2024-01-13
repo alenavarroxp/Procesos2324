@@ -108,6 +108,11 @@ function WSServer() {
         io.to(obj.code).emit("playerEliminado", obj);
       });
 
+      socket.on("playerMovido", (obj) => {
+        console.log("PLAYER MOVIDOSERVIDOOOOOOOOR", obj);
+        io.to(obj.code).emit("playerMovido", obj);
+      });
+
       socket.on("salirEquipo", (obj) => {
         sistema.salirEquipo(obj.partida, obj.usr, obj.equipo, function (obj) {
           io.to(obj.partida.passCode).emit(
