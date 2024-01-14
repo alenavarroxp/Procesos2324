@@ -1017,12 +1017,11 @@ function ControlWeb() {
 
     $("#partido").load("./cliente/juego/partido.html", function () {
       const user = $.cookie("nick");
-      setTimeout(()=>{
-        if(window.juego)
-        window.juego.setPassCode(partida.passCode);
-        console.log("WINDOW JUEGO",window.juego)
-      },2500)
-      
+      setTimeout(() => {
+        if (window.juego) window.juego.setPassCode(partida.passCode);
+        console.log("WINDOW JUEGO", window.juego);
+      }, 2500);
+
       window.addEventListener("beforeunload", async function (e) {
         e.preventDefault();
 
@@ -1299,7 +1298,8 @@ function ControlWeb() {
         checkboxB.addEventListener("change", function () {
           if (checkboxB.checked) {
             rest.obtenerUsuario($.cookie("nick"), function (usr) {
-              window.juego.addPlayer(partida.passCode, usr, "equipoAzul");
+              if (window.juego)
+                window.juego.addPlayer(partida.passCode, usr, "equipoAzul");
               socket.emit("unirseAEquipo", {
                 partida: partida,
                 usr: usr,
@@ -1335,7 +1335,8 @@ function ControlWeb() {
         checkboxR.addEventListener("change", function () {
           if (checkboxR.checked) {
             rest.obtenerUsuario($.cookie("nick"), function (usr) {
-              window.juego.addPlayer(partida.passCode, usr, "equipoRojo");
+              if (window.juego)
+                window.juego.addPlayer(partida.passCode, usr, "equipoRojo");
               socket.emit("unirseAEquipo", {
                 partida: partida,
                 usr: usr,
@@ -1442,8 +1443,10 @@ function ControlWeb() {
                   checkrTeam.disabled = false;
                   checkrTeam.checked = false;
                 }
-                startButton.disabled = false;
-                startText.textContent = "EMPEZAR";
+                if (startText) {
+                  startButton.disabled = false;
+                  startText.textContent = "EMPEZAR";
+                }
                 spin.parentNode.removeChild(spin);
               }
             });
@@ -1617,7 +1620,8 @@ function ControlWeb() {
 
         socket.on("playerCreado", function (obj) {
           console.log("PLAYER CREADOWEBBBBBBBBBB", obj);
-          window.juego.addOtherPlayer(obj.player, obj.equipo, obj.position);
+          if (window.juego)
+            window.juego.addOtherPlayer(obj.player, obj.equipo, obj.position);
         });
 
         socket.on("playerEliminado", function (obj) {
@@ -1683,7 +1687,7 @@ function ControlWeb() {
                 const equipo = cw.getEquipoUsuario(partida, usr);
                 window.juego.zoomCamera(usr, equipo);
               });
-            }, 4500);
+            }, 400); //4500
           }
         });
       });

@@ -20,6 +20,7 @@ export default class Juego {
     this._usr = null;
     this._principalCharacter = null;
     this._passCode = null;
+    this._elementMap = {}
   }
 
   getUser = function () {
@@ -88,7 +89,7 @@ export default class Juego {
   };
 
   manejarMovimiento = function () {
-    if (!this._canMove) {
+    if (this._canMove) {
       if (this._principalCharacter) {
         if (this._keys.W) {
           this._principalCharacter.moveForward(this._players, this);
@@ -206,7 +207,6 @@ export default class Juego {
   zoomCamera = function (usr, equipo) {
     if (this._players[usr.email]) {
       this._canMove = true;
-      this._isLookingAtPlayer = true;
 
       this._players[usr.email].character.setEquipo(equipo);
 
@@ -244,6 +244,7 @@ export default class Juego {
         this._camera.target,
         targetPosition
       );
+
       juego.animacion(
         "betaAnimation",
         this._camera,
