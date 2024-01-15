@@ -29,7 +29,7 @@ function Mapa() {
           ground.position.x = 0;
           ground.position.y = 0.6;
           ground.position.z = 0;
-          ground.isVisible = true;
+          ground.isVisible = false;
 
           // elementosMapa["ground"] = ground;
 
@@ -58,7 +58,7 @@ function Mapa() {
     wall1.position.x = 0;
     wall1.position.y = 2.5;
     wall1.position.z = 19;
-    wall1.isVisible = true;
+    wall1.isVisible = false;
 
     const wall11 = BABYLON.MeshBuilder.CreateBox(
       "wall11",
@@ -69,7 +69,7 @@ function Mapa() {
     wall11.position.x = 1.5;
     wall11.position.y = 1;
     wall11.position.z = 19.36;
-    wall11.isVisible = true;
+    wall11.isVisible = false;
     wall11.rotation = new BABYLON.Vector3(0, Math.PI / 2.5, 0); // Rotación en diagonal
 
     const wall12 = BABYLON.MeshBuilder.CreateBox(
@@ -80,7 +80,7 @@ function Mapa() {
     wall12.position.x = -2;
     wall12.position.y = 1;
     wall12.position.z = 19.36;
-    wall12.isVisible = true;
+    wall12.isVisible = false;
     wall12.rotation = new BABYLON.Vector3(0, -Math.PI / 2.5, 0); // Rotación en diagonal
 
     const wall2 = BABYLON.MeshBuilder.CreateBox(
@@ -91,7 +91,7 @@ function Mapa() {
     wall2.position.x = 0;
     wall2.position.y = 2.5;
     wall2.position.z = -19;
-    wall2.isVisible = true;
+    wall2.isVisible = false;
 
     const wall21 = BABYLON.MeshBuilder.CreateBox(
       "wall21",
@@ -101,7 +101,7 @@ function Mapa() {
     wall21.position.x = 1.5;
     wall21.position.y = 1;
     wall21.position.z = -19.36;
-    wall21.isVisible = true;
+    wall21.isVisible = false;
     wall21.rotation = new BABYLON.Vector3(0, -Math.PI / 2.5, 0); // Rotación en diagonal
 
     const wall22 = BABYLON.MeshBuilder.CreateBox(
@@ -112,7 +112,7 @@ function Mapa() {
     wall22.position.x = -2;
     wall22.position.y = 1;
     wall22.position.z = -19.36;
-    wall22.isVisible = true;
+    wall22.isVisible = false;
     wall22.rotation = new BABYLON.Vector3(0, Math.PI / 2.5, 0); // Rotación en diagonal
 
     const wall3 = BABYLON.MeshBuilder.CreateBox(
@@ -123,7 +123,7 @@ function Mapa() {
     wall3.position.x = 9.5;
     wall3.position.y = 2.5;
     wall3.position.z = 0;
-    wall3.isVisible = true;
+    wall3.isVisible = false;
 
     const wall4 = BABYLON.MeshBuilder.CreateBox(
       "wall4",
@@ -133,7 +133,7 @@ function Mapa() {
     wall4.position.x = -9.5;
     wall4.position.y = 2.5;
     wall4.position.z = 0;
-    wall4.isVisible = true;
+    wall4.isVisible = false;
 
     const goalWallBlue = BABYLON.MeshBuilder.CreateBox(
       "goalWallBlue",
@@ -143,7 +143,7 @@ function Mapa() {
     goalWallBlue.position.x = -0.275;
     goalWallBlue.position.y = 1;
     goalWallBlue.position.z = 18.9;
-    goalWallBlue.isVisible = true;
+    goalWallBlue.isVisible = false;
 
     goalWallBlue.material = new BABYLON.StandardMaterial("goalWallBlue", scene);
     goalWallBlue.material.diffuseColor = new BABYLON.Color3(0, 0, 1);
@@ -156,7 +156,7 @@ function Mapa() {
     goalWallRed.position.x = -0.275;
     goalWallRed.position.y = 1;
     goalWallRed.position.z = -18.9;
-    goalWallRed.isVisible = true;
+    goalWallRed.isVisible = false;
 
     goalWallRed.material = new BABYLON.StandardMaterial("goalWallRed", scene);
     goalWallRed.material.diffuseColor = new BABYLON.Color3(1, 0, 0);

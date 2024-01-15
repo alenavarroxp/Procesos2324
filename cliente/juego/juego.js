@@ -20,7 +20,7 @@ export default class Juego {
     this._usr = null;
     this._principalCharacter = null;
     this._passCode = null;
-    this._elementMap = {}
+    this._elementMap = {};
   }
 
   getUser = function () {
@@ -47,6 +47,7 @@ export default class Juego {
     console.log("CANVAS", this._canvas);
     this._engine = new BABYLON.Engine(this._canvas, true);
     this._scene = new BABYLON.Scene(this._engine);
+    this._scene.actionMaganer = new BABYLON.ActionManager(this._scene);
     this._camera = new BABYLON.ArcRotateCamera(
       "Camera",
       Math.PI / 2,
@@ -83,7 +84,7 @@ export default class Juego {
   startRenderingLoop = function () {
     if (!this._engine) return;
     this._engine.runRenderLoop(() => {
-      if (juego) juego.manejarMovimiento();
+      // if (juego) juego.manejarMovimiento();
       this._scene.render();
     });
   };
@@ -112,6 +113,7 @@ export default class Juego {
             rotation: this._principalCharacter._actualRotation,
           });
         }
+        
       }
     }
   };
@@ -338,15 +340,25 @@ setTimeout(() => {
   window.juego = juego;
 
   const mapa = new Mapa();
-  mapa.initMap(juego._scene,juego._elementMap);
-  console.log("ELEMENTOS DEL MAPA CREADOS EN MAPAS PERO EN JUEGO", juego._elementMap);
+  mapa.initMap(juego._scene, juego._elementMap);
+  console.log(
+    "ELEMENTOS DEL MAPA CREADOS EN MAPAS PERO EN JUEGO",
+    juego._elementMap
+  );
 
   console.log("Scene elementos", juego._scene.meshes);
 
+  if(juego){
+    juego._scene.onBeforeRenderObservable.add(() => {
+      juego.manejarMovimiento();
+    });
+  }
   setTimeout(() => {
     socket.emit("recuperarPlayers", juego._passCode);
   }, 1100);
 }, 1000);
+
+
 
 socket.on("recuperarPlayers", (obj) => {
   console.log("EN JUEGO RECUPERAR PLAYERS", obj);
@@ -362,11 +374,8 @@ socket.on("playerMovido", (obj) => {
   console.log("OBJETO EN PLAYER MOVIDO", obj);
   if (obj.player.email == juego._usr.email) return;
 
-  const character = juego._players[obj.player.email].character
-  character.moverPersonaje(
-    obj.position,
-    obj.rotation
-  );
+  const character = juego._players[obj.player.email].character;
+  character.moverPersonaje(obj.position, obj.rotation);
 });
 
 // const ball = new FBXLoader();

@@ -25,6 +25,8 @@ class Player {
             console.log("mesheshuman", newMeshes);
             this._meshes = newMeshes;
             this._mesh = newMeshes[0];
+            this._skeletons = skeletons;
+            console.log("skeletons", skeletons);
             this._mesh.scaling = new BABYLON.Vector3(0.35, 0.35, 0.35);
             this._mesh.name = player.nick;
 
@@ -116,17 +118,29 @@ class Player {
 
             juego._scene.animationGroups.forEach((animationGroup) => {
               this._animations[animationGroup] = animationGroup;
+              // animationGroup.normalize(0, 52.5)
               animationGroup.stop();
             });
 
             const IdleAnimation = juego._scene.getAnimationGroupByName(
               "HumanArmature|Man_Idle"
             );
+            const WalkAnimation = juego._scene.getAnimationGroupByName(
+              "HumanArmature|Man_Run"
+            );
+
+            this._idleAnimation = IdleAnimation;
+            this._walkAnimation = WalkAnimation;
+            console.log("Idleanimation", IdleAnimation);
+            console.log("Runanimation", WalkAnimation);
+            console.log("this._animations", this._animations);
+
             IdleAnimation.start(
               true,
               1.0,
               IdleAnimation.from,
-              IdleAnimation.to
+              IdleAnimation.to,
+              false
             );
 
             this._mesh.getChildMeshes().forEach((mesh) => {
@@ -249,6 +263,19 @@ class Player {
   setEquipo = function (equipo) {
     this._actualEquipo = equipo;
   };
+
+  //   playAnimation = function (scene) {
+  //     if (this._isMoving) {
+  //       scene.stopAnimation(this._mesh, this._walkAnimation)
+  //         this._walkAnimation.start(true, 1.0, this._walkAnimation.from, this._walkAnimation.to);
+
+  //         // console.log("CORRIENDO this walk animation", this._walkAnimation)
+  //     } else {
+  //       scene.stopAnimation(this._mesh, this._walkAnimation)
+  //         this._walkAnimation.stop();
+  //         // console.log(" NO CORRIENDO this walk animation", this._walkAnimation)
+  //     }
+  // };
 
   moveForward = function (characters, juego) {
     console.log("this", this);
@@ -400,7 +427,7 @@ class Player {
           //QUIERO COMPROBAR SI LA PARED ESTA ROTADA y EN EL CASO DE QUE LO ESTE, COMPROBAR LA COLISION CON LA PARED ROTADA
           if (pared.rotation.y !== 0) {
             console.log("PARED ROTADA");
-            if(pared.intersectsPoint(newPosition)){
+            if (pared.intersectsPoint(newPosition)) {
               return true;
             }
             // // Obtén la posición del centro de la pared después de la rotación
@@ -418,7 +445,7 @@ class Player {
             // const distanciaUmbralZ = pared.getBoundingInfo().boundingBox.extendSize.z
             // console.log("distancia X e Z", distanciaUmbralX, distanciaUmbralZ)
             // const distanciaUmbral = Math.max(distanciaUmbralX, distanciaUmbralZ);
-            
+
             // console.log("distancia", distancia);
             // console.log("distanciaUmbral", distanciaUmbral);
 
