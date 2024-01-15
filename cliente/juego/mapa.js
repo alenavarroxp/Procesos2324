@@ -3,11 +3,11 @@ function Mapa() {
   this._hollowBox;
   this._goalBox = {};
 
-  this.initMap = function (scene) {
-    this.createMap(scene);
+  this.initMap = function (scene, elementosMapa) {
+    this.createMap(scene, elementosMapa);
   };
 
-  this.createMap = function (scene) {
+  this.createMap = function (scene, elementosMapa) {
     BABYLON.SceneLoader.ImportMesh(
       "",
       "./cliente/juego/public/models/",
@@ -23,7 +23,7 @@ function Mapa() {
 
           const ground = BABYLON.MeshBuilder.CreateGround(
             "ground",
-            { width: 20, height: 40 ,depth: 0.1},
+            { width: 20, height: 40, depth: 0.1 },
             scene
           );
           ground.position.x = 0;
@@ -31,7 +31,9 @@ function Mapa() {
           ground.position.z = 0;
           ground.isVisible = true;
 
-          this.createWalls(scene);
+          // elementosMapa["ground"] = ground;
+
+          this.createWalls(scene,elementosMapa);
 
           // const groundAggregate = new BABYLON.PhysicsAggregate(
           //   ground,
@@ -47,7 +49,7 @@ function Mapa() {
     );
   };
 
-  this.createWalls = function (scene) {
+  this.createWalls = function (scene, elementosMapa) {
     const wall1 = BABYLON.MeshBuilder.CreateBox(
       "wall1",
       { width: 19.1, height: 5, depth: 0.1 },
@@ -63,7 +65,7 @@ function Mapa() {
       { width: 2, height: 2.7, depth: 0.1 },
       scene
     );
-    
+
     wall11.position.x = 1.5;
     wall11.position.y = 1;
     wall11.position.z = 19.36;
@@ -80,7 +82,6 @@ function Mapa() {
     wall12.position.z = 19.36;
     wall12.isVisible = true;
     wall12.rotation = new BABYLON.Vector3(0, -Math.PI / 2.5, 0); // Rotación en diagonal
-
 
     const wall2 = BABYLON.MeshBuilder.CreateBox(
       "wall2",
@@ -140,7 +141,7 @@ function Mapa() {
       scene
     );
     goalWallBlue.position.x = -0.275;
-    goalWallBlue.position.y = 1
+    goalWallBlue.position.y = 1;
     goalWallBlue.position.z = 18.9;
     goalWallBlue.isVisible = true;
 
@@ -153,14 +154,24 @@ function Mapa() {
       scene
     );
     goalWallRed.position.x = -0.275;
-    goalWallRed.position.y = 1
+    goalWallRed.position.y = 1;
     goalWallRed.position.z = -18.9;
     goalWallRed.isVisible = true;
 
     goalWallRed.material = new BABYLON.StandardMaterial("goalWallRed", scene);
     goalWallRed.material.diffuseColor = new BABYLON.Color3(1, 0, 0);
-    
-  };
+
+    elementosMapa["wall1"] = wall1;
+    elementosMapa["wall11"] = wall11;
+    elementosMapa["wall12"] = wall12;
+    elementosMapa["wall2"] = wall2;
+    elementosMapa["wall21"] = wall21;
+    elementosMapa["wall22"] = wall22;
+    elementosMapa["wall3"] = wall3;
+    elementosMapa["wall4"] = wall4;
+    elementosMapa["goalWallBlue"] = goalWallBlue;
+    elementosMapa["goalWallRed"] = goalWallRed;
+  }
 }
 
 export default Mapa;

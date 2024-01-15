@@ -255,7 +255,10 @@ class Player {
     const newPosition = this._mesh.position.clone();
     newPosition.z += this._speed;
 
-    if (!this.checkCollisions(newPosition, characters)) {
+    if (
+      !this.checkCollisions(newPosition, characters) &&
+      !this.checkCollisionsMap(newPosition, juego._elementMap)
+    ) {
       this._mesh.position.z = newPosition.z;
 
       let angle;
@@ -273,7 +276,10 @@ class Player {
     const newPosition = this._mesh.position.clone();
     newPosition.z -= this._speed;
 
-    if (!this.checkCollisions(newPosition, characters)) {
+    if (
+      !this.checkCollisions(newPosition, characters) &&
+      !this.checkCollisionsMap(newPosition, juego._elementMap)
+    ) {
       this._mesh.position.z = newPosition.z;
 
       let angle;
@@ -291,7 +297,10 @@ class Player {
     const newPosition = this._mesh.position.clone();
     newPosition.x -= this._speed;
 
-    if (!this.checkCollisions(newPosition, characters)) {
+    if (
+      !this.checkCollisions(newPosition, characters) &&
+      !this.checkCollisionsMap(newPosition, juego._elementMap)
+    ) {
       this._mesh.position.x = newPosition.x;
 
       let angle;
@@ -310,7 +319,10 @@ class Player {
     const newPosition = this._mesh.position.clone();
     newPosition.x += this._speed;
 
-    if (!this.checkCollisions(newPosition, characters)) {
+    if (
+      !this.checkCollisions(newPosition, characters) &&
+      !this.checkCollisionsMap(newPosition, juego._elementMap)
+    ) {
       this._mesh.position.x = newPosition.x;
 
       let angle;
@@ -371,8 +383,73 @@ class Player {
     return false; // No hay colisiones
   };
 
-  //Rotación suave
-  // Rotación suave
+  checkCollisionsMap = function (newPosition, elementosMapa) {
+    for (const elemento in elementosMapa) {
+      if (elementosMapa.hasOwnProperty(elemento)) {
+        const pared = elementosMapa[elemento];
+
+        if (pared.name.includes("wall")) {
+          console.log("NOMBRE DE PARED", pared.name);
+          const paredPosition = pared.position;
+          const paredDimensions =
+            pared.getBoundingInfo().boundingBox.extendSize;
+          console.log("newPosition", newPosition);
+          console.log("paredPosition", paredPosition);
+          console.log("paredDimensions", paredDimensions);
+
+          //QUIERO COMPROBAR SI LA PARED ESTA ROTADA y EN EL CASO DE QUE LO ESTE, COMPROBAR LA COLISION CON LA PARED ROTADA
+          if (pared.rotation.y !== 0) {
+            console.log("PARED ROTADA");
+            if(pared.intersectsPoint(newPosition)){
+              return true;
+            }
+            // // Obtén la posición del centro de la pared después de la rotación
+            // const rotatedWallCenter = BABYLON.Vector3.TransformCoordinates(
+            //   new BABYLON.Vector3(0, 0, 0),
+            //   pared.getWorldMatrix()
+            // );
+
+            // // Calcula la distancia entre el personaje y el centro de la pared rotada
+            // const distancia = rotatedWallCenter.subtract(newPosition).length();
+
+            // // Ajusta según el tamaño de la pared y cualquier otro factor necesario
+            // console.log("pared.getBoundingInfo()", pared.getBoundingInfo().boundingBox.extendSize.length());
+            // const distanciaUmbralX = pared.getBoundingInfo().boundingBox.extendSize.x
+            // const distanciaUmbralZ = pared.getBoundingInfo().boundingBox.extendSize.z
+            // console.log("distancia X e Z", distanciaUmbralX, distanciaUmbralZ)
+            // const distanciaUmbral = Math.max(distanciaUmbralX, distanciaUmbralZ);
+            
+            // console.log("distancia", distancia);
+            // console.log("distanciaUmbral", distanciaUmbral);
+
+            // if (distancia < distanciaUmbral) {
+            //   return true; // Hay colisión
+            // }
+          }
+
+          // Comprobar colisión con la pared
+          if (
+            newPosition.x + Number.EPSILON >=
+              paredPosition.x - paredDimensions.x &&
+            newPosition.x - Number.EPSILON <=
+              paredPosition.x + paredDimensions.x &&
+            newPosition.y + Number.EPSILON >=
+              paredPosition.y - paredDimensions.y &&
+            newPosition.y - Number.EPSILON <=
+              paredPosition.y + paredDimensions.y &&
+            newPosition.z + Number.EPSILON >=
+              paredPosition.z - paredDimensions.z &&
+            newPosition.z - Number.EPSILON <=
+              paredPosition.z + paredDimensions.z
+          ) {
+            return true; // Hay colisión
+          }
+        }
+      }
+    }
+    return false; // No hay colisiones
+  };
+
   smoothRotation = function (targetRotation, juego) {
     this._meshes.forEach((mesh) => {
       const currentRotation = mesh.rotation.z * (180 / Math.PI); // Convertir radianes a grados
@@ -444,7 +521,6 @@ class Player {
   //Calcula la posición de la cámara
   calculateCameraPosition = function (juego, direccion) {
     // console.log("ROTATION ACTUAL", this._actualRotation);
-
     // switch (direccion) {
     //   case "Left":
     //     console.log("LEFT");
@@ -455,18 +531,14 @@ class Player {
     //     console.log("ROTATION ACTUAL", this._actualRotation);
     //     break;
     // }
-
     // // Calcula la posición de la cámara en base a la rotación del personaje
     // const cameraX = this._actualPosition._x + Math.cos(this._actualRotation._z);
     // const cameraZ = this._actualPosition._z + Math.sin(this._actualRotation._z);
-
     // // Establece la posición de la cámara en la espalda del personaje
     // juego._camera.position = new BABYLON.Vector3(cameraX, 2, cameraZ);
-
     // console.log("CAMERA POSITION", juego._camera.position);
     // juego._camera.radius = 8;
     // juego._camera.beta = Math.PI / 5.5;
-
     // switch (this._actualEquipo) {
     //   case "equipoAzul":
     //     juego._camera.alpha = Math.PI / 2;
@@ -479,7 +551,6 @@ class Player {
     // }
     // console.log("MATH eje z direccion", Math.sin(this._actualRotation._z));
     // console.log("eje z direccion", this._actualPosition._z);
-
     // const direccions = new BABYLON.Vector3(
     //   this._actualPosition._x,
     //   this._actualPosition._y,
@@ -488,7 +559,6 @@ class Player {
     // console.log("DIRRECCCINO", direccions);
     // // Establece el target de la cámara en la posición del personaje
     // juego._camera.setTarget(direccions);
-
     // console.log("CAMERA TARGET", juego._camera.target);
   };
 }

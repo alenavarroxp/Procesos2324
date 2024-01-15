@@ -10,7 +10,7 @@ export default class Juego {
     this._light = null;
     this._players = {};
     this._isLookingAtPlayer = false;
-    this._canMove = false;
+    this._acnMove = false;
     this._keys = {
       W: false,
       A: false,
@@ -89,7 +89,7 @@ export default class Juego {
   };
 
   manejarMovimiento = function () {
-    if (this._canMove) {
+    if (!this._canMove) {
       if (this._principalCharacter) {
         if (this._keys.W) {
           this._principalCharacter.moveForward(this._players, this);
@@ -338,7 +338,10 @@ setTimeout(() => {
   window.juego = juego;
 
   const mapa = new Mapa();
-  mapa.initMap(juego._scene);
+  mapa.initMap(juego._scene,juego._elementMap);
+  console.log("ELEMENTOS DEL MAPA CREADOS EN MAPAS PERO EN JUEGO", juego._elementMap);
+
+  console.log("Scene elementos", juego._scene.meshes);
 
   setTimeout(() => {
     socket.emit("recuperarPlayers", juego._passCode);
