@@ -65,6 +65,7 @@ export default class Juego {
     this._camera.inputs.attached.keyboard.useAltToZoom = false;
     this._camera.attachControl(this._canvas, true);
     this._camera.upperBetaLimit = Math.PI / 2.15;
+    this._camera.upperRadiusLimit = 100;
 
     this._camera.position = new BABYLON.Vector3(0, 50, 0);
     this._camera.target = new BABYLON.Vector3(0, 0, 0); // Ajusta el punto al que la cámara apunta
@@ -84,13 +85,12 @@ export default class Juego {
   startRenderingLoop = function () {
     if (!this._engine) return;
     this._engine.runRenderLoop(() => {
-      // if (juego) juego.manejarMovimiento();
       this._scene.render();
     });
   };
 
   manejarMovimiento = function () {
-    if (!this._canMove) {
+    if (this._canMove) {
       if (this._principalCharacter) {
         if (this._keys.W) {
           this._principalCharacter.moveForward(this._players, this);
@@ -106,6 +106,8 @@ export default class Juego {
         }
 
         if (this._keys.W || this._keys.A || this._keys.S || this._keys.D) {
+          if (this._canMove)
+            this._camera.target = this._principalCharacter._actualPosition;
           socket.emit("playerMovido", {
             code: this._passCode,
             player: this._usr,
@@ -113,7 +115,6 @@ export default class Juego {
             rotation: this._principalCharacter._actualRotation,
           });
         }
-        
       }
     }
   };
@@ -154,14 +155,6 @@ export default class Juego {
   };
 
   addOtherPlayer = function (player, equipo, position) {
-    console.log(
-      "PLAYERAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-      player,
-      equipo,
-      position
-    );
-    console.log("AISDJIASJDIAJSIDJAISDIJASD", this._players);
-    console.log("!this._players[player.email]", !this._players[player.email]);
     let character;
     if (!this._players[player.email]) {
       console.log("NO TABA");
@@ -265,6 +258,11 @@ export default class Juego {
         this._camera.alpha,
         targetAlpha
       );
+
+      setTimeout(() => {
+        this._camera.target =
+          this._players[usr.email].character._actualPosition;
+      }, 1500);
     }
   };
   cambiarTarget = function (usr) {
@@ -348,7 +346,7 @@ setTimeout(() => {
 
   console.log("Scene elementos", juego._scene.meshes);
 
-  if(juego){
+  if (juego) {
     juego._scene.onBeforeRenderObservable.add(() => {
       juego.manejarMovimiento();
     });
@@ -357,8 +355,6 @@ setTimeout(() => {
     socket.emit("recuperarPlayers", juego._passCode);
   }, 1100);
 }, 1000);
-
-
 
 socket.on("recuperarPlayers", (obj) => {
   console.log("EN JUEGO RECUPERAR PLAYERS", obj);

@@ -125,15 +125,6 @@ class Player {
             const IdleAnimation = juego._scene.getAnimationGroupByName(
               "HumanArmature|Man_Idle"
             );
-            const WalkAnimation = juego._scene.getAnimationGroupByName(
-              "HumanArmature|Man_Run"
-            );
-
-            this._idleAnimation = IdleAnimation;
-            this._walkAnimation = WalkAnimation;
-            console.log("Idleanimation", IdleAnimation);
-            console.log("Runanimation", WalkAnimation);
-            console.log("this._animations", this._animations);
 
             IdleAnimation.start(
               true,
@@ -242,7 +233,13 @@ class Player {
           const IdleAnimation = juego._scene.getAnimationGroupByName(
             "HumanArmature|Man_Idle"
           );
-          IdleAnimation.start(true, 1.0, IdleAnimation.from, IdleAnimation.to);
+          IdleAnimation.start(
+            true,
+            1.0,
+            IdleAnimation.from,
+            IdleAnimation.to,
+            false
+          );
 
           this._mesh.getChildMeshes().forEach((mesh) => {
             if (mesh.name == "BaseHuman_primitive0") mesh.material = material;
@@ -416,42 +413,15 @@ class Player {
         const pared = elementosMapa[elemento];
 
         if (pared.name.includes("wall")) {
-          console.log("NOMBRE DE PARED", pared.name);
           const paredPosition = pared.position;
           const paredDimensions =
             pared.getBoundingInfo().boundingBox.extendSize;
-          console.log("newPosition", newPosition);
-          console.log("paredPosition", paredPosition);
-          console.log("paredDimensions", paredDimensions);
 
           //QUIERO COMPROBAR SI LA PARED ESTA ROTADA y EN EL CASO DE QUE LO ESTE, COMPROBAR LA COLISION CON LA PARED ROTADA
           if (pared.rotation.y !== 0) {
-            console.log("PARED ROTADA");
             if (pared.intersectsPoint(newPosition)) {
               return true;
             }
-            // // Obtén la posición del centro de la pared después de la rotación
-            // const rotatedWallCenter = BABYLON.Vector3.TransformCoordinates(
-            //   new BABYLON.Vector3(0, 0, 0),
-            //   pared.getWorldMatrix()
-            // );
-
-            // // Calcula la distancia entre el personaje y el centro de la pared rotada
-            // const distancia = rotatedWallCenter.subtract(newPosition).length();
-
-            // // Ajusta según el tamaño de la pared y cualquier otro factor necesario
-            // console.log("pared.getBoundingInfo()", pared.getBoundingInfo().boundingBox.extendSize.length());
-            // const distanciaUmbralX = pared.getBoundingInfo().boundingBox.extendSize.x
-            // const distanciaUmbralZ = pared.getBoundingInfo().boundingBox.extendSize.z
-            // console.log("distancia X e Z", distanciaUmbralX, distanciaUmbralZ)
-            // const distanciaUmbral = Math.max(distanciaUmbralX, distanciaUmbralZ);
-
-            // console.log("distancia", distancia);
-            // console.log("distanciaUmbral", distanciaUmbral);
-
-            // if (distancia < distanciaUmbral) {
-            //   return true; // Hay colisión
-            // }
           }
 
           // Comprobar colisión con la pared
