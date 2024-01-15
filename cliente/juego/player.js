@@ -273,49 +273,81 @@ class Player {
   //         // console.log(" NO CORRIENDO this walk animation", this._walkAnimation)
   //     }
   // };
+  move;
 
-  moveForward = function (characters, juego) {
+  moveForwardAndBackward = function (characters, juego, direccion) {
     console.log("this", this);
+    let angle;
     const newPosition = this._mesh.position.clone();
-    newPosition.z += this._speed;
+    switch (this._actualEquipo) {
+      case "equipoAzul":
+        if (direccion == "W") {
+          newPosition.z -= this._speed;
+          angle = 0;
+        } else if (direccion == "S") {
+          newPosition.z += this._speed;
+          angle = Math.PI;
+        }
+        break;
+      case "equipoRojo":
+        if (direccion == "W") {
+          newPosition.z += this._speed;
+          angle = 0;
+        } else if (direccion == "S") {
+          newPosition.z -= this._speed;
+          angle = Math.PI;
+        }
+        break;
+      default:
+        break;
+    }
 
     if (
       !this.checkCollisions(newPosition, characters) &&
       !this.checkCollisionsMap(newPosition, juego._elementMap)
     ) {
       this._mesh.position.z = newPosition.z;
-
-      let angle;
-      if (this._actualEquipo == "equipoAzul") {
-        angle = Math.PI;
-      } else if (this._actualEquipo == "equipoRojo") {
-        angle = 0;
-      }
       this.smoothRotation(angle, juego);
       this.calculateCameraPosition(juego);
     }
   };
 
-  moveBackward = function (characters, juego) {
+  moveLeftAndRight = function (characters, juego, direccion) {
+    let angle;
     const newPosition = this._mesh.position.clone();
-    newPosition.z -= this._speed;
+    switch (this._actualEquipo) {
+      case "equipoAzul":
+        if (direccion == "A") {
+          newPosition.x += this._speed;
+          angle = -Math.PI / 2;
+        } else if (direccion == "D") {
+          newPosition.x -= this._speed;
+          angle = Math.PI / 2;
+        }
+        break;
+      case "equipoRojo":
+        if (direccion == "A") {
+          newPosition.x -= this._speed;
+          angle = -Math.PI / 2;
+        } else if (direccion == "D") {
+          newPosition.x += this._speed;
+          angle = Math.PI / 2;
+        }
+        break;
+      default:
+        break;
+    }
 
     if (
       !this.checkCollisions(newPosition, characters) &&
       !this.checkCollisionsMap(newPosition, juego._elementMap)
     ) {
-      this._mesh.position.z = newPosition.z;
-
-      let angle;
-      if (this._actualEquipo == "equipoAzul") {
-        angle = 0;
-      } else if (this._actualEquipo == "equipoRojo") {
-        angle = Math.PI;
-      }
+      this._mesh.position.x = newPosition.x;
       this.smoothRotation(angle, juego);
       this.calculateCameraPosition(juego);
     }
   };
+
 
   moveLeft = function (characters, juego) {
     const newPosition = this._mesh.position.clone();

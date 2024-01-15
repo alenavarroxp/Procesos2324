@@ -16,11 +16,13 @@ export default class Juego {
       A: false,
       S: false,
       D: false,
+      R: false,
     };
     this._usr = null;
     this._principalCharacter = null;
     this._passCode = null;
     this._elementMap = {};
+    this._isOffensiveCamera = true;
   }
 
   getUser = function () {
@@ -93,21 +95,31 @@ export default class Juego {
     if (this._canMove) {
       if (this._principalCharacter) {
         if (this._keys.W) {
-          this._principalCharacter.moveForward(this._players, this);
+          this._principalCharacter.moveForwardAndBackward(
+            this._players,
+            this,
+            "W"
+          );
         }
         if (this._keys.A) {
-          this._principalCharacter.moveLeft(this._players, this);
+          this._principalCharacter.moveLeftAndRight(this._players, this, "A");
         }
         if (this._keys.S) {
-          this._principalCharacter.moveBackward(this._players, this);
+          this._principalCharacter.moveForwardAndBackward(
+            this._players,
+            this,
+            "S"
+          );
         }
         if (this._keys.D) {
-          this._principalCharacter.moveRight(this._players, this);
+          this._principalCharacter.moveLeftAndRight(this._players, this, "D");
         }
 
         if (this._keys.W || this._keys.A || this._keys.S || this._keys.D) {
-          if (this._canMove)
+          if (this._canMove) {
             this._camera.target = this._principalCharacter._actualPosition;
+            this._camera.upperRadiusLimit = 10;
+          }
           socket.emit("playerMovido", {
             code: this._passCode,
             player: this._usr,
@@ -207,7 +219,7 @@ export default class Juego {
 
       const targetPosition = this._players[usr.email].character._actualPosition;
       const targetRadius = 8;
-      const targetBeta = Math.PI / 5.5; // Puedes ajustar este valor según tus preferencias
+      const targetBeta = Math.PI / 3.2; // Puedes ajustar este valor según tus preferencias
 
       var targetAlpha;
       switch (equipo) {
@@ -265,6 +277,35 @@ export default class Juego {
       }, 1500);
     }
   };
+
+  restoreCameraZoom = function (equipo) {
+    this._isOffensiveCamera = !this._isOffensiveCamera;
+    this._camera.radius = 8;
+    this._camera.beta = Math.PI / 3.2;
+    if (this._isOffensiveCamera) {
+      switch (equipo) {
+        case "equipoAzul":
+          this._camera.alpha = Math.PI / 2;
+          break;
+        case "equipoRojo":
+          this._camera.alpha = -Math.PI / 2;
+          break;
+        default:
+          break;
+      }
+    } else {
+      switch (equipo) {
+        case "equipoAzul":
+          this._camera.alpha = -Math.PI / 2;
+          break;
+        case "equipoRojo":
+          this._camera.alpha = Math.PI / 2;
+          break;
+        default:
+          break;
+      }
+    }
+  };
   cambiarTarget = function (usr) {
     this._isLookingAtPlayer = !this._isLookingAtPlayer;
     if (this._isLookingAtPlayer && this._players[usr.email]) {
@@ -308,6 +349,9 @@ export default class Juego {
     const key = event.key.toUpperCase();
     if (this._keys.hasOwnProperty(key)) {
       this._keys[key] = true;
+    }
+    if(this._keys.R){
+      this.restoreCameraZoom(this._principalCharacter._actualEquipo);
     }
   };
 }

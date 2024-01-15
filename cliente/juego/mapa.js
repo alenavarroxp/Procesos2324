@@ -19,7 +19,7 @@ function Mapa() {
           const object = newMeshes[0];
           object.position = new BABYLON.Vector3(-12, 0, 21.75);
           object.rotation = new BABYLON.Vector3(0, Math.PI / 2, 0);
-          console.log("object", object);
+          console.log("objectMAPA", object);
 
           const ground = BABYLON.MeshBuilder.CreateGround(
             "ground",
@@ -33,7 +33,7 @@ function Mapa() {
 
           // elementosMapa["ground"] = ground;
 
-          this.createWalls(scene,elementosMapa);
+          this.createWalls(scene, elementosMapa);
 
           // const groundAggregate = new BABYLON.PhysicsAggregate(
           //   ground,
@@ -49,7 +49,7 @@ function Mapa() {
     );
   };
 
-  this.createWalls = function (scene, elementosMapa) {
+  this.createWalls = async function (scene, elementosMapa) {
     const wall1 = BABYLON.MeshBuilder.CreateBox(
       "wall1",
       { width: 19.1, height: 5, depth: 0.1 },
@@ -161,6 +161,88 @@ function Mapa() {
     goalWallRed.material = new BABYLON.StandardMaterial("goalWallRed", scene);
     goalWallRed.material.diffuseColor = new BABYLON.Color3(1, 0, 0);
 
+    var adt = new BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI");
+    // Crear la caja
+    const indicatorBlue = BABYLON.MeshBuilder.CreateBox(
+      "indicatorBlue",
+      { width: 4, height: 2, depth: 0.1 },
+      scene
+    );
+    indicatorBlue.position.x = -0.275;
+    indicatorBlue.position.y = 4;
+    indicatorBlue.position.z = 18.9;
+    indicatorBlue.isVisible = true;
+
+    // Material azul
+    indicatorBlue.material = new BABYLON.StandardMaterial(
+      "indicatorBlue",
+      scene
+    );
+    indicatorBlue.material.diffuseColor = new BABYLON.Color3(0, 0, 1);
+    
+    var blueText = new BABYLON.GUI.TextBlock();
+    blueText.text = "Equipo Azul";
+    blueText.color = "white";
+    blueText.fontSize = 24;
+    blueText.fontStyle = "bold"; // Añade negrita
+    blueText.fontFamily = "Arial, sans-serif";
+    
+    // Alinea el texto horizontalmente al centro de la caja
+    blueText.textHorizontalAlignment =
+      BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
+
+    // Estilo de sombra
+    blueText.shadowColor = "black";
+    blueText.shadowBlur = 3;
+    blueText.shadowOffsetX = 2;
+    blueText.shadowOffsetY = 2;
+
+    adt.addControl(blueText);
+
+    // Ajusta la posición vertical del texto con respecto a la caja
+    blueText.linkWithMesh(indicatorBlue);
+    
+    // Crear la caja
+    const indicatorRed = BABYLON.MeshBuilder.CreateBox(
+      "indicatorRed",
+      { width: 4, height: 2, depth: 0.1 },
+      scene
+    );
+    indicatorRed.position.x = -0.275;
+    indicatorRed.position.y = 4;
+    indicatorRed.position.z = -18.9;
+    indicatorRed.isVisible = true;
+
+    // Material rojo
+    indicatorRed.material = new BABYLON.StandardMaterial("indicatorRed", scene);
+    indicatorRed.material.diffuseColor = new BABYLON.Color3(1, 0, 0);
+
+    
+
+    var redText = new BABYLON.GUI.TextBlock();
+    redText.text = "Equipo Rojo";
+    redText.color = "white";
+    redText.fontSize = 24;
+    redText.fontStyle = "bold"; // Añade negrita
+    redText.fontFamily = "Arial, sans-serif";
+
+    // Alinea el texto horizontalmente al centro de la caja
+    redText.textHorizontalAlignment =
+      BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
+
+    // Estilo de sombra
+    redText.shadowColor = "black";
+    redText.shadowBlur = 3;
+    redText.shadowOffsetX = 2;
+    redText.shadowOffsetY = 2;
+
+    adt.addControl(redText);
+
+    // Ajusta la posición vertical del texto con respecto a la caja
+    redText.linkWithMesh(indicatorRed);
+
+    // Crear el plano para el texto
+
     elementosMapa["wall1"] = wall1;
     elementosMapa["wall11"] = wall11;
     elementosMapa["wall12"] = wall12;
@@ -171,7 +253,7 @@ function Mapa() {
     elementosMapa["wall4"] = wall4;
     elementosMapa["goalWallBlue"] = goalWallBlue;
     elementosMapa["goalWallRed"] = goalWallRed;
-  }
+  };
 }
 
 export default Mapa;
