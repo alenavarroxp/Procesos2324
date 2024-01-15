@@ -1,5 +1,6 @@
 <div id="GUIContador" class="flex justify-between items-center mx-auto hidden">
-    <div class="bg-gray-700 border-[3px] shadow-2xl border-gray-900 rounded-b-[45px] flex justify-center items-center mx-auto">
+    <div
+        class="bg-gray-700 border-[3px] shadow-2xl border-gray-900 rounded-b-[45px] flex justify-center items-center mx-auto">
         <div class="text-center px-8 ml-2 mt-1 mb-1 bg-gray-700 text-white rounded-bl-full">
             <p class="text-sm">Equipo Azul</p>
             <p id="golesEquipoAzul" class="text-3xl font-bold text-blue-500">0</p>
@@ -7,8 +8,10 @@
 
         <div id="tiempo" class="text-center px-4 rounded-full text-white">
             <p class="text-md font-bold">Tiempo</p>
-            <p id="contadorTiempo" class="text-3xl font-bold">00:00</p>
+            <p id="contadorTiempo" class="text-3xl font-bold animate__animated"></p>
         </div>
+
+        
 
         <div class="text-center px-8 mr-2 mt-1 mb-1 bg-gray-700 text-white rounded-br-full">
             <p class="text-sm">Equipo Rojo</p>
@@ -99,6 +102,7 @@
     </div>
 
 </div>
+
 
 <style>
     #chatMessages::-webkit-scrollbar {

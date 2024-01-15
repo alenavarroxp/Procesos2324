@@ -165,7 +165,7 @@ function Mapa() {
     // Crear la caja
     const indicatorBlue = BABYLON.MeshBuilder.CreateBox(
       "indicatorBlue",
-      { width: 4, height: 2, depth: 0.1 },
+      { width: 4, height: 1, depth: 0.1 },
       scene
     );
     indicatorBlue.position.x = -0.275;
@@ -179,6 +179,9 @@ function Mapa() {
       scene
     );
     indicatorBlue.material.diffuseColor = new BABYLON.Color3(0, 0, 1);
+    indicatorBlue.material.alpha = 0.5;
+    
+    
     
     var blueText = new BABYLON.GUI.TextBlock();
     blueText.text = "Equipo Azul";
@@ -205,7 +208,7 @@ function Mapa() {
     // Crear la caja
     const indicatorRed = BABYLON.MeshBuilder.CreateBox(
       "indicatorRed",
-      { width: 4, height: 2, depth: 0.1 },
+      { width: 4, height: 1, depth: 0.1 },
       scene
     );
     indicatorRed.position.x = -0.275;
@@ -216,6 +219,7 @@ function Mapa() {
     // Material rojo
     indicatorRed.material = new BABYLON.StandardMaterial("indicatorRed", scene);
     indicatorRed.material.diffuseColor = new BABYLON.Color3(1, 0, 0);
+    indicatorRed.material.alpha = 0.5;
 
     
 

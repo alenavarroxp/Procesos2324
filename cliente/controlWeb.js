@@ -1008,6 +1008,39 @@ function ControlWeb() {
     }
   };
 
+  this.formatTime = function (minutes, seconds) {
+    if (seconds !== undefined) {
+      // Si seconds está definido
+      seconds = seconds < 10 ? "0" + seconds : seconds;
+      return `${minutes}:${seconds}`;
+    } else {
+      // Si seconds no está definido, se asume como 0
+      return `${minutes}:00`;
+    }
+  };
+
+  this.contador = function (contadorTiempo, partida, email) {
+    socket.emit("contadorServidor", { partida: partida, email: email });
+
+    socket.on("contadorCliente", (obj) => {
+      if (email == obj.email) {
+        console.log("OBJ CLIENTE CONTADOR", obj);
+        let tiempoFormateado = cw.formatTime(obj.minutes, obj.seconds);
+        contadorTiempo.textContent = tiempoFormateado;
+        contadorTiempo.className = "text-3xl font-bold animate__animated";
+        if (
+          obj.color == "red" &&
+          (obj.seconds == 10 || obj.seconds == 5 || obj.seconds == 0)
+        ) {
+          contadorTiempo.className =
+            "text-3xl font-bold animate__animated animate__heartBeat";
+        }
+
+        contadorTiempo.style.color = obj.color;
+      }
+    });
+  };
+
   this.mostrarPartido = function (partida) {
     console.log("MOSTRAR PARTIDO", partida);
     $("#navbar").addClass("hidden");
@@ -1041,12 +1074,30 @@ function ControlWeb() {
         }
       });
 
+      window.addEventListener("mouseout", function (event) {
+        // Verificar si el puntero del ratón está fuera de la ventana
+        if (
+          event.clientY <= 0 ||
+          event.clientY >= window.innerHeight ||
+          event.clientX <= 0 ||
+          event.clientX >= window.innerWidth
+        ) {
+          // Redirigir el puntero del ratón de nuevo a la ventana
+          window.moveTo(event.clientX, event.clientY);
+        }
+      });
+
       //Inicializar el juego
       cw.mostrarLoadingGame(partida);
       socket.emit("joinRoom", partida.passCode);
       $("#partido").removeClass("hidden");
       $("#GUI").load("./cliente/juego/GUI.html", function () {
         socket.emit("actualizarContadorEquipo", partida);
+
+        //CONTADOR
+        const contadorTiempo = document.getElementById("contadorTiempo");
+        console.log();
+        contadorTiempo.textContent = cw.formatTime(partida.duracion);
         //PASSCODE
         const passCodeDiv = document.getElementById("passCode");
         const passCode = `<h1 class="text-white leading-none tracking-tighter justify-end items-center flex font-bold mt-2 text-2xl mr-2">Código de la partida: <span class="inline-block animate__animated animate__zoomInDown ml-2 text-yellow-500 pointer-events-auto hover:text-yellow-700">${partida.passCode}</span>
@@ -1405,7 +1456,7 @@ function ControlWeb() {
                   startText.textContent = "EMPEZAR";
                 }
                 //Eliminar el spinner
-                spin.parentNode.removeChild(spin);
+                if (spin) spin.parentNode.removeChild(spin);
               }
 
               const lockB = document.getElementById("lockB");
@@ -1447,7 +1498,7 @@ function ControlWeb() {
                   startButton.disabled = false;
                   startText.textContent = "EMPEZAR";
                 }
-                spin.parentNode.removeChild(spin);
+                if (spin) spin.parentNode.removeChild(spin);
               }
             });
           }
@@ -1686,6 +1737,14 @@ function ControlWeb() {
               rest.obtenerUsuario($.cookie("nick"), function (usr) {
                 const equipo = cw.getEquipoUsuario(partida, usr);
                 window.juego.zoomCamera(usr, equipo);
+                const lastCountDown = document.getElementById("lastCountDown");
+                lastCountDown.innerHTML = `<div class="flex flex-row items-center justify-center">
+                <lottie-player src="./cliente/img/lottie/countDown.json" background="transparent" speed="1" class="w-32 h-32" autoplay></lottie-player>
+                </div>`;
+                setTimeout(() => {
+                  window.juego._canMove = true;
+                  cw.contador(contadorTiempo, obj.partida, usr.email);
+                }, 4500);
               });
             }, 400); //4500
           }

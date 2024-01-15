@@ -122,6 +122,48 @@ function WSServer() {
         });
       });
 
+      let contador = 0;
+
+      socket.on("contadorServidor", (obj) => {
+        console.log("OBJETO", obj);
+        contador = obj.partida.duracion * 60;
+        var minutes = Math.floor(contador / 60);
+        var seconds = contador % 60;
+        let isLast30Seconds = false; // Variable para rastrear si estamos en los últimos 30 segundos
+        let interval = setInterval(() => {
+          if (seconds == 0) {
+            if (minutes == 0) {
+              clearInterval(interval);
+              return;
+            }
+            minutes--;
+            seconds = 59;
+          } else {
+            seconds--;
+
+            // Verificar si estamos en los últimos 30 segundos
+            if (minutes === 0 && seconds <= 30) {
+              isLast30Seconds = true;
+            }
+          }
+
+          // Determinar el color a enviar
+          let color = isLast30Seconds
+            ? seconds % 2 === 0
+              ? "red"
+              : "white"
+            : "white";
+          if (isLast30Seconds && seconds <= 10) color = "red";
+
+          io.to(obj.partida.passCode).emit("contadorCliente", {
+            minutes: minutes,
+            seconds: seconds,
+            email: obj.email,
+            color: color,
+          });
+        }, 1000);
+      });
+
       socket.on("salirPartida", (obj) => {
         console.log("OBJETO", obj);
         io.to(obj.partida.passCode).emit(

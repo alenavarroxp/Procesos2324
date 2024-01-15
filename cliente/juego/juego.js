@@ -1,5 +1,6 @@
 import Mapa from "./mapa.js";
 import Player from "./player.js";
+import Ball from "./ball.js";
 
 export default class Juego {
   constructor() {
@@ -213,8 +214,6 @@ export default class Juego {
 
   zoomCamera = function (usr, equipo) {
     if (this._players[usr.email]) {
-      this._canMove = true;
-
       this._players[usr.email].character.setEquipo(equipo);
 
       const targetPosition = this._players[usr.email].character._actualPosition;
@@ -350,7 +349,7 @@ export default class Juego {
     if (this._keys.hasOwnProperty(key)) {
       this._keys[key] = true;
     }
-    if(this._keys.R){
+    if (this._keys.R) {
       this.restoreCameraZoom(this._principalCharacter._actualEquipo);
     }
   };
@@ -387,6 +386,10 @@ setTimeout(() => {
     "ELEMENTOS DEL MAPA CREADOS EN MAPAS PERO EN JUEGO",
     juego._elementMap
   );
+
+  const ball = new Ball();
+  ball.initBall(juego);
+  console.log("BALL", ball)
 
   console.log("Scene elementos", juego._scene.meshes);
 
