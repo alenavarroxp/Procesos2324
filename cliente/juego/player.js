@@ -47,7 +47,7 @@ class Player {
                 );
                 this._mesh.position = new BABYLON.Vector3(
                   randomPositionX,
-                  0.75,
+                  0.55,
                   randomPositionZ
                 );
                 this._savePosition.equipoAzul = {
@@ -68,7 +68,7 @@ class Player {
                 );
                 this._mesh.position = new BABYLON.Vector3(
                   randomPositionX,
-                  0.75,
+                  0.55,
                   randomPositionZ
                 );
                 console.log("rotation", this._mesh.rotation);
@@ -136,22 +136,7 @@ class Player {
 
             this._mesh.getChildMeshes().forEach((mesh) => {
               if (mesh.name == "BaseHuman_primitive0") mesh.material = material;
-            });
-            // var dummyPhysicsRoot = BABYLON.MeshBuilder.CreateCapsule(
-            //   "dummyPhysicsRoot",
-            //   { height: 2 },
-            //   juego._scene
-            // );
-            // // object.position.y += dummyPhysicsRoot.scaling.y / 2;
-            // dummyPhysicsRoot.position = object.position
-            // dummyPhysicsRoot.visibility = 1;
-
-            // var dummyAggregate = new BABYLON.PhysicsAggregate(
-            //   dummyPhysicsRoot,
-            //   BABYLON.PhysicsShapeType.CAPSULE,
-            //   { mass: 50 },
-            //   juego._scene
-            // );
+            });            
 
             juego.addToScene(this._mesh);
           } catch (err) {}
@@ -275,7 +260,7 @@ class Player {
   // };
   move;
 
-  moveForwardAndBackward = function (characters, juego, direccion) {
+  moveForwardAndBackward = function (characters, juego, direccion, ball) {
     console.log("this", this);
     let angle;
     const newPosition = this._mesh.position.clone();
@@ -309,10 +294,14 @@ class Player {
       this._mesh.position.z = newPosition.z;
       this.smoothRotation(angle, juego);
       this.calculateCameraPosition(juego);
+      if (this.shootBall(ball, juego)) {
+        console.log("SHOOT BALL");
+        ball.shootBall(this, juego);
+      }
     }
   };
 
-  moveLeftAndRight = function (characters, juego, direccion) {
+  moveLeftAndRight = function (characters, juego, direccion, ball) {
     let angle;
     const newPosition = this._mesh.position.clone();
     switch (this._actualEquipo) {
@@ -345,53 +334,13 @@ class Player {
       this._mesh.position.x = newPosition.x;
       this.smoothRotation(angle, juego);
       this.calculateCameraPosition(juego);
-    }
-  };
-
-
-  moveLeft = function (characters, juego) {
-    const newPosition = this._mesh.position.clone();
-    newPosition.x -= this._speed;
-
-    if (
-      !this.checkCollisions(newPosition, characters) &&
-      !this.checkCollisionsMap(newPosition, juego._elementMap)
-    ) {
-      this._mesh.position.x = newPosition.x;
-
-      let angle;
-      if (this._actualEquipo == "equipoAzul") {
-        angle = Math.PI / 2;
-      } else if (this._actualEquipo == "equipoRojo") {
-        angle = -Math.PI / 2;
+      if (this.shootBall(ball, juego)) {
+        console.log("SHOOT BALL");
+        ball.shootBall(this, juego);
       }
-
-      this.smoothRotation(angle, juego);
-      this.calculateCameraPosition(juego, "Left");
     }
   };
 
-  moveRight = function (characters, juego) {
-    const newPosition = this._mesh.position.clone();
-    newPosition.x += this._speed;
-
-    if (
-      !this.checkCollisions(newPosition, characters) &&
-      !this.checkCollisionsMap(newPosition, juego._elementMap)
-    ) {
-      this._mesh.position.x = newPosition.x;
-
-      let angle;
-      if (this._actualEquipo == "equipoAzul") {
-        angle = -Math.PI / 2;
-      } else if (this._actualEquipo == "equipoRojo") {
-        angle = Math.PI / 2;
-      }
-
-      this.smoothRotation(angle, juego);
-      this.calculateCameraPosition(juego, "Right");
-    }
-  };
 
   //Colisiones
   checkCollisions = function (newPosition, characters) {
@@ -590,5 +539,43 @@ class Player {
     // juego._camera.setTarget(direccions);
     // console.log("CAMERA TARGET", juego._camera.target);
   };
+  shootBall = function (ball, juego) {
+    console.log("BALL", ball);
+    const distanceVector = ball._ball.position.subtract(
+      this._mesh.position.clone()
+    );
+    console.log("DISTANCEVECTOR", distanceVector);
+    const distance = distanceVector.length();
+    console.log("DISTANCE", distance);
+    if (distance < 1) {
+      return true;
+    }
+  };
+
+  reset = function () {
+    switch(this._actualEquipo){
+      case "equipoAzul":
+        console.log("SAVEPOSITION", this._savePosition.equipoAzul.position)
+        if(this._mesh){
+          this._mesh.position = new BABYLON.Vector3(
+            this._savePosition.equipoAzul.position._x,
+            this._savePosition.equipoAzul.position._y,
+            this._savePosition.equipoAzul.position._z
+          );
+        }
+        break;
+      case "equipoRojo":
+        if (this._mesh) {
+          this._mesh.position = new BABYLON.Vector3(
+            this._savePosition.equipoRojo.position._x,
+            this._savePosition.equipoRojo.position._y,
+            this._savePosition.equipoRojo.position._z
+          );
+        }
+        break;
+      default:
+        break;
+    }
+  }
 }
 export default Player;

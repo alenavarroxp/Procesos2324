@@ -19,7 +19,9 @@
     try {
         loadScript('https://cdnjs.cloudflare.com/ajax/libs/babylonjs/6.38.0/babylon.js', function () {
             loadScript('https://cdn.babylonjs.com/loaders/babylonjs.loaders.js', function () {
-                loadScript("https://cdn.jsdelivr.net/npm/babylonjs-gui@6.38.1/babylon.gui.min.js", function () { })
+                loadScript("https://cdn.jsdelivr.net/npm/babylonjs-gui@6.38.1/babylon.gui.min.js", function () {
+                    loadScript("https://cdn.babylonjs.com/cannon.js",function(){})
+                 })
             });
         });
     } catch (e) {

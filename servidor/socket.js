@@ -68,13 +68,6 @@ function WSServer() {
       });
 
       socket.on("playerCreado", (obj) => {
-        console.log("PLAYER CREADOSERVIDOOOOOOOOR", obj);
-        const playerData = {
-          player: obj.player,
-          equipo: obj.equipo,
-          position: obj.position,
-        };
-
         if (!this.players[obj.code]) {
           this.players[obj.code] = [];
         }
@@ -99,17 +92,14 @@ function WSServer() {
             position: obj.position,
           });
         }
-        console.log("PLAYERS", this.players);
         io.to(obj.code).emit("playerCreado", obj);
       });
 
       socket.on("playerEliminado", (obj) => {
-        console.log("PLAYER ELIMINADOSERVIDOOOOOOOOR", obj);
         io.to(obj.code).emit("playerEliminado", obj);
       });
 
       socket.on("playerMovido", (obj) => {
-        console.log("PLAYER MOVIDOSERVIDOOOOOOOOR", obj);
         io.to(obj.code).emit("playerMovido", obj);
       });
 
@@ -163,6 +153,23 @@ function WSServer() {
           });
         }, 1000);
       });
+
+      socket.on("updateBallPosition", (obj) => {
+        io.to(obj.code).emit("updateBallPosition", obj);
+      });
+
+      socket.on("marcarGol", (obj) => {
+        console.log("GOOOOL", obj);
+        io.to(obj.code).emit("marcarGol", obj);
+      });
+
+      socket.on("actualizarPartidaGol", (obj) => {
+        console.log("OBJETO", obj);
+        sistema.actualizarPartidaGol(obj.partida, obj.obj.equipo, function (obj) {
+          console.log("OBJ", obj);
+          io.to(obj.passCode).emit("actualizarPartidaGol", obj);
+        });
+      })
 
       socket.on("salirPartida", (obj) => {
         console.log("OBJETO", obj);

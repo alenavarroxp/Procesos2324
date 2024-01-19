@@ -1024,7 +1024,6 @@ function ControlWeb() {
 
     socket.on("contadorCliente", (obj) => {
       if (email == obj.email) {
-        console.log("OBJ CLIENTE CONTADOR", obj);
         let tiempoFormateado = cw.formatTime(obj.minutes, obj.seconds);
         contadorTiempo.textContent = tiempoFormateado;
         contadorTiempo.className = "text-3xl font-bold animate__animated";
@@ -1680,6 +1679,24 @@ function ControlWeb() {
           window.juego.removeOtherPlayer(obj.player);
         });
 
+        socket.on("marcarGol", function (obj) {
+          console.log("MARCAR GOL", obj);
+          console.log("PARTIDA ANTES DE MARCAR GOLE",partida)
+          rest.obtenerUsuario($.cookie("nick"), function (usr) {
+            if(usr.email == obj.usr.email){
+              console.log("EMAIL",obj.usr.email , usr.email)
+              cw.marcarGol(partida, obj);
+            }
+          });
+        });
+
+        socket.on("actualizarPartidaGol", function (obj) {
+          console.log("ACTUALIZAR PARTIDA GOL", obj);
+          console.log("PARTIDA ANTES",partida)
+          partida = obj;
+          console.log("PARTIDA DESPUES",partida)
+        });
+
         socket.on("jugadorReady", function (obj) {
           const startButton = document.getElementById("startButton");
           console.log("JUGADOR READY", obj);
@@ -1771,6 +1788,19 @@ function ControlWeb() {
     }
 
     return null; // El usuario no está en ningún equipo
+  };
+
+  this.actualizarContador = function (partida) {
+    const contadorTiempo = 0
+  }
+
+  this.marcarGol = function (partida, obj) {
+    console.log("PARTIDA EN MARCAR GOLE", partida);
+    //TODO: ACTUALIZAR LA PARTIDA DESPUES DEL GOL
+    socket.emit("actualizarPartidaGol", { partida: partida, obj: obj })
+    //TODO: ACTUALIZAR EL MARCADOR
+    cw.actualizarContador(partida);
+    //TODO: MOSTRAR PANTALLA GOL
   };
 
   this.ocultarDivs = function (div) {

@@ -12,8 +12,8 @@ function Sistema(test) {
 
     if (!this.usuarios[usr.nick]) {
       if (!usr.clave && Object.values(this.usuarios).length > 0) {
-        for (let user in this.usuarios){
-          if(this.usuarios[user].email == usr.email) return;
+        for (let user in this.usuarios) {
+          if (this.usuarios[user].email == usr.email) return;
         }
       }
       this.usuarios[usr.nick] = new Usuario(usr);
@@ -390,6 +390,14 @@ function Sistema(test) {
         return;
     }
   };
+
+  this.actualizarPartidaGol = function (partida, equipo, callback) {
+    console.log("ACTUALIZAR PARTIDA GOL EN SISTEMA", partida, equipo);
+    if (!this.partidas[partida.id]) return;
+    this.partidas[partida.id].actualizarPartidaGol(equipo);
+    console.log("PARTIDAS", this.partidas[partida.id].equipos);
+    callback(this.partidas[partida.id]);
+  };
 }
 
 function Usuario(usr) {
@@ -491,11 +499,17 @@ function Partida(
       return false;
     }
   };
+
+  this.actualizarPartidaGol = function (equipo) {
+    console.log("paramtero equipo", equipo)
+    console.log("This equipos equipo", this.equipos)
+    this.equipos[equipo].actualizarPartidaGol();
+  };
 }
 
 function Equipo() {
   this.jugadores = {};
-  this.goles;
+  this.goles = 0;
 
   this.unirseAEquipo = function (usr) {
     if (!this.jugadores[usr.nick]) {
@@ -518,6 +532,12 @@ function Equipo() {
       console.log("El jugador no está en este equipo: " + usr.nick);
       return undefined;
     }
+  };
+
+  this.actualizarPartidaGol = function () {
+    console.log("GOLES ANTES", this.goles);
+    this.goles++;
+    console.log("GOLES DESPUES", this.goles);
   };
 }
 

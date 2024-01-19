@@ -21,27 +21,20 @@ function Mapa() {
           object.rotation = new BABYLON.Vector3(0, Math.PI / 2, 0);
           console.log("objectMAPA", object);
 
-          const ground = BABYLON.MeshBuilder.CreateGround(
+          const ground = BABYLON.MeshBuilder.CreateBox(
             "ground",
-            { width: 20, height: 40, depth: 0.1 },
+            { width: 20, height: 0.1, depth: 40 },
             scene
           );
           ground.position.x = 0;
-          ground.position.y = 0.6;
+          ground.position.y = 0.35;
           ground.position.z = 0;
-          ground.isVisible = false;
-
+          ground.isVisible = true;
+         
           // elementosMapa["ground"] = ground;
 
           this.createWalls(scene, elementosMapa);
-
-          // const groundAggregate = new BABYLON.PhysicsAggregate(
-          //   ground,
-          //   BABYLON.PhysicsShapeType.MESH,
-          //   { mass: 0, restitution: 1 },
-          //   scene
-          // );
-          // object.physicsImpostor = groundAggregate;
+          
         } catch (err) {
           console.log("Error", err);
         }
@@ -136,7 +129,7 @@ function Mapa() {
     wall4.isVisible = false;
 
     const goalWallBlue = BABYLON.MeshBuilder.CreateBox(
-      "goalWallBlue",
+      "wallGoalBlue",
       { width: 3.6, height: 3, depth: 0.1 },
       scene
     );
@@ -145,11 +138,11 @@ function Mapa() {
     goalWallBlue.position.z = 18.9;
     goalWallBlue.isVisible = false;
 
-    goalWallBlue.material = new BABYLON.StandardMaterial("goalWallBlue", scene);
+    goalWallBlue.material = new BABYLON.StandardMaterial("wallGoalBlue", scene);
     goalWallBlue.material.diffuseColor = new BABYLON.Color3(0, 0, 1);
 
     const goalWallRed = BABYLON.MeshBuilder.CreateBox(
-      "goalWallRed",
+      "wallGoalRed",
       { width: 3.6, height: 3, depth: 0.1 },
       scene
     );
@@ -158,7 +151,7 @@ function Mapa() {
     goalWallRed.position.z = -18.9;
     goalWallRed.isVisible = false;
 
-    goalWallRed.material = new BABYLON.StandardMaterial("goalWallRed", scene);
+    goalWallRed.material = new BABYLON.StandardMaterial("wallGoalRed", scene);
     goalWallRed.material.diffuseColor = new BABYLON.Color3(1, 0, 0);
 
     var adt = new BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI");
@@ -180,16 +173,14 @@ function Mapa() {
     );
     indicatorBlue.material.diffuseColor = new BABYLON.Color3(0, 0, 1);
     indicatorBlue.material.alpha = 0.5;
-    
-    
-    
+
     var blueText = new BABYLON.GUI.TextBlock();
     blueText.text = "Equipo Azul";
     blueText.color = "white";
     blueText.fontSize = 24;
     blueText.fontStyle = "bold"; // Añade negrita
     blueText.fontFamily = "Arial, sans-serif";
-    
+
     // Alinea el texto horizontalmente al centro de la caja
     blueText.textHorizontalAlignment =
       BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
@@ -204,7 +195,7 @@ function Mapa() {
 
     // Ajusta la posición vertical del texto con respecto a la caja
     blueText.linkWithMesh(indicatorBlue);
-    
+
     // Crear la caja
     const indicatorRed = BABYLON.MeshBuilder.CreateBox(
       "indicatorRed",
@@ -220,8 +211,6 @@ function Mapa() {
     indicatorRed.material = new BABYLON.StandardMaterial("indicatorRed", scene);
     indicatorRed.material.diffuseColor = new BABYLON.Color3(1, 0, 0);
     indicatorRed.material.alpha = 0.5;
-
-    
 
     var redText = new BABYLON.GUI.TextBlock();
     redText.text = "Equipo Rojo";

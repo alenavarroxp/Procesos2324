@@ -24,6 +24,7 @@ export default class Juego {
     this._passCode = null;
     this._elementMap = {};
     this._isOffensiveCamera = true;
+    this._ball = null;
   }
 
   getUser = function () {
@@ -51,6 +52,7 @@ export default class Juego {
     this._engine = new BABYLON.Engine(this._canvas, true);
     this._scene = new BABYLON.Scene(this._engine);
     this._scene.actionMaganer = new BABYLON.ActionManager(this._scene);
+    this._scene.enablePhysics(new BABYLON.Vector3(0, -9.81, 0), new BABYLON.CannonJSPlugin());
     this._camera = new BABYLON.ArcRotateCamera(
       "Camera",
       Math.PI / 2,
@@ -99,21 +101,22 @@ export default class Juego {
           this._principalCharacter.moveForwardAndBackward(
             this._players,
             this,
-            "W"
+            "W",
+            this._ball
           );
         }
         if (this._keys.A) {
-          this._principalCharacter.moveLeftAndRight(this._players, this, "A");
+          this._principalCharacter.moveLeftAndRight(this._players, this, "A",this._ball);
         }
         if (this._keys.S) {
           this._principalCharacter.moveForwardAndBackward(
             this._players,
             this,
-            "S"
+            "S",this._ball
           );
         }
         if (this._keys.D) {
-          this._principalCharacter.moveLeftAndRight(this._players, this, "D");
+          this._principalCharacter.moveLeftAndRight(this._players, this, "D",this._ball);
         }
 
         if (this._keys.W || this._keys.A || this._keys.S || this._keys.D) {
@@ -310,7 +313,8 @@ export default class Juego {
     if (this._isLookingAtPlayer && this._players[usr.email]) {
       this._camera.target = this._players[usr.email].character._actualPosition;
     } else {
-      this._camera.target = new BABYLON.Vector3(0, 0, 0);
+      console.log("BALL", this._ball)
+      this._camera.target = this._ball._actualPosition;
     }
     this._camera.upperRadiusLimit = 10;
   };
@@ -335,6 +339,61 @@ export default class Juego {
       BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT, // Modo de bucle
       new BABYLON.QuadraticEase() // Función de interpolación (ease)
     );
+  };
+
+  setBallPosition = function (position) {
+    this._ball._actualPosition = position;
+    this._ball.position = position;
+  };
+
+  resetGameToGol = function () {
+    this._canMove = false;
+
+    this.animacion("positionBallAnimation", this._ball, "position", 60, 120, this._ball._ball.position, new BABYLON.Vector3(0, 0.55, 0))
+    this._ball._ball.position = new BABYLON.Vector3(0, 0.55, 0);
+    // this._ball._isGoal = false;
+    
+    this._principalCharacter.reset()
+
+    for (const playerId in this._players) {
+      if (this._players.hasOwnProperty(playerId)) {
+        const player = this._players[playerId];
+        console.log("PLAYER", player)
+    
+        switch (player.character._actualEquipo) {
+          case "equipoAzul":
+            // this.animacion("positionBlueAnimation", player.character._mesh, "position", 60, 120, player.character._mesh.position, player.character._savePosition.equipoAzul);
+            player.character.reset()
+            break;
+          case "equipoRojo":
+            // this.animacion("positionRedAnimation", player.character._mesh, "position", 60, 120, player.character._mesh.position, player.character._savePosition.equipoRojo);
+            player.character.reset()
+            break;
+          default:
+            break;
+        }
+      }
+    }
+    
+  }
+  
+  marcarGol = function (equipo) {
+    console.log("MARCAR GOL", equipo);
+    this.resetGameToGol();
+    socket.emit("marcarGol", {
+      code: this._passCode,
+      usr: this._usr,
+      equipo: equipo,
+    })
+  }
+
+  updateBallPosition = function () {
+    console.log("ACTUAL POSITION", this._ball._actualPosition)
+    socket.emit("updateBallPosition", {
+      code: this._passCode,
+      usr: this._usr,
+      position: this._ball._actualPosition,
+    })
   };
 
   handleKeyUp = function (event) {
@@ -375,21 +434,25 @@ window.addEventListener("keyup", function (evt) {
 });
 
 const juego = new Juego();
-setTimeout(() => {
+setTimeout(async () => {
   juego.initGame();
   juego.startRenderingLoop();
   window.juego = juego;
 
   const mapa = new Mapa();
-  mapa.initMap(juego._scene, juego._elementMap);
+  await mapa.initMap(juego._scene, juego._elementMap);
   console.log(
     "ELEMENTOS DEL MAPA CREADOS EN MAPAS PERO EN JUEGO",
     juego._elementMap
   );
 
   const ball = new Ball();
-  ball.initBall(juego);
-  console.log("BALL", ball)
+  ball.initBall(juego, function (obj) {
+    console.log("BALL", obj)
+    juego._ball = obj;
+    console.log("BALL en juego", juego._ball)
+  });
+  
 
   console.log("Scene elementos", juego._scene.meshes);
 
@@ -414,13 +477,24 @@ socket.on("recuperarPlayers", (obj) => {
 });
 
 socket.on("playerMovido", (obj) => {
-  console.log("OBJETO EN PLAYER MOVIDO", obj);
+  // console.log("OBJETO EN PLAYER MOVIDO", obj);
   if (obj.player.email == juego._usr.email) return;
 
   const character = juego._players[obj.player.email].character;
   character.moverPersonaje(obj.position, obj.rotation);
 });
 
+socket.on("updateBallPosition", (obj) => {
+  // console.log("OBJETO EN UPDATE BALL POSITION", obj.position);
+  // console.log("POSICION PELOTA ANTES", juego._ball)
+  if(obj.usr != juego._usr){
+    // console.log("OBJETO UPDATE",obj)
+    juego._ball.setPosition(obj.position);
+  }
+  
+  // console.log("POSICION PELOTA DESPUES", juego._ball)
+
+});
 // const ball = new FBXLoader();
 // ball.load("./cliente/juego/public/ball.fbx", function (object) {
 //   object.scale.set(0.01, 0.01, 0.01);
