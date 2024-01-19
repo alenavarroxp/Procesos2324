@@ -1,8 +1,9 @@
 <div class="relative">
     <div id="loading" class="absolute z-10 w-screen h-screen animate__animated"></div>
     <div id="GUI" class="absolute z-0 w-screen h-screen pointer-events-none"></div>
-    <div id="lastCountDown" class="absolute w-screen flex h-screen justify-center items-center pointer-events-none">   
+    <div id="lastCountDown" class="absolute w-screen flex h-screen justify-center items-center pointer-events-none">
     </div>
+    <div id="goalScreen" class="absolute w-screen mx-auto max-w-[600px] max-h-[600px] left-0 right-0 flex h-screen justify-center items-center pointer-events-none hidden"></div>
     <canvas id="juego" class="w-screen h-screen"></canvas>
 </div>
 
@@ -20,8 +21,7 @@
         loadScript('https://cdnjs.cloudflare.com/ajax/libs/babylonjs/6.38.0/babylon.js', function () {
             loadScript('https://cdn.babylonjs.com/loaders/babylonjs.loaders.js', function () {
                 loadScript("https://cdn.jsdelivr.net/npm/babylonjs-gui@6.38.1/babylon.gui.min.js", function () {
-                    loadScript("https://cdn.babylonjs.com/cannon.js",function(){})
-                 })
+                })
             });
         });
     } catch (e) {

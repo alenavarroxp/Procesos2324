@@ -51,7 +51,8 @@ class Player {
                   randomPositionZ
                 );
                 this._savePosition.equipoAzul = {
-                  position: this._mesh.position,
+                  position: this._mesh.position.clone(),
+                  rotation: this._mesh.rotation.clone(),
                 };
                 this._actualPosition = this._mesh.position;
               }
@@ -72,16 +73,18 @@ class Player {
                   randomPositionZ
                 );
                 console.log("rotation", this._mesh.rotation);
+
                 this._savePosition.equipoRojo = {
-                  position: this._mesh.position,
+                  position: this._mesh.position.clone(),
+                  rotation: this._mesh.rotation.clone(),
                 };
                 this._actualPosition = this._mesh.position;
               }
             }
             switch (equipo) {
               case "equipoAzul":
-                var position = this._savePosition.equipoAzul.position;
-                this._mesh.position = position;
+                // var position = this._savePosition.equipoAzul.position;
+                // this._mesh.position = position;
 
                 this._mesh.rotationQuaternion = new BABYLON.Quaternion(
                   0,
@@ -93,12 +96,12 @@ class Player {
                 material.diffuseColor = new BABYLON.Color3.FromHexString(
                   "#00bfff"
                 );
-                this._actualPosition = position;
-                this._actualRotation = this._mesh.rotation;
+                // this._actualPosition = position;
+                this._actualRotation = this._mesh.rotationQuaternion.clone(); // Guarda la rotación como un cuaternión
                 break;
               case "equipoRojo":
-                var position = this._savePosition.equipoRojo.position;
-                this._mesh.position = position;
+                // var position = this._savePosition.equipoRojo.position;
+                // this._mesh.position = position;
                 this._mesh.rotationQuaternion = new BABYLON.Quaternion(
                   0,
                   0,
@@ -109,8 +112,8 @@ class Player {
                 material.diffuseColor = new BABYLON.Color3.FromHexString(
                   "#d60909"
                 );
-                this._actualPosition = position;
-                this._actualRotation = this._mesh.rotation;
+                // this._actualPosition = position;
+                this._actualRotation = this._mesh.rotationQuaternion.clone(); // Guarda la rotación como un cuaternión
                 break;
               default:
                 break;
@@ -136,8 +139,9 @@ class Player {
 
             this._mesh.getChildMeshes().forEach((mesh) => {
               if (mesh.name == "BaseHuman_primitive0") mesh.material = material;
-            });            
+            });
 
+            console.log("THIS CRAER PERSONAJS", this);
             juego.addToScene(this._mesh);
           } catch (err) {}
           resolve();
@@ -258,7 +262,6 @@ class Player {
   //         // console.log(" NO CORRIENDO this walk animation", this._walkAnimation)
   //     }
   // };
-  move;
 
   moveForwardAndBackward = function (characters, juego, direccion, ball) {
     console.log("this", this);
@@ -340,7 +343,6 @@ class Player {
       }
     }
   };
-
 
   //Colisiones
   checkCollisions = function (newPosition, characters) {
@@ -539,6 +541,7 @@ class Player {
     // juego._camera.setTarget(direccions);
     // console.log("CAMERA TARGET", juego._camera.target);
   };
+
   shootBall = function (ball, juego) {
     console.log("BALL", ball);
     const distanceVector = ball._ball.position.subtract(
@@ -552,30 +555,63 @@ class Player {
     }
   };
 
-  reset = function () {
-    switch(this._actualEquipo){
-      case "equipoAzul":
-        console.log("SAVEPOSITION", this._savePosition.equipoAzul.position)
-        if(this._mesh){
-          this._mesh.position = new BABYLON.Vector3(
+  reset = function (juego, usr) {
+    console.log("this mesh jeje", this);
+    if (this._mesh.name == usr.nick) {
+      let targetMeshPosition;
+      let targetRotation = 0
+      switch (this._actualEquipo) {
+        case "equipoAzul":
+          targetMeshPosition = new BABYLON.Vector3(
             this._savePosition.equipoAzul.position._x,
             this._savePosition.equipoAzul.position._y,
             this._savePosition.equipoAzul.position._z
           );
-        }
-        break;
-      case "equipoRojo":
-        if (this._mesh) {
-          this._mesh.position = new BABYLON.Vector3(
+          // console.log("meshrotation reset", this._mesh.rotationQuaternion)
+          // this._mesh.rotationQuaternion = new BABYLON.Quaternion(0, 1, 0, 0);
+          //   console.log("meshrotation reset", this._mesh.rotationQuaternion)
+          //   console.log("meshrotation rotation", this._mesh.rotation)
+          // this._mesh.rotation = new BABYLON.Vector3(0, 0, 0);
+          // console.log("meshrotation rotation", this._mesh.rotation)
+
+          break;
+        case "equipoRojo":
+          targetMeshPosition = new BABYLON.Vector3(
             this._savePosition.equipoRojo.position._x,
             this._savePosition.equipoRojo.position._y,
             this._savePosition.equipoRojo.position._z
           );
-        }
-        break;
-      default:
-        break;
+
+          break;
+        default:
+          break;
+      }
+
+      this._meshes.forEach((mesh) => {
+        this._meshes.forEach((mesh) => {
+          juego.animacion(
+            "zRotationAnimation", // Nombre de la animación
+            mesh, // Objetivo de la animación
+            "rotation.z", // Propiedad que se animará
+            60, // Velocidad de fotogramas
+            120, // Número total de fotogramas
+            mesh.rotation.z, // Valor inicial
+            targetRotation // Valor final
+          );
+        });
+        
+      });
+
+      juego.animacion(
+        "resetAnimation", // Nombre de la animación
+        this._mesh, // Objetivo de la animación
+        "position", // Propiedad que se animará
+        60, // Velocidad de fotogramas
+        120, // Número total de fotogramas
+        this._mesh.position, // Valor inicial
+        targetMeshPosition // Valor final
+      );
     }
-  }
+  };
 }
 export default Player;

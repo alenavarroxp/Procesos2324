@@ -52,7 +52,6 @@ export default class Juego {
     this._engine = new BABYLON.Engine(this._canvas, true);
     this._scene = new BABYLON.Scene(this._engine);
     this._scene.actionMaganer = new BABYLON.ActionManager(this._scene);
-    this._scene.enablePhysics(new BABYLON.Vector3(0, -9.81, 0), new BABYLON.CannonJSPlugin());
     this._camera = new BABYLON.ArcRotateCamera(
       "Camera",
       Math.PI / 2,
@@ -106,17 +105,28 @@ export default class Juego {
           );
         }
         if (this._keys.A) {
-          this._principalCharacter.moveLeftAndRight(this._players, this, "A",this._ball);
+          this._principalCharacter.moveLeftAndRight(
+            this._players,
+            this,
+            "A",
+            this._ball
+          );
         }
         if (this._keys.S) {
           this._principalCharacter.moveForwardAndBackward(
             this._players,
             this,
-            "S",this._ball
+            "S",
+            this._ball
           );
         }
         if (this._keys.D) {
-          this._principalCharacter.moveLeftAndRight(this._players, this, "D",this._ball);
+          this._principalCharacter.moveLeftAndRight(
+            this._players,
+            this,
+            "D",
+            this._ball
+          );
         }
 
         if (this._keys.W || this._keys.A || this._keys.S || this._keys.D) {
@@ -313,7 +323,7 @@ export default class Juego {
     if (this._isLookingAtPlayer && this._players[usr.email]) {
       this._camera.target = this._players[usr.email].character._actualPosition;
     } else {
-      console.log("BALL", this._ball)
+      console.log("BALL", this._ball);
       this._camera.target = this._ball._actualPosition;
     }
     this._camera.upperRadiusLimit = 10;
@@ -349,34 +359,25 @@ export default class Juego {
   resetGameToGol = function () {
     this._canMove = false;
 
-    this.animacion("positionBallAnimation", this._ball, "position", 60, 120, this._ball._ball.position, new BABYLON.Vector3(0, 0.55, 0))
-    this._ball._ball.position = new BABYLON.Vector3(0, 0.55, 0);
-    // this._ball._isGoal = false;
-    
-    this._principalCharacter.reset()
+    // Definir la nueva posición
+    var targetPosition = new BABYLON.Vector3(0, 0.55, 0);
 
-    for (const playerId in this._players) {
-      if (this._players.hasOwnProperty(playerId)) {
-        const player = this._players[playerId];
-        console.log("PLAYER", player)
-    
-        switch (player.character._actualEquipo) {
-          case "equipoAzul":
-            // this.animacion("positionBlueAnimation", player.character._mesh, "position", 60, 120, player.character._mesh.position, player.character._savePosition.equipoAzul);
-            player.character.reset()
-            break;
-          case "equipoRojo":
-            // this.animacion("positionRedAnimation", player.character._mesh, "position", 60, 120, player.character._mesh.position, player.character._savePosition.equipoRojo);
-            player.character.reset()
-            break;
-          default:
-            break;
-        }
-      }
+    // Crear y comenzar la animación
+    this.animacion(
+      "resetBallAnimation", // Nombre de la animación
+      this._ball._ball, // Objeto a animar
+      "position", // Propiedad a animar
+      60, // Fotogramas por segundo
+      120, // Duración de la animación en fotogramas
+      this._ball._ball.position, // Posición inicial
+      targetPosition // Posición final
+    );
+
+    for (const player in this._players) {
+      this._players[player].character.reset(juego, juego._usr);
     }
-    
-  }
-  
+  };
+
   marcarGol = function (equipo) {
     console.log("MARCAR GOL", equipo);
     this.resetGameToGol();
@@ -384,16 +385,16 @@ export default class Juego {
       code: this._passCode,
       usr: this._usr,
       equipo: equipo,
-    })
-  }
+    });
+  };
 
   updateBallPosition = function () {
-    console.log("ACTUAL POSITION", this._ball._actualPosition)
+    console.log("ACTUAL POSITION", this._ball._actualPosition);
     socket.emit("updateBallPosition", {
       code: this._passCode,
       usr: this._usr,
       position: this._ball._actualPosition,
-    })
+    });
   };
 
   handleKeyUp = function (event) {
@@ -448,11 +449,10 @@ setTimeout(async () => {
 
   const ball = new Ball();
   ball.initBall(juego, function (obj) {
-    console.log("BALL", obj)
+    console.log("BALL", obj);
     juego._ball = obj;
-    console.log("BALL en juego", juego._ball)
+    console.log("BALL en juego", juego._ball);
   });
-  
 
   console.log("Scene elementos", juego._scene.meshes);
 
@@ -487,13 +487,12 @@ socket.on("playerMovido", (obj) => {
 socket.on("updateBallPosition", (obj) => {
   // console.log("OBJETO EN UPDATE BALL POSITION", obj.position);
   // console.log("POSICION PELOTA ANTES", juego._ball)
-  if(obj.usr != juego._usr){
+  if (obj.usr != juego._usr) {
     // console.log("OBJETO UPDATE",obj)
     juego._ball.setPosition(obj.position);
   }
-  
-  // console.log("POSICION PELOTA DESPUES", juego._ball)
 
+  // console.log("POSICION PELOTA DESPUES", juego._ball)
 });
 // const ball = new FBXLoader();
 // ball.load("./cliente/juego/public/ball.fbx", function (object) {

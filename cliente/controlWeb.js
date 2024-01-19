@@ -1681,20 +1681,20 @@ function ControlWeb() {
 
         socket.on("marcarGol", function (obj) {
           console.log("MARCAR GOL", obj);
-          console.log("PARTIDA ANTES DE MARCAR GOLE",partida)
+          console.log("PARTIDA ANTES DE MARCAR GOLE", partida);
           rest.obtenerUsuario($.cookie("nick"), function (usr) {
-            if(usr.email == obj.usr.email){
-              console.log("EMAIL",obj.usr.email , usr.email)
+            if (usr.email == obj.usr.email) {
+              console.log("EMAIL", obj.usr.email, usr.email);
               cw.marcarGol(partida, obj);
             }
           });
         });
 
         socket.on("actualizarPartidaGol", function (obj) {
-          console.log("ACTUALIZAR PARTIDA GOL", obj);
-          console.log("PARTIDA ANTES",partida)
+          const prevPartida = partida;
           partida = obj;
-          console.log("PARTIDA DESPUES",partida)
+          cw.actualizarContadorGoles(prevPartida, partida);
+          cw.mostrarGol(partida);
         });
 
         socket.on("jugadorReady", function (obj) {
@@ -1790,17 +1790,66 @@ function ControlWeb() {
     return null; // El usuario no está en ningún equipo
   };
 
-  this.actualizarContador = function (partida) {
-    const contadorTiempo = 0
-  }
+  this.actualizarContadorGoles = function (prevPartida, partida) {
+    const golesEquipoAzul = document.getElementById("golesEquipoAzul");
+    const golesEquipoRojo = document.getElementById("golesEquipoRojo");
+
+    console.log("prevPartida", prevPartida);
+    console.log("partida", partida);
+    const prevGolesAzul = prevPartida.equipos["equipoAzul"].goles;
+    const prevGolesRojo = prevPartida.equipos["equipoRojo"].goles;
+    const golesAzul = partida.equipos["equipoAzul"].goles;
+    const golesRojo = partida.equipos["equipoRojo"].goles;
+
+    if (prevGolesAzul !== golesAzul) {
+      // Animación para Equipo Azul
+      golesEquipoAzul.classList.add("animate__animated", "animate__flipOutX");
+      setTimeout(() => {
+        golesEquipoAzul.textContent = golesAzul;
+        golesEquipoAzul.classList.remove(
+          "animate__animated",
+          "animate__flipOutX"
+        );
+        golesEquipoAzul.classList.add("animate__animated", "animate__flipInX");
+      }, 500);
+    }
+
+    if (prevGolesRojo !== golesRojo) {
+      // Animación para Equipo Rojo
+      golesEquipoRojo.classList.add("animate__animated", "animate__flipOutX");
+      setTimeout(() => {
+        golesEquipoRojo.textContent = golesRojo;
+        golesEquipoRojo.classList.remove(
+          "animate__animated",
+          "animate__flipOutX"
+        );
+        golesEquipoRojo.classList.add("animate__animated", "animate__flipInX");
+      }, 500);
+    }
+  };
+
+  this.mostrarGol = function (partida) {
+    const goalScreen = document.getElementById("goalScreen");
+    goalScreen.classList.remove("hidden");
+  
+    const lottieDiv = document.createElement("div");
+    lottieDiv.className = "w-full  flex items-center justify-center";
+    lottieDiv.innerHTML = `<lottie-player src="./cliente/img/lottie/goal.json" background="transparent" speed="1" class="w-full h-full" autoplay></lottie-player>`;
+    goalScreen.appendChild(lottieDiv);
+  
+    
+  
+    setTimeout(() => {
+      goalScreen.classList.add("hidden");
+      goalScreen.innerHTML = "";
+    }, 3500);
+  };
+  
+  
 
   this.marcarGol = function (partida, obj) {
     console.log("PARTIDA EN MARCAR GOLE", partida);
-    //TODO: ACTUALIZAR LA PARTIDA DESPUES DEL GOL
-    socket.emit("actualizarPartidaGol", { partida: partida, obj: obj })
-    //TODO: ACTUALIZAR EL MARCADOR
-    cw.actualizarContador(partida);
-    //TODO: MOSTRAR PANTALLA GOL
+    socket.emit("actualizarPartidaGol", { partida: partida, obj: obj });
   };
 
   this.ocultarDivs = function (div) {
