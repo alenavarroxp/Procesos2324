@@ -555,63 +555,70 @@ class Player {
     }
   };
 
-  reset = function (juego, usr) {
+  reset = function (juego) {
     console.log("this mesh jeje", this);
-    if (this._mesh.name == usr.nick) {
-      let targetMeshPosition;
-      let targetRotation = 0
-      switch (this._actualEquipo) {
-        case "equipoAzul":
-          targetMeshPosition = new BABYLON.Vector3(
-            this._savePosition.equipoAzul.position._x,
-            this._savePosition.equipoAzul.position._y,
-            this._savePosition.equipoAzul.position._z
-          );
-          // console.log("meshrotation reset", this._mesh.rotationQuaternion)
-          // this._mesh.rotationQuaternion = new BABYLON.Quaternion(0, 1, 0, 0);
-          //   console.log("meshrotation reset", this._mesh.rotationQuaternion)
-          //   console.log("meshrotation rotation", this._mesh.rotation)
-          // this._mesh.rotation = new BABYLON.Vector3(0, 0, 0);
-          // console.log("meshrotation rotation", this._mesh.rotation)
+    let targetMeshPosition;
+    let targetRotation = 0;
+    switch (this._actualEquipo) {
+      case "equipoAzul":
+        targetMeshPosition = new BABYLON.Vector3(
+          this._savePosition.equipoAzul.position._x,
+          this._savePosition.equipoAzul.position._y,
+          this._savePosition.equipoAzul.position._z
+        );
+        // console.log("meshrotation reset", this._mesh.rotationQuaternion)
+        // this._mesh.rotationQuaternion = new BABYLON.Quaternion(0, 1, 0, 0);
+        //   console.log("meshrotation reset", this._mesh.rotationQuaternion)
+        //   console.log("meshrotation rotation", this._mesh.rotation)
+        // this._mesh.rotation = new BABYLON.Vector3(0, 0, 0);
+        // console.log("meshrotation rotation", this._mesh.rotation)
 
-          break;
-        case "equipoRojo":
-          targetMeshPosition = new BABYLON.Vector3(
-            this._savePosition.equipoRojo.position._x,
-            this._savePosition.equipoRojo.position._y,
-            this._savePosition.equipoRojo.position._z
-          );
+        break;
+      case "equipoRojo":
+        targetMeshPosition = new BABYLON.Vector3(
+          this._savePosition.equipoRojo.position._x,
+          this._savePosition.equipoRojo.position._y,
+          this._savePosition.equipoRojo.position._z
+        );
 
-          break;
-        default:
-          break;
-      }
-
-      this._meshes.forEach((mesh) => {
-        this._meshes.forEach((mesh) => {
-          juego.animacion(
-            "zRotationAnimation", // Nombre de la animación
-            mesh, // Objetivo de la animación
-            "rotation.z", // Propiedad que se animará
-            60, // Velocidad de fotogramas
-            120, // Número total de fotogramas
-            mesh.rotation.z, // Valor inicial
-            targetRotation // Valor final
-          );
-        });
-        
-      });
-
-      juego.animacion(
-        "resetAnimation", // Nombre de la animación
-        this._mesh, // Objetivo de la animación
-        "position", // Propiedad que se animará
-        60, // Velocidad de fotogramas
-        120, // Número total de fotogramas
-        this._mesh.position, // Valor inicial
-        targetMeshPosition // Valor final
-      );
+        break;
+      default:
+        break;
     }
+
+    this._meshes.forEach((mesh) => {
+      this._meshes.forEach((mesh) => {
+        juego.animacion(
+          "zRotationAnimation", // Nombre de la animación
+          mesh, // Objetivo de la animación
+          "rotation.z", // Propiedad que se animará
+          60, // Velocidad de fotogramas
+          120, // Número total de fotogramas
+          mesh.rotation.z, // Valor inicial
+          targetRotation // Valor final
+        );
+      });
+    });
+
+    juego.animacion(
+      "resetAnimation", // Nombre de la animación
+      this._mesh, // Objetivo de la animación
+      "position", // Propiedad que se animará
+      60, // Velocidad de fotogramas
+      120, // Número total de fotogramas
+      this._mesh.position, // Valor inicial
+      targetMeshPosition // Valor final
+    );
+    this._actualPosition = new BABYLON.Vector3(
+      targetMeshPosition._x,
+      targetMeshPosition._y,
+      targetMeshPosition._z
+    );
+    
+    setTimeout(() => {
+      
+      this._actualPosition = this._mesh.position;
+    }, 1500);
   };
 }
 export default Player;

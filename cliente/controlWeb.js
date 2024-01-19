@@ -1682,6 +1682,7 @@ function ControlWeb() {
         socket.on("marcarGol", function (obj) {
           console.log("MARCAR GOL", obj);
           console.log("PARTIDA ANTES DE MARCAR GOLE", partida);
+          window.juego.resetGameToGol()
           rest.obtenerUsuario($.cookie("nick"), function (usr) {
             if (usr.email == obj.usr.email) {
               console.log("EMAIL", obj.usr.email, usr.email);

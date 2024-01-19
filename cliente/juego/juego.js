@@ -234,6 +234,8 @@ export default class Juego {
       const targetBeta = Math.PI / 3.2; // Puedes ajustar este valor según tus preferencias
 
       var targetAlpha;
+
+      console.log("ACTUAL POSITION DEL PLAYER", targetPosition);
       switch (equipo) {
         case "equipoAzul":
           targetAlpha = Math.PI / 2;
@@ -372,15 +374,27 @@ export default class Juego {
       this._ball._ball.position, // Posición inicial
       targetPosition // Posición final
     );
-
+      console.log("PRINCIPLA CHARACTER", this._principalCharacter)
     for (const player in this._players) {
-      this._players[player].character.reset(juego, juego._usr);
+      this._players[player].character.reset(juego);
+      if (player == this._usr.email) {
+        this._principalCharacter = this._players[player].character;
+      }
     }
+    console.log("PRINCIPLAasd CHARACTER", this._principalCharacter)
+
+    this.zoomCamera(this._usr, this._principalCharacter._actualEquipo);
+    setTimeout(() => {
+      //TODO: Hacer que la pelota se mueva hacia el centro del campo
+      this._ball._actualPosition = targetPosition;
+      this._ball.position = targetPosition;
+
+      this._canMove = true;
+    }, 1500);
   };
 
   marcarGol = function (equipo) {
     console.log("MARCAR GOL", equipo);
-    this.resetGameToGol();
     socket.emit("marcarGol", {
       code: this._passCode,
       usr: this._usr,
