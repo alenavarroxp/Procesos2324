@@ -374,14 +374,14 @@ export default class Juego {
       this._ball._ball.position, // Posición inicial
       targetPosition // Posición final
     );
-      console.log("PRINCIPLA CHARACTER", this._principalCharacter)
+    console.log("PRINCIPLA CHARACTER", this._principalCharacter);
     for (const player in this._players) {
       this._players[player].character.reset(juego);
       if (player == this._usr.email) {
         this._principalCharacter = this._players[player].character;
       }
     }
-    console.log("PRINCIPLAasd CHARACTER", this._principalCharacter)
+    console.log("PRINCIPLAasd CHARACTER", this._principalCharacter);
 
     this.zoomCamera(this._usr, this._principalCharacter._actualEquipo);
     setTimeout(() => {
@@ -495,7 +495,7 @@ socket.on("playerMovido", (obj) => {
   if (obj.player.email == juego._usr.email) return;
 
   const character = juego._players[obj.player.email].character;
-  character.moverPersonaje(obj.position, obj.rotation);
+  if (character) character.moverPersonaje(obj.position, obj.rotation);
 });
 
 socket.on("updateBallPosition", (obj) => {
