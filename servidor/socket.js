@@ -1,5 +1,6 @@
 function WSServer() {
   this.players = {};
+  this.partidasStatus = {};
   this.lanzarServidor = function (io, sistema) {
     io.on("connection", (socket) => {
       console.log("Nuevo cliente conectado", socket.id);
@@ -137,6 +138,12 @@ function WSServer() {
             }
           }
 
+          if(this.partidasStatus[obj.partida.passCode]){
+            console.log("Limpiando intervalo");
+            clearInterval(interval);
+            return;
+          }
+
           // Determinar el color a enviar
           let color = isLast30Seconds
             ? seconds % 2 === 0
@@ -158,6 +165,12 @@ function WSServer() {
         io.to(obj.code).emit("updateBallPosition", obj);
       });
 
+      socket.on("partidaFinalizada", (obj) => {
+        console.log("objeto finalizada", obj);
+        this.partidasStatus[obj.partida.passCode] = true;
+        io.to(obj.partida.passCode).emit("partidaFinalizada", obj);
+      });
+
       socket.on("marcarGol", (obj) => {
         console.log("GOOOOL", obj);
         io.to(obj.code).emit("marcarGol", obj);
@@ -170,6 +183,11 @@ function WSServer() {
           io.to(obj.passCode).emit("actualizarPartidaGol", obj);
         });
       })
+
+      socket.on("pantallaFinal", (obj) => {
+        console.log("OBJETO FINAL FINAL", obj);
+        io.to(obj.partida.passCode).emit("pantallaFinal", obj);
+      });
 
       socket.on("salirPartida", (obj) => {
         console.log("OBJETO", obj);

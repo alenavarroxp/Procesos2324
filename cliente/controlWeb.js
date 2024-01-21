@@ -1036,6 +1036,14 @@ function ControlWeb() {
         }
 
         contadorTiempo.style.color = obj.color;
+        if (obj.minutes == 0 && obj.seconds == 0) {
+          rest.obtenerPartida(partida.id, function (partida) {
+            socket.emit("partidaFinalizada", {
+              partida: partida,
+              email: email,
+            });
+          });
+        }
       }
     });
   };
@@ -1669,9 +1677,11 @@ function ControlWeb() {
         });
 
         socket.on("playerCreado", function (obj) {
-          console.log("PLAYER CREADOWEBBBBBBBBBB", obj);
-          if (window.juego)
-            window.juego.addOtherPlayer(obj.player, obj.equipo, obj.position);
+          try {
+            console.log("PLAYER CREADOWEBBBBBBBBBB", obj);
+            if (window.juego)
+              window.juego.addOtherPlayer(obj.player, obj.equipo, obj.position);
+          } catch (err) {}
         });
 
         socket.on("playerEliminado", function (obj) {
@@ -1682,7 +1692,7 @@ function ControlWeb() {
         socket.on("marcarGol", function (obj) {
           console.log("MARCAR GOL", obj);
           console.log("PARTIDA ANTES DE MARCAR GOLE", partida);
-          window.juego.resetGameToGol()
+          window.juego.resetGameToGol();
           rest.obtenerUsuario($.cookie("nick"), function (usr) {
             if (usr.email == obj.usr.email) {
               console.log("EMAIL", obj.usr.email, usr.email);
@@ -1751,6 +1761,25 @@ function ControlWeb() {
               const GUIContador = document.getElementById("GUIContador");
               GUIContador.classList.remove("hidden");
 
+              const golesEquipoAzul =
+                document.getElementById("golesEquipoAzul");
+              const golesEquipoRojo =
+                document.getElementById("golesEquipoRojo");
+
+              if (partida.numGoles) {
+                const maxGolesSpan = document.createElement("span");
+                maxGolesSpan.id = "maxGolesB";
+                maxGolesSpan.className = "text-2xl";
+                maxGolesSpan.textContent = `/${partida.numGoles}`;
+                golesEquipoAzul.appendChild(maxGolesSpan);
+
+                const maxGolesSpanR = document.createElement("span");
+                maxGolesSpanR.id = "maxGolesR";
+                maxGolesSpanR.className = "text-2xl";
+                maxGolesSpanR.textContent = `/${partida.numGoles}`;
+                golesEquipoRojo.appendChild(maxGolesSpanR);
+              }
+
               obj.partida.estado = "jugando";
               rest.obtenerUsuario($.cookie("nick"), function (usr) {
                 const equipo = cw.getEquipoUsuario(partida, usr);
@@ -1759,6 +1788,7 @@ function ControlWeb() {
                 lastCountDown.innerHTML = `<div class="flex flex-row items-center justify-center">
                 <lottie-player src="./cliente/img/lottie/countDown.json" background="transparent" speed="1" class="w-32 h-32" autoplay></lottie-player>
                 </div>`;
+
                 setTimeout(() => {
                   window.juego._canMove = true;
                   cw.contador(contadorTiempo, obj.partida, usr.email);
@@ -1766,6 +1796,10 @@ function ControlWeb() {
               });
             }, 400); //4500
           }
+        });
+
+        socket.on("pantallaFinal", function (obj) {
+          cw.mostrarPantallaFinal(obj);
         });
       });
     });
@@ -1804,49 +1838,150 @@ function ControlWeb() {
 
     if (prevGolesAzul !== golesAzul) {
       // Animación para Equipo Azul
-      golesEquipoAzul.classList.add("animate__animated", "animate__flipOutX");
-      setTimeout(() => {
-        golesEquipoAzul.textContent = golesAzul;
-        golesEquipoAzul.classList.remove(
-          "animate__animated",
-          "animate__flipOutX"
-        );
-        golesEquipoAzul.classList.add("animate__animated", "animate__flipInX");
-      }, 500);
+      if (!partida.numGoles) {
+        golesEquipoAzul.classList.add("animate__animated", "animate__flipOutX");
+        setTimeout(() => {
+          golesEquipoAzul.textContent = golesAzul;
+          golesEquipoAzul.classList.remove(
+            "animate__animated",
+            "animate__flipOutX"
+          );
+          golesEquipoAzul.classList.add(
+            "animate__animated",
+            "animate__flipInX"
+          );
+        }, 500);
+      } else {
+        golesEquipoAzul.classList.add("animate__animated", "animate__flipOutX");
+        setTimeout(() => {
+          golesEquipoAzul.textContent = golesAzul;
+          golesEquipoAzul.classList.remove(
+            "animate__animated",
+            "animate__flipOutX"
+          );
+          golesEquipoAzul.classList.add(
+            "animate__animated",
+            "animate__flipInX"
+          );
+          const maxGolesSpan = document.createElement("span");
+          maxGolesSpan.id = "maxGolesB";
+          maxGolesSpan.className = "text-2xl";
+          maxGolesSpan.textContent = `/${partida.numGoles}`;
+          golesEquipoAzul.appendChild(maxGolesSpan);
+        }, 500);
+      }
     }
 
     if (prevGolesRojo !== golesRojo) {
-      // Animación para Equipo Rojo
-      golesEquipoRojo.classList.add("animate__animated", "animate__flipOutX");
-      setTimeout(() => {
-        golesEquipoRojo.textContent = golesRojo;
-        golesEquipoRojo.classList.remove(
-          "animate__animated",
-          "animate__flipOutX"
-        );
-        golesEquipoRojo.classList.add("animate__animated", "animate__flipInX");
-      }, 500);
+      if (!partida.numGoles) {
+        golesEquipoRojo.classList.add("animate__animated", "animate__flipOutX");
+        setTimeout(() => {
+          golesEquipoRojo.textContent = golesRojo;
+          golesEquipoRojo.classList.remove(
+            "animate__animated",
+            "animate__flipOutX"
+          );
+          golesEquipoRojo.classList.add(
+            "animate__animated",
+            "animate__flipInX"
+          );
+        }, 500);
+      } else {
+        golesEquipoRojo.classList.add("animate__animated", "animate__flipOutX");
+        setTimeout(() => {
+          golesEquipoRojo.textContent = golesRojo;
+          golesEquipoRojo.classList.remove(
+            "animate__animated",
+            "animate__flipOutX"
+          );
+          golesEquipoRojo.classList.add(
+            "animate__animated",
+            "animate__flipInX"
+          );
+          const maxGolesSpanR = document.createElement("span");
+          maxGolesSpanR.id = "maxGolesR";
+          maxGolesSpanR.className = "text-2xl";
+          maxGolesSpanR.textContent = `/${partida.numGoles}`;
+          golesEquipoRojo.appendChild(maxGolesSpanR);
+        }, 500);
+      }
+    }
+
+    if (partida.numGoles) {
+      console.log(
+        "NUMERO DE GOLES ",
+        partida.numGoles,
+        "azul ",
+        golesAzul,
+        "rojo ",
+        golesRojo
+      );
+      if (golesAzul == partida.numGoles || golesRojo == partida.numGoles) {
+        console.log("PARTIDA FINALIZADA");
+        rest.obtenerPartida(partida.id, function (partida) {
+          rest.obtenerUsuario($.cookie("nick"), function (usr) {
+            socket.emit("partidaFinalizada", {
+              partida: partida,
+              email: usr.email,
+            });
+          });
+        });
+      }
     }
   };
 
   this.mostrarGol = function (partida) {
     const goalScreen = document.getElementById("goalScreen");
     goalScreen.classList.remove("hidden");
-  
-    const lottieDiv = document.createElement("div");
-    lottieDiv.className = "w-full  flex items-center justify-center";
-    lottieDiv.innerHTML = `<lottie-player src="./cliente/img/lottie/goal.json" background="transparent" speed="1" class="w-full h-full" autoplay></lottie-player>`;
-    goalScreen.appendChild(lottieDiv);
-  
-    
-  
+
+    let lottieDiv = document.getElementById("lottieDiv");
+
+    if (!lottieDiv) {
+      lottieDiv = document.createElement("div");
+      lottieDiv.id = "lottieDiv";
+      lottieDiv.className = "w-full  flex items-center justify-center";
+      lottieDiv.innerHTML = `<lottie-player src="./cliente/img/lottie/goal.json" background="transparent" speed="1" class="w-full h-full" autoplay></lottie-player>`;
+      goalScreen.appendChild(lottieDiv);
+    }
+
     setTimeout(() => {
       goalScreen.classList.add("hidden");
       goalScreen.innerHTML = "";
     }, 3500);
   };
-  
-  
+
+  this.mostrarPantallaFinal = function (obj) {
+    $("#GUIContador").empty();
+    $("#endScreen").load("./cliente/juego/endScreen.html", function () {
+      console.log("endScreen objt", obj);
+      const endScreen = document.getElementById("endScreen");
+      endScreen.classList.remove("hidden");
+
+      const golesEndBlue = document.getElementById("golesEndBlue");
+      const golesEndRed = document.getElementById("golesEndRed");
+
+      // TODO: QUIERO COMPROBAR SI HA GANADO EL EQUIPO AZUL, EL EQUIPO ROJO O HAN EMPATADO
+      const golesAzul = obj.partida.equipos["equipoAzul"].goles;
+      const golesRojo = obj.partida.equipos["equipoRojo"].goles;
+
+      golesEndBlue.textContent = golesAzul;
+      golesEndRed.textContent = golesRojo;
+
+      if (golesAzul > golesRojo) {
+        // El equipo azul ha ganado
+        const winText = document.getElementById("winText");
+        winText.textContent = "¡Ha ganado el Equipo Azul!";
+      } else if (golesRojo > golesAzul) {
+        // El equipo rojo ha ganado
+        const winText = document.getElementById("winText");
+        winText.textContent = "¡Ha ganado el Equipo Rojo!";
+      } else {
+        // Han empatado
+        const winText = document.getElementById("winText");
+        winText.textContent = "¡El partido ha terminado en empate!";
+      }
+    });
+  };
 
   this.marcarGol = function (partida, obj) {
     console.log("PARTIDA EN MARCAR GOLE", partida);

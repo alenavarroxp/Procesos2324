@@ -411,6 +411,58 @@ export default class Juego {
     });
   };
 
+  gameEnd = function (obj) {
+    console.log("OBJETO EN GAME END", obj);
+    this._canMove = false;
+    //Quiero hacer que la camara se mueva al personaje y empiece a girar alrededor de él
+    this.cameraEnd(obj);
+  };
+
+  cameraEnd = function (obj) {
+    this.animacion(
+      "cameraEndAnimation",
+      this._camera,
+      "radius",
+      60,
+      120,
+      this._camera.radius,
+      5
+    );
+
+    this.animacion(
+      "cameraEndAnimation",
+      this._camera,
+      "beta",
+      60,
+      120,
+      this._camera.beta,
+      Math.PI / 2.15
+    );
+
+    this.animacion(
+      "cameraEndAnimation",
+      this._camera,
+      "alpha",
+      60,
+      120,
+      this._camera.alpha,
+      Math.PI / 2
+    );
+
+    this._camera.target = this._principalCharacter._actualPosition;
+    this._camera.upperRadiusLimit = 5;
+    this._camera.lowerRadiusLimit = 5;
+
+    setTimeout(() => {
+      socket.emit("pantallaFinal", obj)
+      this._scene.registerBeforeRender(() => {
+        // Ajusta la posición de la cámara para que orbite alrededor del personaje
+        this._camera.alpha += 0.005; // Ajusta la velocidad de rotación según sea necesario
+
+      });
+    }, 1500);
+  };
+
   handleKeyUp = function (event) {
     const key = event.key.toUpperCase();
     if (this._keys.hasOwnProperty(key)) {
@@ -508,11 +560,8 @@ socket.on("updateBallPosition", (obj) => {
 
   // console.log("POSICION PELOTA DESPUES", juego._ball)
 });
-// const ball = new FBXLoader();
-// ball.load("./cliente/juego/public/ball.fbx", function (object) {
-//   object.scale.set(0.01, 0.01, 0.01);
-//   object.position.set(0, 4, 0);
-//   object.remove(object.children[0]);
-//   console.log(object);
-//   scene.add(object);
-// });
+
+socket.on("partidaFinalizada", (obj) => {
+  console.log("OBJETO EN PARTIDA FINALIZADA", obj);
+  if (obj.email == juego._usr.email) juego.gameEnd(obj);
+});
