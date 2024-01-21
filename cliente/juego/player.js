@@ -56,6 +56,9 @@ class Player {
                 };
                 this._actualPosition = this._mesh.position;
               }
+            } else {
+              this._mesh.position =
+                this._savePosition.equipoAzul.position.clone();
             }
             if (!this._savePosition.equipoRojo) {
               if (equipo == "equipoRojo") {
@@ -83,9 +86,6 @@ class Player {
             }
             switch (equipo) {
               case "equipoAzul":
-                // var position = this._savePosition.equipoAzul.position;
-                // this._mesh.position = position;
-
                 this._mesh.rotationQuaternion = new BABYLON.Quaternion(
                   0,
                   1,
@@ -96,12 +96,11 @@ class Player {
                 material.diffuseColor = new BABYLON.Color3.FromHexString(
                   "#00bfff"
                 );
-                // this._actualPosition = position;
+                this._mesh.position =
+                  this._savePosition.equipoAzul.position.clone();
                 this._actualRotation = this._mesh.rotationQuaternion.clone(); // Guarda la rotación como un cuaternión
                 break;
               case "equipoRojo":
-                // var position = this._savePosition.equipoRojo.position;
-                // this._mesh.position = position;
                 this._mesh.rotationQuaternion = new BABYLON.Quaternion(
                   0,
                   0,
@@ -112,7 +111,8 @@ class Player {
                 material.diffuseColor = new BABYLON.Color3.FromHexString(
                   "#d60909"
                 );
-                // this._actualPosition = position;
+                this._mesh.position =
+                  this._savePosition.equipoRojo.position.clone();
                 this._actualRotation = this._mesh.rotationQuaternion.clone(); // Guarda la rotación como un cuaternión
                 break;
               default:
@@ -368,7 +368,7 @@ class Player {
         this._mesh.name != charactersArrayWithoutMe[character].user.nick
       ) {
         const valor = charactersArrayWithoutMe[character];
-        console.log("VALOR", valor.character._actualPosition);
+        console.log("VALOR", valor.character._mesh.position);
         console.log(
           "VALOR CHARACTER MES POSITION",
           valor.character._mesh.position
@@ -609,15 +609,17 @@ class Player {
       this._mesh.position, // Valor inicial
       targetMeshPosition // Valor final
     );
-    this._actualPosition = new BABYLON.Vector3(
-      targetMeshPosition._x,
-      targetMeshPosition._y,
-      targetMeshPosition._z
-    );
-    
+    // this._actualPosition = new BABYLON.Vector3(
+    //   targetMeshPosition._x,
+    //   targetMeshPosition._y,
+    //   targetMeshPosition._z
+    // );
+
     setTimeout(() => {
-      
-      this._actualPosition = this._mesh.position;
+      if (this._mesh.position)
+        try {
+          this._actualPosition = this._mesh.position.clone();
+        } catch (err) {}
     }, 1500);
   };
 }

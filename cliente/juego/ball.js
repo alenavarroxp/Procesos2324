@@ -121,8 +121,8 @@ class Ball {
     ).scale(-1);
 
     var playerPositionXZ = new BABYLON.Vector2(
-      player._actualPosition.x,
-      player._actualPosition.z
+      player._mesh.position._x,
+      player._mesh.position._z
     );
 
     var targetPositionXZ = new BABYLON.Vector2(

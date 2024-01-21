@@ -1799,6 +1799,7 @@ function ControlWeb() {
         });
 
         socket.on("pantallaFinal", function (obj) {
+          window.juego._canMove = false;
           cw.mostrarPantallaFinal(obj);
         });
       });

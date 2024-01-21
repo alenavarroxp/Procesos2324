@@ -131,13 +131,13 @@ export default class Juego {
 
         if (this._keys.W || this._keys.A || this._keys.S || this._keys.D) {
           if (this._canMove) {
-            this._camera.target = this._principalCharacter._actualPosition;
+            this._camera.target = this._principalCharacter._mesh.position;
             this._camera.upperRadiusLimit = 10;
           }
           socket.emit("playerMovido", {
             code: this._passCode,
             player: this._usr,
-            position: this._principalCharacter._actualPosition,
+            position: this._principalCharacter._mesh.position,
             rotation: this._principalCharacter._actualRotation,
           });
         }
@@ -175,7 +175,7 @@ export default class Juego {
         code: code,
         player: player,
         equipo: equipo,
-        position: juego._players[player.email].character._actualPosition,
+        position: juego._players[player.email].character._mesh.position,
       });
     });
   };
@@ -228,8 +228,26 @@ export default class Juego {
   zoomCamera = function (usr, equipo) {
     if (this._players[usr.email]) {
       this._players[usr.email].character.setEquipo(equipo);
+      let targetPosition;
+      switch (equipo) {
+        case "equipoAzul":
+          console.log("this.players[usr.email]", this._players[usr.email].character._savePosition)
+          targetPosition =
+            this._players[
+              usr.email
+            ].character._savePosition.equipoAzul.position.clone();
+          break;
+        case "equipoRojo":
+          console.log("this.players[usr.email]", this._players[usr.email].character._savePosition)
+          targetPosition =
+            this._players[
+              usr.email
+            ].character._savePosition.equipoRojo.position.clone();
+          break;
+        default:
+          break;
+      }
 
-      const targetPosition = this._players[usr.email].character._actualPosition;
       const targetRadius = 8;
       const targetBeta = Math.PI / 3.2; // Puedes ajustar este valor según tus preferencias
 
@@ -286,8 +304,7 @@ export default class Juego {
       );
 
       setTimeout(() => {
-        this._camera.target =
-          this._players[usr.email].character._actualPosition;
+        this._camera.target = this._players[usr.email].character._mesh.position;
       }, 1500);
     }
   };
@@ -323,7 +340,7 @@ export default class Juego {
   cambiarTarget = function (usr) {
     this._isLookingAtPlayer = !this._isLookingAtPlayer;
     if (this._isLookingAtPlayer && this._players[usr.email]) {
-      this._camera.target = this._players[usr.email].character._actualPosition;
+      this._camera.target = this._players[usr.email].character._mesh.position;
     } else {
       console.log("BALL", this._ball);
       this._camera.target = this._ball._actualPosition;
@@ -385,7 +402,6 @@ export default class Juego {
 
     this.zoomCamera(this._usr, this._principalCharacter._actualEquipo);
     setTimeout(() => {
-      //TODO: Hacer que la pelota se mueva hacia el centro del campo
       this._ball._actualPosition = targetPosition;
       this._ball.position = targetPosition;
 
@@ -449,16 +465,15 @@ export default class Juego {
       Math.PI / 2
     );
 
-    this._camera.target = this._principalCharacter._actualPosition;
+    this._camera.target = this._principalCharacter._mesh.position;
     this._camera.upperRadiusLimit = 5;
     this._camera.lowerRadiusLimit = 5;
 
     setTimeout(() => {
-      socket.emit("pantallaFinal", obj)
+      socket.emit("pantallaFinal", obj);
       this._scene.registerBeforeRender(() => {
         // Ajusta la posición de la cámara para que orbite alrededor del personaje
         this._camera.alpha += 0.005; // Ajusta la velocidad de rotación según sea necesario
-
       });
     }, 1500);
   };
