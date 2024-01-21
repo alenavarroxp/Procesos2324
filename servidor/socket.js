@@ -138,7 +138,7 @@ function WSServer() {
             }
           }
 
-          if(this.partidasStatus[obj.partida.passCode]){
+          if (this.partidasStatus[obj.partida.passCode]) {
             console.log("Limpiando intervalo");
             clearInterval(interval);
             return;
@@ -178,11 +178,15 @@ function WSServer() {
 
       socket.on("actualizarPartidaGol", (obj) => {
         console.log("OBJETO", obj);
-        sistema.actualizarPartidaGol(obj.partida, obj.obj.equipo, function (obj) {
-          console.log("OBJ", obj);
-          io.to(obj.passCode).emit("actualizarPartidaGol", obj);
-        });
-      })
+        sistema.actualizarPartidaGol(
+          obj.partida,
+          obj.obj.equipo,
+          function (obj) {
+            console.log("OBJ", obj);
+            io.to(obj.passCode).emit("actualizarPartidaGol", obj);
+          }
+        );
+      });
 
       socket.on("pantallaFinal", (obj) => {
         console.log("OBJETO FINAL FINAL", obj);
@@ -209,6 +213,17 @@ function WSServer() {
             socket.broadcast.emit("obtenerPartidas", obj);
           });
         });
+      });
+
+      socket.on("actualizarEstadoPartida", (obj) => {
+        sistema.actualizarEstadoPartida(
+          obj.partida,
+          obj.estado,
+          function (obj) {
+            console.log("OBJ DEVUELTA", obj);
+            io.to(obj.passCode).emit("actualizarEstadoPartida", obj);
+          }
+        );
       });
 
       socket.on("recargarPagina", (obj) => {

@@ -391,6 +391,12 @@ function Sistema(test) {
     }
   };
 
+  this.actualizarEstadoPartida = function (partida, estado, callback) {
+    if (!this.partidas[partida.id]) return;
+    this.partidas[partida.id].estado = estado;
+    callback(this.partidas[partida.id]);
+  };
+
   this.actualizarPartidaGol = function (partida, equipo, callback) {
     console.log("ACTUALIZAR PARTIDA GOL EN SISTEMA", partida, equipo);
     if (!this.partidas[partida.id]) return;
@@ -484,7 +490,7 @@ function Partida(
       delete this.jugadores[usr.nick];
       this.jugadoresConectados = Object.keys(this.jugadores).length;
       if (this.jugadoresConectados < this.cantidadJugadores) {
-        this.estado = "esperando";
+        if (this.estado != "jugando") this.estado = "esperando";
       }
       // Comprobar si el jugador está en un equipo y eliminarlo
       for (let equipo in this.equipos) {
@@ -501,8 +507,8 @@ function Partida(
   };
 
   this.actualizarPartidaGol = function (equipo) {
-    console.log("paramtero equipo", equipo)
-    console.log("This equipos equipo", this.equipos)
+    console.log("paramtero equipo", equipo);
+    console.log("This equipos equipo", this.equipos);
     this.equipos[equipo].actualizarPartidaGol();
   };
 }

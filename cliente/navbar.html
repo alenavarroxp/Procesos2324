@@ -3,8 +3,7 @@
     <nav class="navegacion mt-1 space-y-1">
         <div>
             <div class="items-center justify-center flex mt-3 flex-col">
-                <div
-                    class="relative mb-1 inline-flex items-center justify-center w-20 h-20 bg-gray-200 rounded-full dark:bg-gray-800">
+                <div class="relative mb-1 inline-flex items-center justify-center w-20 h-20 bg-gray-200 rounded-full">
                     <div
                         class="absolute top-1 right-1 bg-green-500 w-4 h-4 z-20 rounded-full border-green-400 border-2">
                     </div>
@@ -14,48 +13,46 @@
                 </div>
 
                 <span id="username" class="text-md font-bold">Nombre de usuario</span>
-                <span id="emailValue" class="text-xs text-gray-600 dark:text-gray-400"></span>
+                <span id="emailValue" class="text-xs text-gray-600 "></span>
                 <button id="editProfile"
-                    class="text-xs -mb-4 mt-2 font-semibold px-4 py-2 rounded-full transition duration-300 ease-in-out bg-gray-200 text-gray-600 dark:bg-gray-800 dark:text-gray-400 hover:bg-gray-300 dark:hover:bg-gray-700 focus:outline-none focus:ring focus:border-blue-300">
+                    class="text-xs -mb-4 mt-2 font-semibold px-4 py-2 rounded-full transition duration-300 ease-in-out bg-gray-200 text-gray-600 focus:outline-none focus:ring focus:border-blue-300">
                     Editar perfil
                 </button>
 
             </div>
         </div>
-        <div class="h-full px-3 py-4 overflow-y-auto bg-gray-50 dark:bg-gray-800">
-            <ul class="pt-5 mt-5 space-y-2 border-t border-gray-200 dark:border-gray-700">
+        <div class="h-full px-3 py-4 overflow-y-auto bg-gray-50 ">
+            <ul class="pt-5 mt-5 space-y-2 border-t border-gray-200 ">
                 <li>
                     <a id="homeVisible"
-                        class="cursor-pointer flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group no-underline hover:no-underline">
+                        class="cursor-pointer flex items-center p-2 text-gray-900 rounded-lg  hover:bg-gray-100  group no-underline hover:no-underline">
 
                         <i
-                            class="fas fa-home text-xl w-10 h-10 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-white flex items-center"></i>
+                            class="fas fa-home text-xl w-10 h-10 text-gray-500 transition duration-75 0 group-hover:text-blue-600  flex items-center"></i>
                         <span>Inicio</span>
                     </a>
                 </li>
 
                 <li>
                     <a onclick="toggleSubMenu()"
-                        class="cursor-pointer flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group no-underline hover:no-underline">
+                        class="cursor-pointer flex items-center p-2 text-gray-900 rounded-lg  hover:bg-gray-100  group no-underline hover:no-underline">
 
                         <i
-                            class="fas fa-futbol text-xl w-10 h-10 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-white flex items-center"></i>
+                            class="fas fa-futbol text-xl w-10 h-10 text-gray-500 transition duration-75  group-hover:text-blue-600  flex items-center"></i>
                         Partidos
                     </a>
                     <ul class="sub-menu hidden">
                         <li>
                             <a id="crearPartidaVisible"
-                                class="cursor-pointer flex items-center px-4 py-2 text-sm text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group no-underline hover:no-underline">
-                                <i
-                                    class="fas fa-plus-circle text-gray-500 mr-2 group-hover:text-blue-600 dark:group-hover:text-white"></i>
+                                class="cursor-pointer flex items-center px-4 py-2 text-sm text-gray-700  hover:bg-gray-100  group no-underline hover:no-underline">
+                                <i class="fas fa-plus-circle text-gray-500 mr-2 group-hover:text-blue-600"></i>
                                 Crear partido
                             </a>
                         </li>
                         <li>
                             <a id="explorarPartidosVisible"
-                                class="cursor-pointer flex items-center px-4 py-2 text-sm text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group no-underline hover:no-underline">
-                                <i
-                                    class="fas fa-search text-gray-500 mr-2 group-hover:text-blue-600 dark:group-hover:text-white"></i>
+                                class="cursor-pointer flex items-center px-4 py-2 text-sm text-gray-700  hover:bg-gray-100  group no-underline hover:no-underline">
+                                <i class="fas fa-search text-gray-500 mr-2 group-hover:text-blue-600 "></i>
                                 Explorar partidos
                             </a>
                         </li>
@@ -65,10 +62,10 @@
 
                 <li>
                     <a
-                        class="cursor-pointer flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group no-underline hover:no-underline">
+                        class="cursor-pointer flex items-center p-2 text-gray-900 rounded-lg  hover:bg-gray-100 group no-underline hover:no-underline">
 
                         <i
-                            class="fas fa-chart-bar text-xl w-10 h-10 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-white flex items-center"></i>
+                            class="fas fa-chart-bar text-xl w-10 h-10 text-gray-500 transition duration-75  group-hover:text-blue-600  flex items-center"></i>
                         <span>Estadísticas</span>
                     </a>
                 </li>
@@ -81,7 +78,7 @@
 
     <div id="btnSalir" class="absolute bottom-2 w-full flex items-center justify-center mb-4">
         <button type="button"
-            class="py-2 px-5 mt-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-xl border border-gray-200 hover:bg-gray-100 hover:text-red-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700 flex items-center justify-center">
+            class="py-2 px-5 mt-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-xl border border-gray-200 hover:bg-gray-100 hover:text-red-700 focus:z-10 focus:ring-4 focus:ring-gray-200  flex items-center justify-center">
             <span class="mr-1">Salir</span>
             <ion-icon name="exit-outline" class="text-lg"></ion-icon>
         </button>

@@ -222,8 +222,8 @@ function ControlWeb() {
     $("#inicio").load("./cliente/inicio.html", function () {
       cw.mostrarHome();
       // cw.mostrarPartido();
-      $("#navbar").load("./cliente/navbar.html", function () {
-        rest.obtenerUsuario($.cookie("nick"), function (usr) {
+      $("#navbar").load("./cliente/navbar.html", async function () {
+        await rest.obtenerUsuario($.cookie("nick"), function (usr) {
           console.log("usr", usr);
           $("#username").text(usr.nick);
           if (usr.photo) {
@@ -292,31 +292,31 @@ function ControlWeb() {
     $("#home").empty();
     $("#crearPartida").empty();
     $("#explorarPartidas").empty();
+    if ($("#editarPerfil").is(":empty"))
+      $("#editarPerfil").load("./cliente/editProfile.html", function () {
+        const imagen = $("#imgUsuario");
+        $("#photoReg").on("change", function (e) {
+          const actualProfile = $("#actualProfile");
+          const existingImage = $("#imagenPerfil");
 
-    $("#editarPerfil").load("./cliente/editProfile.html", function () {
-      const imagen = $("#imgUsuario");
-      $("#photoReg").on("change", function (e) {
-        const actualProfile = $("#actualProfile");
-        const existingImage = $("#imagenPerfil");
+          const file = e.target.files[0];
+          const reader = new FileReader();
+          cw.cambiarFotoPerfil(actualProfile, existingImage, file, reader);
 
-        const file = e.target.files[0];
-        const reader = new FileReader();
-        cw.cambiarFotoPerfil(actualProfile, existingImage, file, reader);
+          const actualImage = document.getElementById("actualImage");
+          actualImage.classList.add("hidden");
 
-        const actualImage = document.getElementById("actualImage");
-        actualImage.classList.add("hidden");
+          // Limpiar el valor actual del input file
+          $("#photoReg").val("");
+        });
+        rest.obtenerUsuario($.cookie("nick"), function (usr) {
+          const actualImage = document.getElementById("actualImage");
 
-        // Limpiar el valor actual del input file
-        $("#photoReg").val("");
-      });
-      rest.obtenerUsuario($.cookie("nick"), function (usr) {
-        const actualImage = document.getElementById("actualImage");
+          if (usr.clave) {
+            const noOAuth = document.getElementById("noOAuth");
 
-        if (usr.clave) {
-          const noOAuth = document.getElementById("noOAuth");
-
-          // HTML que quieres agregar
-          const passwordElement = `
+            // HTML que quieres agregar
+            const passwordElement = `
     <!-- Contraseña actual -->
     <div class="mb-4">
         <label class="block text-sm font-medium text-gray-600">Contraseña actual (*)</label>
@@ -342,98 +342,98 @@ function ControlWeb() {
             </div>
 `;
 
-          // Agregar el HTML al elemento con id "noOAuth"
-          noOAuth.innerHTML = passwordElement;
-        }
-        if (usr.photo) {
-          const imgElement = document.createElement("img");
-          imgElement.src = usr.photo;
-          imgElement.alt = "Foto de perfil";
-          imgElement.classList.add("w-28", "h-28", "rounded-full", "mb-2");
-          actualImage.appendChild(imgElement);
-        } else {
-          const divElement = document.createElement("div");
-          divElement.classList.add(
-            "relative",
-            "mb-1",
-            "inline-flex",
-            "items-center",
-            "justify-center",
-            "w-28",
-            "h-28",
-            "bg-gray-200",
-            "rounded-full",
-            "dark:bg-gray-800"
-          );
-
-          const iElement = document.createElement("i");
-          iElement.classList.add(
-            "fas",
-            "fa-user",
-            "text-4xl",
-            "relative",
-            "z-10"
-          );
-
-          divElement.appendChild(iElement);
-          actualImage.appendChild(divElement);
-        }
-
-        console.log("USUARIO", usr);
-        $("#usernameInput").attr("placeholder", usr.nick);
-        $("#emailInput").attr("placeholder", usr.email);
-      });
-
-      $("#saveChanges").on("click", function (e) {
-        e.preventDefault();
-        const username = $("#usernameInput").val();
-        const email = $("#emailInput").val();
-        const photo = $("#imagenPerfil").attr("src");
-        const password = $("#passwordInput").val();
-        const confirmPassword = $("#passwordRepeat").val();
-        const currentPassword = $("#currentPassword").val();
-
-        if (email) {
-          if (!cw.validarEmail(email)) {
-            cw.mostrarMsg("Introduce un email válido");
-            return;
+            // Agregar el HTML al elemento con id "noOAuth"
+            noOAuth.innerHTML = passwordElement;
           }
-        }
+          if (usr.photo) {
+            const imgElement = document.createElement("img");
+            imgElement.src = usr.photo;
+            imgElement.alt = "Foto de perfil";
+            imgElement.classList.add("w-28", "h-28", "rounded-full", "mb-2");
+            actualImage.appendChild(imgElement);
+          } else {
+            const divElement = document.createElement("div");
+            divElement.classList.add(
+              "relative",
+              "mb-1",
+              "inline-flex",
+              "items-center",
+              "justify-center",
+              "w-28",
+              "h-28",
+              "bg-gray-200",
+              "rounded-full",
+              "dark:bg-gray-800"
+            );
 
-        if (password !== confirmPassword) {
-          cw.mostrarMsg("Las contraseñas no coinciden");
-          return;
-        } else {
-          $("#mensajeError").empty();
-        }
+            const iElement = document.createElement("i");
+            iElement.classList.add(
+              "fas",
+              "fa-user",
+              "text-4xl",
+              "relative",
+              "z-10"
+            );
 
-        if (username || email || photo || password || currentPassword) {
-          $("#mensajeError").empty();
-          rest.obtenerUsuario($.cookie("nick"), function (usr) {
-            if (username) usr.newNick = username;
-            if (email) usr.newEmail = email;
-            if (photo) usr.newPhoto = photo;
-            if (password) usr.newPassword = password;
-            console.log("USR", usr);
-            usr.password = currentPassword;
-            if (email) {
-              rest.obtenerUsuarioBD(email, function (obj) {
-                console.log("USREMAIL", obj.email);
-                if (obj.email != undefined) {
-                  cw.mostrarMsg("Ya existe un usuario con ese email");
-                  return;
-                }
-                rest.actualizarUsuario(usr);
-              });
-            } else {
-              rest.actualizarUsuario(usr);
+            divElement.appendChild(iElement);
+            actualImage.appendChild(divElement);
+          }
+
+          console.log("USUARIO", usr);
+          $("#usernameInput").attr("placeholder", usr.nick);
+          $("#emailInput").attr("placeholder", usr.email);
+        });
+
+        $("#saveChanges").on("click", function (e) {
+          e.preventDefault();
+          const username = $("#usernameInput").val();
+          const email = $("#emailInput").val();
+          const photo = $("#imagenPerfil").attr("src");
+          const password = $("#passwordInput").val();
+          const confirmPassword = $("#passwordRepeat").val();
+          const currentPassword = $("#currentPassword").val();
+
+          if (email) {
+            if (!cw.validarEmail(email)) {
+              cw.mostrarMsg("Introduce un email válido");
+              return;
             }
-          });
-        } else {
-          cw.mostrarMsg("Introduce al menos un campo");
-        }
+          }
+
+          if (password !== confirmPassword) {
+            cw.mostrarMsg("Las contraseñas no coinciden");
+            return;
+          } else {
+            $("#mensajeError").empty();
+          }
+
+          if (username || email || photo || password || currentPassword) {
+            $("#mensajeError").empty();
+            rest.obtenerUsuario($.cookie("nick"), function (usr) {
+              if (username) usr.newNick = username;
+              if (email) usr.newEmail = email;
+              if (photo) usr.newPhoto = photo;
+              if (password) usr.newPassword = password;
+              console.log("USR", usr);
+              usr.password = currentPassword;
+              if (email) {
+                rest.obtenerUsuarioBD(email, function (obj) {
+                  console.log("USREMAIL", obj.email);
+                  if (obj.email != undefined) {
+                    cw.mostrarMsg("Ya existe un usuario con ese email");
+                    return;
+                  }
+                  rest.actualizarUsuario(usr);
+                });
+              } else {
+                rest.actualizarUsuario(usr);
+              }
+            });
+          } else {
+            cw.mostrarMsg("Introduce al menos un campo");
+          }
+        });
       });
-    });
   };
 
   this.actualizarNavbar = function () {
@@ -457,8 +457,26 @@ function ControlWeb() {
     if ($("#home").is(":empty")) {
       cw.limpiarInicio();
       $("#home").load("./cliente/home.html", function () {
-        // Agregar esta clase: class="w-full"
         $("#home").removeClass("hidden");
+        const diffComponent = document.getElementById("diffComponent");
+        const crearPartidaDiff = document.getElementById("CrearPartidaDiff");
+        const explorarPartidasDiff = document.getElementById(
+          "ExplorarPartidaDiff"
+        );
+        crearPartidaDiff.addEventListener("click", () => {
+          diffComponent.classList.remove("animate__slideInDown");
+          diffComponent.classList.add("animate__slideOutUp");
+          setTimeout(() => {
+            cw.mostrarCrearPartida();
+          }, 850);
+        });
+        explorarPartidasDiff.addEventListener("click", () => {
+          diffComponent.classList.remove("animate__slideInDown");
+          diffComponent.classList.add("animate__slideOutUp");
+          setTimeout(() => {
+            cw.mostrarExplorarPartida();
+          }, 850);
+        });
       });
     }
   };
@@ -758,9 +776,6 @@ function ControlWeb() {
               `;
 
               noPartidasDiv.addEventListener("click", () => {
-                // Aquí puedes agregar la lógica para redirigir al usuario a la página de creación de partidas
-                // Por ejemplo:
-                // window.location.href = "ruta de la página para crear partidas";
                 cw.mostrarCrearPartida();
               });
 
@@ -797,7 +812,8 @@ function ControlWeb() {
     const ordenEstado = {
       completa: 1,
       esperando: 2,
-      //AÑADIR JUGANDO
+      jugando: 3,
+      finalizada: 4,
     };
     const partidasOrdenadas = Object.values(partidas).sort((a, b) => {
       const estadoA = a.estado;
@@ -871,12 +887,47 @@ function ControlWeb() {
                 </div>
             </div>
         `;
+      } else if (partida.estado === "jugando") {
+        nuevaPartidaDiv.innerHTML = `
+            <div class="flex-1">
+                <h3 class="font-semibold text-xl">${partida.nombrePartida}</h3>
+                <p class="text-sm">${partida.creador}</p>
+            </div>
+            <div class="flex items-center bottom-0 justify-between">
+                <div class="items-center justify-center flex-row">
+                    <div class="flex flex-rol items-center justify-center px-2 py-1 bg-neutral rounded-box text-neutral-content">
+                        <span class="relative flex h-3 w-3 m-2">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+                        </span>
+                        <span class="countdown font-mono text-2xl">
+                            <span style="--value:${partida.duracion};"></span> :
+                            <span style="--value:00;"></span>
+                        </span>
+                    </div>
+                </div>`;
+      } else if (partida.estado === "finalizada") {
+        nuevaPartidaDiv.innerHTML = `
+                    <div class="flex-1">
+                        <h3 class="font-semibold text-xl"><span class="font-bold">FINALIZADA</span> ${partida.nombrePartida}</h3>
+                        <p class="text-sm">${partida.creador}</p>
+                    </div>
+                    <div>
+                        <div>
+                            <p class="text-xl font-bold text-blue-500">Equipo Azul: <span class="text-black text-2xl">${partida.equipos["equipoAzul"].goles}</span></p>
+                        </div>
+                        <div>
+                            <p class="text-xl font-bold text-red-500">Equipo Rojo: <span class="text-black text-2xl">${partida.equipos["equipoRojo"].goles}</span></p>
+                        </div>
+                    </div>
+                `;
       }
 
       // Agregar el nuevo div al contenedor de partidas
       partidasPadre.appendChild(nuevaPartidaDiv);
       nuevaPartidaDiv.addEventListener("click", () => {
-        cw.mostrarModalUnirtePartida(partida);
+        if (partida.estado === "esperando")
+          cw.mostrarModalUnirtePartida(partida);
       });
     }
     if (Object.keys(partidas).length == 0) {
@@ -1041,6 +1092,7 @@ function ControlWeb() {
             socket.emit("partidaFinalizada", {
               partida: partida,
               email: email,
+              abandono: false,
             });
           });
         }
@@ -1064,7 +1116,6 @@ function ControlWeb() {
 
       window.addEventListener("beforeunload", async function (e) {
         e.preventDefault();
-
         if (e.eventPhase == 2) {
           rest.obtenerUsuario($.cookie("nick"), function (usr) {
             socket.emit("salirPartida", { usr, partida });
@@ -1144,6 +1195,25 @@ function ControlWeb() {
             if (waitingDiv.innerHTML != "") {
               waitingDiv.innerHTML = "";
             }
+
+          if (partida.estado === "jugando") {
+            const numJugadoresAzul = Object.values(
+              partida.equipos["equipoAzul"].jugadores
+            ).length;
+            const numJugadoresRojo = Object.values(
+              partida.equipos["equipoRojo"].jugadores
+            ).length;
+
+            if (numJugadoresAzul == 0 || numJugadoresRojo == 0) {
+              rest.obtenerUsuario($.cookie("nick"), function (usr) {
+                socket.emit("partidaFinalizada", {
+                  partida: partida,
+                  email: usr.email,
+                  abandono: true,
+                });
+              });
+            }
+          }
         });
         if (partida.estado === "esperando") {
           const waitingDiv = document.getElementById("waitingDiv");
@@ -1780,7 +1850,14 @@ function ControlWeb() {
                 golesEquipoRojo.appendChild(maxGolesSpanR);
               }
 
-              obj.partida.estado = "jugando";
+              socket.emit("actualizarEstadoPartida", {
+                partida: partida,
+                estado: "jugando",
+              });
+              socket.on("actualizarEstadoPartida", function (obj) {
+                partida = obj;
+              });
+
               rest.obtenerUsuario($.cookie("nick"), function (usr) {
                 const equipo = cw.getEquipoUsuario(partida, usr);
                 window.juego.zoomCamera(usr, equipo);
@@ -1924,6 +2001,7 @@ function ControlWeb() {
             socket.emit("partidaFinalizada", {
               partida: partida,
               email: usr.email,
+              abandono: false,
             });
           });
         });
@@ -1961,7 +2039,6 @@ function ControlWeb() {
       const golesEndBlue = document.getElementById("golesEndBlue");
       const golesEndRed = document.getElementById("golesEndRed");
 
-      // TODO: QUIERO COMPROBAR SI HA GANADO EL EQUIPO AZUL, EL EQUIPO ROJO O HAN EMPATADO
       const golesAzul = obj.partida.equipos["equipoAzul"].goles;
       const golesRojo = obj.partida.equipos["equipoRojo"].goles;
 
@@ -1980,6 +2057,27 @@ function ControlWeb() {
         // Han empatado
         const winText = document.getElementById("winText");
         winText.textContent = "¡El partido ha terminado en empate!";
+      }
+
+      if (obj.abandono) {
+        socket.emit("actualizarEstadoPartida", {
+          partida: obj.partida,
+          estado: "finalizada",
+        });
+        const numJugadoresAzul = Object.values(
+          obj.partida.equipos["equipoAzul"].jugadores
+        ).length;
+        const numJugadoresRojo = Object.values(
+          obj.partida.equipos["equipoRojo"].jugadores
+        ).length;
+
+        if (numJugadoresAzul == 0) {
+          const winText = document.getElementById("winText");
+          winText.textContent = "¡Ha ganado el Equipo Rojo por abandono!";
+        } else if (numJugadoresRojo == 0) {
+          const winText = document.getElementById("winText");
+          winText.textContent = "¡Ha ganado el Equipo Azul por abandono!";
+        }
       }
     });
   };
