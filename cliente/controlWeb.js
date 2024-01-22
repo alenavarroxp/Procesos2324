@@ -2033,6 +2033,19 @@ function ControlWeb() {
     $("#GUIContador").empty();
     $("#endScreen").load("./cliente/juego/endScreen.html", function () {
       console.log("endScreen objt", obj);
+      const volverInicio = document.getElementById("volverInicio");
+      volverInicio.addEventListener("click", () => {
+        //TODO: METER ESTADISTICAS y eliminar la partida 
+        rest.obtenerUsuario(obj.email, function (usr) {
+          socket.emit("salirPartida", { usr: usr, partida: obj.partida });
+          $("#partido").empty();
+          $("#navbar").removeClass("hidden");
+          $("#navBarBtn").removeClass("hidden");
+          $("#container").removeClass("hidden");
+          $("#GUI").empty();
+          cw.mostrarInicio();
+        });
+      });
       const endScreen = document.getElementById("endScreen");
       endScreen.classList.remove("hidden");
 
