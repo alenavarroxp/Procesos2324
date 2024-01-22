@@ -61,10 +61,12 @@ function CAD() {
             return;
           }
           console.log("ELEMENTO CON CONTRASEÑA", element);
+          console.log("CRITERIO", criterio)
           const isPasswordCorrect = await bcrypt.compare(
             criterio.password,
             element.password
           );
+          console.log("IS PASSWORD CORRECT", isPasswordCorrect);
           if (isPasswordCorrect) callback(element);
           else callback({ error: -1 });
         });

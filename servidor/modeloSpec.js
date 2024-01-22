@@ -3,7 +3,7 @@ const modelo = require("./modelo.js");
 
 describe("El sistema", function () {
   let sistema;
-  let usr1, usr2;
+  let usr1;
 
   beforeEach(function () {
     sistema = new modelo.Sistema(true);
@@ -126,7 +126,6 @@ describe("El sistema", function () {
   });
 
   describe("Pruebas de las partidas", function () {
-    //TODO
     let usr1, usr2, usr3, partida;
     beforeEach(function () {
       usr1 = {
@@ -406,6 +405,7 @@ describe("El sistema", function () {
 
   describe("Métodos que acceden a datos", function () {
     let usrTest = { nick: "test", email: "test@test.es", password: "test" };
+    let usrOAuth = { nick: "test2", email: "test2@test2.es" };
 
     beforeEach(function (done) {
       sistema.cad.conectar(function () {
@@ -453,41 +453,141 @@ describe("El sistema", function () {
           resolve(elimRes);
         });
       });
-
-      console.log("elimRes", elimRes);
-
-      // sistema.registrarUsuario(usrTest, function (res) {
-      //   expect(sistema.usuarios[res.nick].nick).toEqual("test");
-      //   expect(sistema.usuarios[res.nick].email).toEqual("test@test.es");
-      //   expect(res.nick).toEqual("test");
-      //   expect(res.email).toEqual("test@test.es");
-      //   expect(res.confirmada).toEqual(false);
-
-      //   sistema.registrarUsuario(usrTest, function (res) {
-      //     expect(res.email).toEqual(-1);
-
-      //     sistema.cad.confirmarUsuario(
-      //       res.email,
-      //       res.key,
-      //       function (confirmRes) {
-      //         expect(confirmRes.confirmada).toEqual(false);
-
-      //         sistema.eliminarUsuarioBD(res, function (elimRes) {
-      //           console.log("eliminado", elimRes);
-      //           done(); // Llama a done() aquí para indicar que la prueba ha terminado
-      //         });
-      //       }
-      //     );
-      //   });
-      // });
+      expect(elimRes.email).toEqual(usrTest.email);
     });
 
-    xit("Inicio de sesión correcto", function (done) {
-      sistema.iniciarSesion(usrTest, function (res) {
-        done();
+    it("Inicio de sesión", async function () {
+      let userLogin = { nick: "test", email: "test@test.es", password: "test" };
+      const { log1e, log1u } = await new Promise((resolve) => {
+        sistema.iniciarSesion(userLogin, (err, log1) => {
+          if (err) {
+            console.error(err);
+            resolve({ log1e: err, log1u: null });
+          } else {
+            resolve({ log1e: log1.error, log1u: log1 });
+          }
+        });
+      });
+
+      expect(log1e.error).toEqual("Usuario no registrado");
+      expect(log1u).toEqual(null);
+
+      console.log("log1e", log1e);
+      console.log("log1u", log1u);
+
+      const res = await new Promise((resolve) => {
+        sistema.registrarUsuario(userLogin, (res) => {
+          resolve(res);
+        });
+      });
+
+      await new Promise((resolve) => {
+        sistema.cad.confirmarUsuario(res.email, res.key, (confirmRes) => {
+          resolve(confirmRes);
+        });
+      });
+
+      const userLogin2 = {
+        nick: "test",
+        email: "test@test.es",
+        password: "test",
+      };
+
+      const { log2e, log2u } = await new Promise((resolve) => {
+        sistema.iniciarSesion(userLogin2, (err, log2) => {
+          if (err) {
+            console.error(err);
+            resolve({ log2e: err, log2u: null });
+          } else {
+            resolve({ log2e: log2.error, log2u: log2 });
+          }
+        });
+      });
+
+      expect(log2e).toEqual(undefined);
+      expect(log2u.nick).toEqual(userLogin2.nick);
+      expect(log2u.email).toEqual(userLogin2.email);
+      expect(log2u.confirmada).toEqual(true);
+
+      console.log("log2e", log2e);
+      console.log("logu", log2u);
+
+      const userLogin3 = {
+        nick: "test",
+        email: "test@test.es",
+        password: "incorrecta",
+      };
+
+      const { log3e, log3u } = await new Promise((resolve) => {
+        sistema.iniciarSesion(userLogin3, (err, log3) => {
+          if (err) {
+            console.error(err);
+            resolve({ log3e: err, log3u: null });
+          } else {
+            resolve({ log3e: log3.error, log3u: log3 });
+          }
+        });
+      });
+
+      expect(log3e.error).toEqual("Contraseña incorrecta");
+      expect(log3u).toEqual(null);
+
+      console.log("log3e", log3e);
+      console.log("log3u", log3u);
+
+      await new Promise((resolve) => {
+        sistema.eliminarUsuarioBD(res, (elimRes) => {
+          console.log("eliminado", elimRes);
+          resolve(elimRes);
+        });
       });
     });
 
-    xit("Inicio de sesión incorrecto", function () {});
+    it("OAUTH", async function () {
+      const rest = await new Promise((resolve) => {
+        sistema.usuarioOAuth(usrOAuth, (res) => {
+          resolve(res);
+        });
+      });
+      expect(rest.nick).toEqual("test2");
+      expect(rest.email).toEqual("test2@test2.es");
+      expect(rest.confirmada).toEqual(true);
+
+      await new Promise((resolve) => {
+        sistema.eliminarUsuarioBD(rest, (elimRes) => {
+          console.log("eliminado", elimRes);
+          resolve(elimRes);
+        });
+      });
+    });
+
+    it("recuperarUsuario", async function () {
+      const userRecuperar = "test";
+      const userRecuperars = {
+        nick: "test",
+        email: "test@test.es",
+        password: "test",
+      };
+
+      const reg = await new Promise((resolve) => {
+        sistema.registrarUsuario(userRecuperars, (res) => {
+          resolve(res);
+        });
+      });
+
+      const res = await new Promise((resolve) => {
+        sistema.recuperarUsuario(userRecuperar);
+        resolve(sistema.usuarios[userRecuperar]);
+      });
+
+      expect(res.nick).toEqual("test");
+      expect(res.email).toEqual("test@test.es");
+
+      await new Promise((resolve) => {
+        sistema.eliminarUsuarioBD(reg, (elimRes) => {
+          resolve(elimRes);
+        });
+      });
+    });
   });
 });

@@ -80,6 +80,7 @@ function Sistema(test) {
     let modelo = this;
     console.log("USUARIOS EN RECUPERAR USUARIO", modelo.usuarios);
     if (!modelo.usuarios[nick]) {
+      console.log("no estaba en local")
       await modelo.cad.obtenerUsuario(nick, function (usr) {
         if (!usr) {
           console.log("El usuario " + nick + " no está registrado");
