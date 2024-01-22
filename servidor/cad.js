@@ -16,7 +16,7 @@ function CAD() {
       if (coleccion.length == 0) {
         callback(undefined);
       } else {
-        console.log("LA COLECCION 0 ES ", coleccion[0])
+        console.log("LA COLECCION 0 ES ", coleccion[0]);
         callback(coleccion[0]);
       }
     });
@@ -43,7 +43,7 @@ function CAD() {
     coleccion
       .find({ email: criterio.email })
       .toArray(async function (error, coleccion) {
-        console.log("Coleccion", coleccion);
+        console.log("Coleccion BUSCAR", coleccion);
         if (coleccion.length == 0) {
           callback(undefined);
         }
@@ -91,6 +91,24 @@ function CAD() {
     });
   }
 
+  this.eliminarUsuario = function (obj, callback) {
+    console.log("ELIMINAR USUARIO CAD", obj);
+    eliminar(
+      this.usuarios,
+      { email: obj.email, password: obj.password },
+      callback
+    );
+  };
+
+  function eliminar(coleccion, criterio, callback) {
+    console.log("ELIMINA", coleccion, criterio);
+
+    coleccion.deleteOne({ email: criterio.email });
+    callback(criterio)
+
+    
+  }
+
   function insertarOAuth(coleccion, elemento, callback) {
     coleccion.insertOne(elemento, function (err, result) {
       if (err) {
@@ -100,6 +118,7 @@ function CAD() {
         callback(elemento);
       }
     });
+    
   }
 
   this.buscarOCrearUsuario = function (usr, callback) {
@@ -124,15 +143,19 @@ function CAD() {
   }
 
   this.confirmarUsuario = function (email, key, callback) {
+    console.log("ALGO", email, key)
     confirmar(this.usuarios, email, key, callback);
   };
 
   function confirmar(coleccion, email, key, callback) {
+    console.log("CONFIRMAR")
     coleccion.findOneAndUpdate(
       { email: email, key: key },
       { $set: { confirmada: true } },
       { returnDocument: "after" },
       function (err, doc) {
+        console.log("DOC", doc);
+        console.log("ERR", err);
         if (err) {
           throw err;
         } else {

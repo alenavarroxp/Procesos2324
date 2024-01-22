@@ -18,7 +18,6 @@ function Sistema(test) {
       }
       this.usuarios[usr.nick] = new Usuario(usr);
       res.nick = usr.nick;
-      console.log("Usuario agregado: " + usr.nick);
     } else {
       console.log("El usuario ya existe: " + usr.nick);
     }
@@ -26,7 +25,6 @@ function Sistema(test) {
   };
 
   this.obtenerUsuario = function (email, callback) {
-    console.log("USUARIOS", this.usuarios);
     for (let usr in this.usuarios) {
       console.log("usr", usr);
       if (this.usuarios[usr].email == email) {
@@ -70,6 +68,14 @@ function Sistema(test) {
     return { nick: nick };
   };
 
+  this.eliminarUsuarioBD = function (usr, callback) {
+    console.log("Eliminar usuario: " + usr.nick)
+    this.cad.eliminarUsuario(usr, function (res) {
+      console.log("Usuario eliminado de la BD: " + usr);
+      callback(res);
+    });
+  };
+
   this.recuperarUsuario = async function (nick) {
     let modelo = this;
     console.log("USUARIOS EN RECUPERAR USUARIO", modelo.usuarios);
@@ -98,10 +104,11 @@ function Sistema(test) {
     this.cad.conectar(function () {
       console.log("Conectado a Mongo Atlas");
     });
+
+    correo.conectar(function (res) {
+      console.log("Variables secretas obtenidas");
+    });
   }
-  correo.conectar(function (res) {
-    console.log("Variables secretas obtenidas");
-  });
 
   this.usuarioOAuth = function (usr, callback) {
     let copiaN = usr.nick;
@@ -154,7 +161,10 @@ function Sistema(test) {
         });
         this.usuarios = modelo.usuarios;
         console.log("USUARIOSIIII", this.usuarios);
-        correo.enviarEmail(obj.email, obj.key, "Confirmar cuenta");
+        if (!modelo.test) {
+          console.log("ENVIAR CORREO");
+          correo.enviarEmail(obj.email, obj.key, "Confirmar cuenta");
+        }
       } else {
         callback({ email: -1 });
       }
@@ -189,7 +199,9 @@ function Sistema(test) {
 
   this.actualizarUsuarioLocal = function (usr) {
     console.log("LOCAL", usr);
+    console.log("users", this.usuarios);
     for (let user in this.usuarios) {
+      console.log("USUARIO", this.usuarios[user]);
       if (
         this.usuarios[user].email == usr.oldEmail &&
         this.usuarios[user].nick == usr.oldNick
@@ -228,7 +240,6 @@ function Sistema(test) {
           callback({ error: "Usuario no registrado en local" }, null);
           return;
         }
-        console.log("USUARIO LOGIN", usr);
         modelo.agregarUsuario(usr);
         callback(null, usr);
       }
@@ -249,7 +260,6 @@ function Sistema(test) {
 
   this.crearPartida = function (obj, callback) {
     let modelo = this;
-    console.log("PARTIDAMODELOCREAR", obj);
     const id = Date.now().toString();
     const estado = "esperando";
     modelo.partidas[id] = new Partida(
@@ -263,17 +273,13 @@ function Sistema(test) {
       obj.passCode
     );
     modelo.obtenerUsuario(obj.email, function (usr) {
-      console.log("USUARIO OBTENIDO", usr);
       modelo.partidas[id].añadirJugador(usr);
     });
     this.partidas = modelo.partidas;
-    console.log("PARTIDAS", this.partidas);
     callback({ id: id });
   };
 
   this.obtenerPartida = function (id, callback) {
-    console.log("ID", id);
-    console.log("PARTIDAS", this.partidas);
     if (!this.partidas[id]) {
       callback({ error: "Partida no encontrada" });
       return;
@@ -288,7 +294,6 @@ function Sistema(test) {
   };
 
   this.unirsePartida = function (obj, callback) {
-    console.log("USR y PASSCODE", obj);
     for (let partida in this.partidas) {
       if (this.partidas[partida].passCode == obj.passCode) {
         let check = this.partidas[partida].añadirJugador(obj.usr);
@@ -318,9 +323,7 @@ function Sistema(test) {
       callback({ error: "Partida no encontrada" });
       return;
     } else {
-      console.log("antes partida", this.partidas);
       let check = this.partidas[partida.id].salirPartida(usr);
-      console.log("partidas", this.partidas);
 
       if (this.partidas[partida.id].jugadoresConectados == 0) {
         this.eliminarPartida(partida.id);
@@ -351,12 +354,11 @@ function Sistema(test) {
   };
 
   this.unirseAEquipo = function (partida, usr, equipo, callback) {
-    console.log("UNIRSE A EQUIPO EN SISTEMA");
-    // console.log("PARTIDA", partida);
-    if (!this.partidas[partida.id]) return;
+    if (!this.partidas[partida.id]) {
+      console.log("goals");
+      return;
+    }
     let check = this.partidas[partida.id].unirseAEquipo(usr, equipo);
-    console.log("CHECK", check);
-    // console.log("PARTIDAS", this.partidas[partida.id])
     switch (check) {
       case true:
         callback({ partida: this.partidas[partida.id] });
