@@ -1,4 +1,4 @@
-function ControlWeb() {
+function ControlWeb(playwright) {
   this.mostrarMsg = function (msg, additionalMsg, onClickFunction) {
     const mensajeError = document.getElementById("mensajeError");
     mensajeError.innerHTML = `
@@ -93,6 +93,9 @@ function ControlWeb() {
   };
 
   let captchaValidado = false;
+  if (playwright) {
+    captchaValidado = true;
+  }
 
   this.mostrarRegistro = function () {
     $("#fmInicioSesion").remove();
@@ -152,8 +155,14 @@ function ControlWeb() {
                   return;
                 }
                 rest.registrarUsuario(nick, email, pwd, photo);
-                captchaValidado = false;
+                if (!playwright) {
+                  captchaValidado = false;
+                } else {
+                  captchaValidado = true;
+                }
               });
+            }else{
+              cw.mostrarMsg("Verifica el captcha");
             }
             console.log(nick, email, pwd);
           } catch (error) {
@@ -2035,7 +2044,7 @@ function ControlWeb() {
       console.log("endScreen objt", obj);
       const volverInicio = document.getElementById("volverInicio");
       volverInicio.addEventListener("click", () => {
-        //TODO: METER ESTADISTICAS y eliminar la partida 
+        //TODO: METER ESTADISTICAS y eliminar la partida
         rest.obtenerUsuario(obj.email, function (usr) {
           socket.emit("salirPartida", { usr: usr, partida: obj.partida });
           $("#partido").empty();

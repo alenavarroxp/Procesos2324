@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node index.js test=false",
     "dev": "nodemon index.js test=false",
+    "e2e": "nodemon index.js test=false playwright=true",
     "testW": "jasmine ./servidor/modeloSpec.js",
     "test": "./node_modules/.bin/jasmine servidor"
   },

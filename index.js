@@ -27,6 +27,11 @@ const args = process.argv.slice(2);
 let test = false;
 test = eval(args[0]); //test=true
 
+const args2 = process.argv.slice(3);
+let playwright = false;
+console.log("args2", args2);
+playwright = eval(args2[0]); //playwright=true
+
 app.use(express.static(__dirname + "/"));
 
 app.use(
@@ -134,11 +139,14 @@ app.get("/good", function (req, res) {
       let nick2 = req.user.displayName;
       let email2 = req.user.username;
       let photo2 = req.user.photos[0].value;
-      sistema.usuarioOAuth({ nick: nick2, email: email2, photo: photo2 }, function (obj) {
-        console.log("obj", obj);
-        res.cookie("nick", obj.email);
-        res.redirect("/");
-      });
+      sistema.usuarioOAuth(
+        { nick: nick2, email: email2, photo: photo2 },
+        function (obj) {
+          console.log("obj", obj);
+          res.cookie("nick", obj.email);
+          res.redirect("/");
+        }
+      );
       break;
     default:
       res.redirect("/");
@@ -157,9 +165,19 @@ app.get("/fallo", function (req, res) {
 let sistema = new modelo.Sistema(test);
 
 app.get("/", function (request, response) {
-  var contenido = fs.readFileSync(__dirname + "/cliente/index.html");
+  // Lee el contenido de index.html
+  var contenido = fs.readFileSync(__dirname + "/cliente/index.html", "utf-8");
+
+  // Añade una inserción de script que define window.playwright
+  const modifiedContent = `
+    <script>
+        window.playwright = ${playwright};
+    </script>
+    ${contenido}
+  `;
+
   response.setHeader("Content-type", "text/html");
-  response.send(contenido);
+  response.send(modifiedContent);
 });
 
 //... Una entrada por cada funcionalidad de mi capa lógica
