@@ -194,17 +194,18 @@ function WSServer() {
       });
 
       socket.on("salirPartida", (obj) => {
-        console.log("OBJETO", obj);
-        io.to(obj.partida.passCode).emit(
-          "chatMessage",
-          "Se ha ido de la partida " + obj.usr.nick
-        );
+        console.log("OBJETO SALIR", obj);
+        let usr = obj.usr;
         sistema.salirPartida(obj.partida, obj.usr, function (obj) {
           console.log("OBJ", obj);
           if (obj.partida) {
             io.to(obj.partida.passCode).emit(
               "actualizarContadorEquipo",
               obj.partida
+            );
+            io.to(obj.partida.passCode).emit(
+              "chatMessage",
+              "Se ha ido de la partida " + usr.nick
             );
             io.to(obj.partida.passCode).emit("cantidadJugadores", obj.partida);
           }

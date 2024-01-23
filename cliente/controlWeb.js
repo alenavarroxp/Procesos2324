@@ -161,7 +161,7 @@ function ControlWeb(playwright) {
                   captchaValidado = true;
                 }
               });
-            }else{
+            } else {
               cw.mostrarMsg("Verifica el captcha");
             }
             console.log(nick, email, pwd);
@@ -1167,7 +1167,7 @@ function ControlWeb(playwright) {
         contadorTiempo.textContent = cw.formatTime(partida.duracion);
         //PASSCODE
         const passCodeDiv = document.getElementById("passCode");
-        const passCode = `<h1 class="text-white leading-none tracking-tighter justify-end items-center flex font-bold mt-2 text-2xl mr-2">Código de la partida: <span class="inline-block animate__animated animate__zoomInDown ml-2 text-yellow-500 pointer-events-auto hover:text-yellow-700">${partida.passCode}</span>
+        const passCode = `<h1 class="text-white leading-none tracking-tighter justify-end items-center flex font-bold mt-2 text-2xl mr-2">Código de la partida: <span id="codeGame" class="inline-block animate__animated animate__zoomInDown ml-2 text-yellow-500 pointer-events-auto hover:text-yellow-700">${partida.passCode}</span>
         </h1>`;
         passCodeDiv.innerHTML = passCode;
 
@@ -1179,7 +1179,9 @@ function ControlWeb(playwright) {
         $("#salirBtn").on("click", function () {
           cw.removeBabylonScripts();
           rest.obtenerUsuario($.cookie("nick"), function (usr) {
-            socket.emit("salirPartida", { usr, partida });
+            if (usr.email == $.cookie("nick")) {
+              socket.emit("salirPartida", { usr, partida });
+            }
             socket.emit("actualizarJugadoresReady", { partida });
             $("#partido").empty();
             $("#navbar").removeClass("hidden");
@@ -2044,7 +2046,6 @@ function ControlWeb(playwright) {
       console.log("endScreen objt", obj);
       const volverInicio = document.getElementById("volverInicio");
       volverInicio.addEventListener("click", () => {
-        //TODO: METER ESTADISTICAS y eliminar la partida
         rest.obtenerUsuario(obj.email, function (usr) {
           socket.emit("salirPartida", { usr: usr, partida: obj.partida });
           $("#partido").empty();
