@@ -1,7 +1,7 @@
 const gv = require("./gestorVariables");
 const nodemailer = require("nodemailer");
-const url = "http://localhost:3000/";
-// const url = "https://arquitectura-base-github-5rfb3lj4yq-ew.a.run.app/";
+// const url = "http://localhost:3000/";
+const url = "https://arquitectura-base-github-5rfb3lj4yq-ew.a.run.app/";
 
 let transporter;
 let options = {
@@ -81,7 +81,7 @@ module.exports.enviarEmail = async function (direccion, key, men) {
               <h1>Bienvenido al Sistema de Partidos de Fútbol</h1>
           </div>
           <div class="content">
-              <p>Hola,</p>
+              <p>Hola!</p>
               <p>Gracias por unirte a nuestro sistema. Para confirmar tu cuenta y empezar a disfrutar de los partidos de fútbol, por favor haz clic en el botón a continuación:</p>
               <a class="button" href="${url}confirmarUsuario/${direccion}/${key}">Confirmar Cuenta</a>
               <p>¡Nos vemos en el campo!</p>
