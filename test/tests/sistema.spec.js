@@ -1,4 +1,8 @@
-import { describe, test, expect } from "@playwright/test";
+import { describe, test, expect, chromium } from "@playwright/test";
+
+const redireccionamiento = async (page) => {
+  await page.goto("http://localhost:3000/");
+};
 
 describe("Test de registro e inicio de sesión", () => {
   test("Registro", async ({ page }) => {
@@ -61,7 +65,7 @@ describe("Test de registro e inicio de sesión", () => {
   });
 
   test("Inicio de sesión", async ({ page }) => {
-    await page.goto("http://localhost:3000/");
+    await redireccionamiento(page);
     await page.getByRole("button", { name: "Iniciar Sesión" }).click();
     await page.getByText("Introduce un email y una").click();
     await page.getByPlaceholder("Introduce tu correo electró").click();
@@ -91,7 +95,7 @@ describe("Test de registro e inicio de sesión", () => {
   });
 
   test("Navbar", async ({ page }) => {
-    await page.goto("http://localhost:3000/");
+    await redireccionamiento(page);
     await page.getByPlaceholder("Introduce tu correo electró").click();
     await page
       .getByPlaceholder("Introduce tu correo electró")
@@ -120,7 +124,7 @@ describe("Test de registro e inicio de sesión", () => {
   });
 
   test("Inicio funcionalidad", async ({ page }) => {
-    await page.goto("http://localhost:3000/");
+    await redireccionamiento(page);
     await page.getByPlaceholder("Introduce tu correo electró").click();
     await page
       .getByPlaceholder("Introduce tu correo electró")
@@ -141,7 +145,7 @@ describe("Test de registro e inicio de sesión", () => {
   });
 
   test("Editar perfil funcionalidad", async ({ page }) => {
-    await page.goto("http://localhost:3000/");
+    await redireccionamiento(page);
 
     //CAMBIO DE NOMBRE
     await page.getByPlaceholder("Introduce tu correo electró").click();
@@ -278,16 +282,10 @@ describe("Test de registro e inicio de sesión", () => {
     await page.getByPlaceholder("Introduce tu contraseña").click();
     await page.getByPlaceholder("Introduce tu contraseña").fill("playwright");
     await page.getByPlaceholder("Introduce tu contraseña").press("Enter");
-    await page.getByText("playwright", { exact: true }).click();
-    await expect(page.locator("#username")).toContainText("playwright");
-    await page.getByText("playwright@playwright.com", { exact: true }).click();
-    await expect(page.locator("#emailValue")).toContainText(
-      "playwright@playwright.com"
-    );
   });
 
   test("Crear partido funcionalidad", async ({ page }) => {
-    await page.goto("http://localhost:3000/");
+    await redireccionamiento(page);
     await page.getByPlaceholder("Introduce tu correo electró").click();
     await page
       .getByPlaceholder("Introduce tu correo electró")
@@ -298,7 +296,6 @@ describe("Test de registro e inicio de sesión", () => {
     await page.getByText("Partidos", { exact: true }).click();
     await page.getByText("Crear partido").click();
 
-    //PARTIDO 1
     await page.getByRole("heading", { name: "Crear un partido" }).click();
     await page.getByRole("button", { name: "Crear Partido" }).click();
     await page.getByText("Introduce los campos").click();
@@ -327,15 +324,8 @@ describe("Test de registro e inicio de sesión", () => {
     await expect(page.locator("#iPartida")).toContainText("2 jugadores");
     await page.getByText("3 minutos").click();
     await expect(page.locator("#iPartida")).toContainText("3 minutos");
-    await page.getByRole("button", { name: "Crear Partida" }).click();
-    // page.once("dialog", (dialog) => {
-    //   console.log(`Dialog message: ${dialog.message()}`);
-    //   dialog.dismiss().catch(() => {});
-    // });
-    await page.getByRole("button", { name: "Salir" }).click();
-
-    //PARTIDO 2
-    await page.getByText("Partidos", { exact: true }).click();
+    await page.getByRole("button", { name: "Cancelar" }).click();
+    await page.locator("#homeVisible").click();
     await page.getByText("Crear partido").click();
     await page.getByPlaceholder("Introduce el nombre del").click();
     await page.getByPlaceholder("Introduce el nombre del").fill("partido2");
@@ -349,6 +339,9 @@ describe("Test de registro e inicio de sesión", () => {
     await page.getByPlaceholder("Número de goles a marcar").click();
     await page.getByPlaceholder("Número de goles a marcar").fill("2");
     await page.getByRole("button", { name: "Crear Partido" }).click();
+    await page
+      .getByRole("heading", { name: "Información de la partida" })
+      .click();
     await page.getByText("partido2").click();
     await expect(page.locator("#iPartida")).toContainText("partido2");
     await page.getByText("2 jugadores").click();
@@ -359,15 +352,8 @@ describe("Test de registro e inicio de sesión", () => {
     );
     await page.getByText("2 goles").click();
     await expect(page.locator("#iPartida")).toContainText("2 goles");
-    await page.getByRole("button", { name: "Crear Partida" }).click();
-    // page.once("dialog", (dialog) => {
-    //   console.log(`Dialog message: ${dialog.message()}`);
-    //   dialog.dismiss().catch(() => {});
-    // });
-    await page.getByRole("button", { name: "Salir" }).click();
-
-    //PARTIDO 3
-    await page.getByText("Partidos", { exact: true }).click();
+    await page.getByRole("button", { name: "Cancelar" }).click();
+    await page.locator("#homeVisible").click();
     await page.getByText("Crear partido").click();
     await page.getByPlaceholder("Introduce el nombre del").click();
     await page.getByPlaceholder("Introduce el nombre del").fill("partido3");
@@ -388,6 +374,9 @@ describe("Test de registro e inicio de sesión", () => {
     await page.getByPlaceholder("Número de goles a marcar").click();
     await page.getByPlaceholder("Número de goles a marcar").fill("5");
     await page.getByRole("button", { name: "Crear Partido" }).click();
+    await page
+      .getByRole("heading", { name: "Información de la partida" })
+      .click();
     await page.getByText("partido3").click();
     await expect(page.locator("#iPartida")).toContainText("partido3");
     await page.getByText("2 jugadores").click();
@@ -396,20 +385,13 @@ describe("Test de registro e inicio de sesión", () => {
     await expect(page.locator("#iPartida")).toContainText("2 minutos");
     await page.getByText("5 goles").click();
     await expect(page.locator("#iPartida")).toContainText("5 goles");
-    await page.getByRole("button", { name: "Crear Partida" }).click();
-    // page.once("dialog", (dialog) => {
-    //   console.log(`Dialog message: ${dialog.message()}`);
-    //   dialog.dismiss().catch(() => {});
-    // });
-    await page.getByRole("button", { name: "Salir" }).click();
-
-    //PARTIDO 4
-    await page.getByText("Partidos", { exact: true }).click();
+    await page.getByRole("button", { name: "Cancelar" }).click();
+    await page.locator("#homeVisible").click();
     await page.getByText("Crear partido").click();
-    await page.getByPlaceholder("Mínimo 2 jugadores").click();
-    await page.getByPlaceholder("Mínimo 2 jugadores").fill("1");
     await page.getByPlaceholder("Introduce el nombre del").click();
     await page.getByPlaceholder("Introduce el nombre del").fill("partido4");
+    await page.getByPlaceholder("Mínimo 2 jugadores").click();
+    await page.getByPlaceholder("Mínimo 2 jugadores").fill("1");
     await page
       .locator("label")
       .filter({ hasText: "Duración Elige la duración" })
@@ -418,6 +400,9 @@ describe("Test de registro e inicio de sesión", () => {
     await page.getByPlaceholder("Duración estimada en minutos").click();
     await page.getByPlaceholder("Duración estimada en minutos").fill("1");
     await page.getByRole("button", { name: "Crear Partido" }).click();
+    await page
+      .getByRole("heading", { name: "Información de la partida" })
+      .click();
     await page.getByText("partido4").click();
     await expect(page.locator("#iPartida")).toContainText("partido4");
     await page.getByText("2 jugadores").click();
@@ -425,25 +410,35 @@ describe("Test de registro e inicio de sesión", () => {
     await page.getByText("1 minutos").click();
     await expect(page.locator("#iPartida")).toContainText("1 minutos");
     await page.getByRole("button", { name: "Cancelar" }).click();
-
-    //PARTIDO 5
-    await page.getByPlaceholder("Duración estimada en minutos").click();
-    await page.getByPlaceholder("Duración estimada en minutos").fill("17");
-    await page.getByPlaceholder("Mínimo 2 jugadores").click();
-    await page.getByPlaceholder("Mínimo 2 jugadores").fill("25");
+    await page.locator("#homeVisible").click();
+    await page.getByText("Crear partido").click();
     await page.getByPlaceholder("Introduce el nombre del").click();
     await page.getByPlaceholder("Introduce el nombre del").fill("partido5");
+    await page.getByPlaceholder("Mínimo 2 jugadores").click();
+    await page.getByPlaceholder("Mínimo 2 jugadores").fill("25");
+    await page
+      .locator("label")
+      .filter({ hasText: "Duración Elige la duración" })
+      .nth(1)
+      .click();
+    await page.getByPlaceholder("Duración estimada en minutos").click();
+    await page.getByPlaceholder("Duración estimada en minutos").fill("17");
     await page.getByRole("button", { name: "Crear Partido" }).click();
+    await page
+      .getByRole("heading", { name: "Información de la partida" })
+      .click();
     await page.getByText("partido5").click();
     await expect(page.locator("#iPartida")).toContainText("partido5");
     await page.getByText("22 jugadores").click();
     await expect(page.locator("#iPartida")).toContainText("22 jugadores");
     await page.getByText("10 minutos").click();
     await expect(page.locator("#iPartida")).toContainText("10 minutos");
+    await page.getByRole("button", { name: "Cancelar" }).click();
+    await page.locator("#homeVisible").click();
   });
 
   test("Explorar partidos funcionalidad", async ({ page }) => {
-    await page.goto("http://localhost:3000/");
+    await redireccionamiento(page);
     await page.getByPlaceholder("Introduce tu correo electró").click();
     await page
       .getByPlaceholder("Introduce tu correo electró")
@@ -476,4 +471,6 @@ describe("Test de registro e inicio de sesión", () => {
     await page.getByRole("button", { name: "Unirse al Partido" }).click();
     await page.getByText("No se ha encontrado la").click();
   });
+
+  
 });

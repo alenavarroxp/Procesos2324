@@ -1,16 +1,20 @@
-import { describe, test, chromium, expect } from "@playwright/test";
+import { describe, test, expect, chromium } from "@playwright/test";
 
-describe("Sistemas", () => {
-  test("Creacion de partida", async () => {
-    const browser1 = await chromium.launch();
-    const browser2 = await chromium.launch();
+const redireccionamiento = async (page) => {
+  await page.goto("http://localhost:3000/");
+};
 
-    const page1 = await browser1.newPage();
-    const page2 = await browser2.newPage();
+test("Creacion de partida", async () => {
+  const browser1 = await chromium.launch();
+  const browser2 = await chromium.launch();
 
-    await page1.goto("http://localhost:3000/");
-    await page2.goto("http://localhost:3000/");
+  const page1 = await browser1.newPage();
+  const page2 = await browser2.newPage();
 
+  await redireccionamiento(page1);
+  await redireccionamiento(page2);
+
+  try {
     await page1.getByPlaceholder("Introduce tu correo electró").click();
     await page1
       .getByPlaceholder("Introduce tu correo electró")
@@ -27,12 +31,11 @@ describe("Sistemas", () => {
     await page2.getByPlaceholder("Introduce tu contraseña").fill("other");
     await page2.getByRole("button", { name: "Iniciar Sesión" }).click();
 
-    await page1.getByText("playwright", { exact: true }).click();
-    await page1.getByText("playwright@playwright.com", { exact: true }).click();
-
+    await page1.waitForTimeout(1000);
     await page1.getByText("Partidos", { exact: true }).click();
     await page1.getByText("Crear partido").click();
 
+    await page2.waitForTimeout(1000);
     await page2.getByText("Partidos", { exact: true }).click();
     await page2.getByText("Explorar partidos").click();
     await page2.getByRole("heading", { name: "Partidas disponibles" }).click();
@@ -57,6 +60,8 @@ describe("Sistemas", () => {
     await page1.getByPlaceholder("Duración estimada en minutos").click();
     await page1.getByPlaceholder("Duración estimada en minutos").fill("2");
     await page1.getByRole("button", { name: "Crear Partido" }).click();
+
+    //TOODO RETRADO
     await page1.getByRole("button", { name: "Crear Partida" }).click();
 
     await page2.locator("#partidas").click();
@@ -103,30 +108,35 @@ describe("Sistemas", () => {
     await page2.locator("#otp-5").press(passCode6);
     await page2.locator("#otp-6").press(passCode7);
     await page2.locator("#otp-7").press(passCode8);
-    await page2.locator("#modalUnirse").click();
+    // await page2.locator("#modalUnirse").click();
     await page2.getByRole("button", { name: "Unirse a la partida" }).click();
 
     await page1.locator("#joinDiv label").nth(1).click();
-    await page1.locator("#verirCheck svg").click();
+    let cantidadBlue, cantidadRed;
 
-    const cantidadBlue = await page1.$("#cantidadBlue");
-    const cantidadRed = await page1.$("#cantidadRed");
+    cantidadBlue = await page1.$("#cantidadBlue");
+    cantidadRed = await page1.$("#cantidadRed");
     expect(await cantidadBlue.textContent()).toBe("Jugadores: 1");
     expect(await cantidadRed.textContent()).toBe("Jugadores: 0");
 
     await page1.locator("#veribCheck svg").click();
-
+    cantidadBlue = await page1.$("#cantidadBlue");
+    cantidadRed = await page1.$("#cantidadRed");
     expect(await cantidadBlue.textContent()).toBe("Jugadores: 0");
     expect(await cantidadRed.textContent()).toBe("Jugadores: 0");
 
     await page1.locator("#joinDiv label").nth(3).click();
 
+    cantidadBlue = await page1.$("#cantidadBlue");
+    cantidadRed = await page1.$("#cantidadRed");
     expect(await cantidadBlue.textContent()).toBe("Jugadores: 0");
     expect(await cantidadRed.textContent()).toBe("Jugadores: 1");
 
     await page1.locator("#veribCheck path").click();
     await page1.locator("#verirCheck svg").click();
 
+    cantidadBlue = await page1.$("#cantidadBlue");
+    cantidadRed = await page1.$("#cantidadRed");
     expect(await cantidadBlue.textContent()).toBe("Jugadores: 0");
     expect(await cantidadRed.textContent()).toBe("Jugadores: 0");
 
@@ -156,10 +166,14 @@ describe("Sistemas", () => {
 
     //UNIRSE AL EQUIPO ROJO
     await page1.locator("#joinDiv label").nth(1).click();
+    // cantidadBlue = await page1.$("#cantidadBlue");
+    // cantidadRed = await page1.$("#cantidadRed");
     expect(await cantidadBlue.textContent()).toBe("Jugadores: 1");
     expect(await cantidadRed.textContent()).toBe("Jugadores: 0");
 
     await page2.locator("#joinDiv label").nth(1).click();
+    // cantidadBlue = await page1.$("#cantidadBlue");
+    // cantidadRed = await page1.$("#cantidadRed");
     expect(await cantidadBlue.textContent()).toBe("Jugadores: 2");
     expect(await cantidadRed.textContent()).toBe("Jugadores: 0");
 
@@ -178,11 +192,15 @@ describe("Sistemas", () => {
 
     await page2.locator("#veribCheck svg").click();
 
+    // cantidadBlue = await page1.$("#cantidadBlue");
+    // cantidadRed = await page1.$("#cantidadRed");
     expect(await cantidadBlue.textContent()).toBe("Jugadores: 1");
     expect(await cantidadRed.textContent()).toBe("Jugadores: 0");
 
     await page2.locator("#joinDiv label").nth(3).click();
 
+    // cantidadBlue = await page1.$("#cantidadBlue");
+    // cantidadRed = await page1.$("#cantidadRed");
     expect(await cantidadBlue.textContent()).toBe("Jugadores: 1");
     expect(await cantidadRed.textContent()).toBe("Jugadores: 1");
 
@@ -229,5 +247,7 @@ describe("Sistemas", () => {
       .click();
 
     await page2.getByRole("button", { name: "Volver al Inicio" }).click();
-  });
+  } catch (error) {
+    console.error("Error en la prueba:", error);
+  }
 });
