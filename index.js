@@ -327,6 +327,7 @@ app.post("/crearPartida", function (request, response) {
 app.get("/obtenerPartida/:id", function (request, response) {
   let id = request.params.id;
   sistema.obtenerPartida(id, function (obj) {
+    console.log("INDEXJS", obj);
     response.send(obj);
   });
 });

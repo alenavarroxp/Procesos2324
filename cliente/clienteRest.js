@@ -282,6 +282,7 @@ function ClienteRest() {
           cw.mostrarMsg(data.error);
         }
         if (data) {
+          console.log("PARTIDA CREADA EN REST", data)
           cw.obtenerPartida(data.id);
         }
       },
@@ -298,6 +299,7 @@ function ClienteRest() {
       if (data.error) {
         cw.mostrarToast(data.error, top);
       } else {
+        console.log("OBTENRE PARTIDA EN RESSSSSST", data)
         callback(data);
       }
     });

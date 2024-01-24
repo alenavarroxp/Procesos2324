@@ -841,6 +841,7 @@ function ControlWeb(playwright) {
     const noPartidas = document.getElementById("no-partidas");
     if (partidasPadre) partidasPadre.innerHTML = "";
     if (!noPartidas) return;
+    console.log("PARTIDAS RENDEREIZAR PARTIDAS ORDENADAS", partidas);
     for (let clave in partidas) {
       noPartidas.style.display = "none";
       partidasPadre.classList.remove("hidden");
@@ -851,7 +852,7 @@ function ControlWeb(playwright) {
       nuevaPartidaDiv.className =
         "border rounded-xl p-2 m-2 flex-col flex cursor-pointer shadow-md min-w-max h-40";
 
-      if (partida.estado === "esperando") {
+      if (partida.estado.estado === "esperando") {
         nuevaPartidaDiv.innerHTML = `
             <div class="flex-1">
                 <h3 class="font-semibold text-xl">${partida.nombrePartida}</h3>
@@ -871,7 +872,7 @@ function ControlWeb(playwright) {
                 </div>
             </div>
         `;
-      } else if (partida.estado === "completa") {
+      } else if (partida.estado.estado === "completa") {
         nuevaPartidaDiv.innerHTML = `
             <div class="flex-1">
                 <h3 class="font-semibold text-xl">${partida.nombrePartida}</h3>
@@ -896,7 +897,7 @@ function ControlWeb(playwright) {
                 </div>
             </div>
         `;
-      } else if (partida.estado === "jugando") {
+      } else if (partida.estado.estado === "jugando") {
         nuevaPartidaDiv.innerHTML = `
             <div class="flex-1">
                 <h3 class="font-semibold text-xl">${partida.nombrePartida}</h3>
@@ -915,7 +916,7 @@ function ControlWeb(playwright) {
                         </span>
                     </div>
                 </div>`;
-      } else if (partida.estado === "finalizada") {
+      } else if (partida.estado.estado === "finalizada") {
         nuevaPartidaDiv.innerHTML = `
                     <div class="flex-1">
                         <h3 class="font-semibold text-xl"><span class="font-bold">FINALIZADA</span> ${partida.nombrePartida}</h3>
@@ -935,13 +936,33 @@ function ControlWeb(playwright) {
       // Agregar el nuevo div al contenedor de partidas
       partidasPadre.appendChild(nuevaPartidaDiv);
       nuevaPartidaDiv.addEventListener("click", () => {
-        if (partida.estado === "esperando")
+        if (partida.estado.estado === "esperando")
           cw.mostrarModalUnirtePartida(partida);
       });
     }
     if (Object.keys(partidas).length == 0) {
-      noPartidas.style.display = "block";
+      console.log("NO HAY PARTIDAS");
       partidasPadre.classList.add("hidden");
+      const noPartidasDiv = document.getElementById("no-partidas")
+      noPartidasDiv.innerHTML = `
+        <div class="flex flex-col items-center justify-center w-full h-full">
+          <div class="text-center">
+            <p class="text-lg text-gray-700 mb-4">En este momento, no hay ninguna partida disponible para poder unirte</p>
+            <div class=" w-full  items-center justify-center mb-4 px-32">
+            <div class=" overflow-hidden animate__animated animate__slideInRight justify-center items-center flex">
+            <lottie-player src="./cliente/img/lottie/triste.json" background="transparent" speed="1"
+            class="w-24 h-24" loop autoplay></lottie-player>
+          </div>
+            <div class="border-t border-gray-200 w-full mt-4" /></div>
+            <p class="m-3">¿Por qué no creas una?</p>
+            <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full transition duration-300">Crear Partida</button>
+          </div>
+          
+        </div>
+    
+        `;
+
+      noPartidas.style.display = "block";
     }
   };
 
@@ -1202,12 +1223,12 @@ function ControlWeb(playwright) {
           if (partida.estado === "esperando") {
             const waiting = `<h1 class="text-white">Esperando jugadores... ${partida.jugadoresConectados} / ${partida.cantidadJugadores}</h1>`;
             if (waitingDiv) waitingDiv.innerHTML = waiting;
-          } else if (partida.estado === "completa")
+          } else if (partida.estado.estado === "completa")
             if (waitingDiv.innerHTML != "") {
               waitingDiv.innerHTML = "";
             }
 
-          if (partida.estado === "jugando") {
+          if (partida.estado.estado === "jugando") {
             const numJugadoresAzul = Object.values(
               partida.equipos["equipoAzul"].jugadores
             ).length;
@@ -1226,7 +1247,7 @@ function ControlWeb(playwright) {
             }
           }
         });
-        if (partida.estado === "esperando") {
+        if (partida.estado.estado === "esperando") {
           const waitingDiv = document.getElementById("waitingDiv");
           console.log("waitingDiv ", waitingDiv);
           const waiting = `<h1 class="text-white">Esperando jugadores... ${partida.jugadoresConectados} / ${partida.cantidadJugadores}</h1>`;

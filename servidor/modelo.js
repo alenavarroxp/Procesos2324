@@ -69,7 +69,7 @@ function Sistema(test) {
   };
 
   this.eliminarUsuarioBD = function (usr, callback) {
-    console.log("Eliminar usuario: " + usr.nick)
+    console.log("Eliminar usuario: " + usr.nick);
     this.cad.eliminarUsuario(usr, function (res) {
       console.log("Usuario eliminado de la BD: " + usr);
       callback(res);
@@ -80,7 +80,7 @@ function Sistema(test) {
     let modelo = this;
     console.log("USUARIOS EN RECUPERAR USUARIO", modelo.usuarios);
     if (!modelo.usuarios[nick]) {
-      console.log("no estaba en local")
+      console.log("no estaba en local");
       await modelo.cad.obtenerUsuario(nick, function (usr) {
         if (!usr) {
           console.log("El usuario " + nick + " no está registrado");
@@ -262,7 +262,9 @@ function Sistema(test) {
   this.crearPartida = function (obj, callback) {
     let modelo = this;
     const id = Date.now().toString();
-    const estado = "esperando";
+    const estado = new Estado();
+    estado.cambiarEstado("esperando");
+    console.log("ESperando",estado.esEsperando());
     modelo.partidas[id] = new Partida(
       id,
       obj.email,
@@ -273,10 +275,13 @@ function Sistema(test) {
       estado,
       obj.passCode
     );
+    console.log("PARTIDA RECIEN CREADA", modelo.partidas[id])
+    console.log("ESTADO EN LA PARTIDA", modelo.partidas[id].estado)
     modelo.obtenerUsuario(obj.email, function (usr) {
       modelo.partidas[id].añadirJugador(usr);
     });
     this.partidas = modelo.partidas;
+    console.log("PARTIDAS", this.partidas);
     callback({ id: id });
   };
 
@@ -285,6 +290,7 @@ function Sistema(test) {
       callback({ error: "Partida no encontrada" });
       return;
     } else {
+      console.log("PARTIDA EN SISTEMA", this.partidas[id])
       callback(this.partidas[id]);
     }
   };
@@ -396,7 +402,7 @@ function Sistema(test) {
 
   this.actualizarEstadoPartida = function (partida, estado, callback) {
     if (!this.partidas[partida.id]) return;
-    this.partidas[partida.id].estado = estado;
+    this.partidas[partida.id].estado.cambiarEstado(estado);
     callback(this.partidas[partida.id]);
   };
 
@@ -450,7 +456,7 @@ function Partida(
       this.jugadores[usr.nick] = usr;
       this.jugadoresConectados = Object.keys(this.jugadores).length;
       if (this.jugadoresConectados == this.cantidadJugadores) {
-        this.estado = "completa";
+        this.estado.cambiarEstado("completa")
       }
       console.log("Jugador agregado: " + usr.nick);
       return true;
@@ -493,7 +499,7 @@ function Partida(
       delete this.jugadores[usr.nick];
       this.jugadoresConectados = Object.keys(this.jugadores).length;
       if (this.jugadoresConectados < this.cantidadJugadores) {
-        if (this.estado != "jugando") this.estado = "esperando";
+        if (!this.estado.esJugando()) this.estado.cambiarEstado("esperando");
       }
       // Comprobar si el jugador está en un equipo y eliminarlo
       for (let equipo in this.equipos) {
@@ -548,6 +554,34 @@ function Equipo() {
     this.goles++;
     console.log("GOLES DESPUES", this.goles);
   };
+}
+
+function Estado() {
+  this.estado = null;
+
+  this.cambiarEstado = function (estado) {
+    this.estado = estado;
+  };
+
+  this.esEsperando = function () {
+    return this.estado == "esperando";
+  };
+
+  this.esCompleta = function () {
+    return this.estado == "completa";
+  };
+
+  this.esJugando = function () {
+    return this.estado == "jugando";
+  };
+
+  this.esFinalizada = function () {
+    return this.estado == "finalizada";
+  };
+}
+
+function Esperando (){
+  Estado.call(this)
 }
 
 module.exports.Sistema = Sistema;
