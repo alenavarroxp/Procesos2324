@@ -86,8 +86,6 @@ test("Creacion de partida", async () => {
     const passCodeElement = await page1.$("#codeGame");
     const passCode = await passCodeElement.textContent();
 
-    console.log("EL PASSCODE ES:", passCode);
-
     //QUIERO SEPARAR EL PASSCODE EN 8 partes de 1 caracter
     const passCode1 = passCode.substring(0, 1);
     const passCode2 = passCode.substring(1, 2);

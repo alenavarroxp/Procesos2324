@@ -34,7 +34,6 @@ export default class Juego {
   };
 
   getPlayers = function () {
-    console.log("PLAYYERS EN GET PLAYERS", this._players);
     return this._players;
   };
 
@@ -48,7 +47,6 @@ export default class Juego {
 
   initGame = async function () {
     this._canvas = document.getElementById("juego");
-    console.log("CANVAS", this._canvas);
     this._engine = new BABYLON.Engine(this._canvas, true);
     this._scene = new BABYLON.Scene(this._engine);
     this._scene.actionMaganer = new BABYLON.ActionManager(this._scene);
@@ -76,7 +74,6 @@ export default class Juego {
     this._camera.alpha += Math.PI; // Rota la cámara 180 grados
     this._camera.lowerRadiusLimit = 5; // Establece la distancia mínima a la que la cámara puede alejarse del objetivo
 
-    console.log("CAMERA", this._camera);
 
     this._light = new BABYLON.HemisphericLight(
       "light",
@@ -155,11 +152,9 @@ export default class Juego {
       character = new Player();
     } else {
       character = this._players[player.email].character;
-      console.log("character", character);
     }
 
     await character.initPlayer(this, player, equipo, function (obj) {
-      console.log("OBJETO", obj);
       character.setEquipo(equipo);
       const playerObj = {
         user: player,
@@ -168,8 +163,6 @@ export default class Juego {
 
       juego._principalCharacter = character;
       juego._players[player.email] = playerObj;
-      console.log("THIS PLAYERS", juego._players);
-      console.log("PLAYER OBJ", playerObj.character);
 
       socket.emit("playerCreado", {
         code: code,
@@ -183,16 +176,13 @@ export default class Juego {
   addOtherPlayer = function (player, equipo, position) {
     let character;
     if (!this._players[player.email]) {
-      console.log("NO TABA");
       character = new Player();
     } else {
-      console.log("SI TABA");
       character = this._players[player.email].character;
     }
 
     character.addPlayer(this, player, equipo, position);
 
-    console.log("CHARACTER", character);
     character.setEquipo(equipo);
 
     const playerObj = {
@@ -204,8 +194,6 @@ export default class Juego {
   };
 
   removePlayer = function (code, player, equipo) {
-    console.log("REMOVE PLAYER", this._players);
-    console.log("PLAYER", player);
     if (this._players[player.email]) {
       this._players[player.email].character.remove();
       socket.emit("playerEliminado", {
@@ -217,11 +205,8 @@ export default class Juego {
   };
 
   removeOtherPlayer = function (player, equipo) {
-    console.log("REMOVE OTHER PLAYER", this._players);
-    console.log("PLAYER", player);
     if (this._players[player.email]) {
       this._players[player.email].character.remove();
-      console.log("scene meshes", Object.keys(this._scene.meshes).length);
     }
   };
 
@@ -231,14 +216,12 @@ export default class Juego {
       let targetPosition;
       switch (equipo) {
         case "equipoAzul":
-          console.log("this.players[usr.email]", this._players[usr.email].character._savePosition)
           targetPosition =
             this._players[
               usr.email
             ].character._savePosition.equipoAzul.position.clone();
           break;
         case "equipoRojo":
-          console.log("this.players[usr.email]", this._players[usr.email].character._savePosition)
           targetPosition =
             this._players[
               usr.email
@@ -253,7 +236,6 @@ export default class Juego {
 
       var targetAlpha;
 
-      console.log("ACTUAL POSITION DEL PLAYER", targetPosition);
       switch (equipo) {
         case "equipoAzul":
           targetAlpha = Math.PI / 2;
@@ -342,7 +324,6 @@ export default class Juego {
     if (this._isLookingAtPlayer && this._players[usr.email]) {
       this._camera.target = this._players[usr.email].character._mesh.position;
     } else {
-      console.log("BALL", this._ball);
       this._camera.target = this._ball._actualPosition;
     }
     this._camera.upperRadiusLimit = 10;
@@ -391,14 +372,12 @@ export default class Juego {
       this._ball._ball.position, // Posición inicial
       targetPosition // Posición final
     );
-    console.log("PRINCIPLA CHARACTER", this._principalCharacter);
     for (const player in this._players) {
       this._players[player].character.reset(juego);
       if (player == this._usr.email) {
         this._principalCharacter = this._players[player].character;
       }
     }
-    console.log("PRINCIPLAasd CHARACTER", this._principalCharacter);
 
     this.zoomCamera(this._usr, this._principalCharacter._actualEquipo);
     setTimeout(() => {
@@ -410,7 +389,6 @@ export default class Juego {
   };
 
   marcarGol = function (equipo) {
-    console.log("MARCAR GOL", equipo);
     socket.emit("marcarGol", {
       code: this._passCode,
       usr: this._usr,
@@ -419,7 +397,6 @@ export default class Juego {
   };
 
   updateBallPosition = function () {
-    console.log("ACTUAL POSITION", this._ball._actualPosition);
     socket.emit("updateBallPosition", {
       code: this._passCode,
       usr: this._usr,
@@ -428,7 +405,6 @@ export default class Juego {
   };
 
   gameEnd = function (obj) {
-    console.log("OBJETO EN GAME END", obj);
     this._canMove = false;
     //Quiero hacer que la camara se mueva al personaje y empiece a girar alrededor de él
     this.cameraEnd(obj);
@@ -523,19 +499,12 @@ setTimeout(async () => {
 
   const mapa = new Mapa();
   await mapa.initMap(juego._scene, juego._elementMap);
-  console.log(
-    "ELEMENTOS DEL MAPA CREADOS EN MAPAS PERO EN JUEGO",
-    juego._elementMap
-  );
 
   const ball = new Ball();
   ball.initBall(juego, function (obj) {
-    console.log("BALL", obj);
     juego._ball = obj;
-    console.log("BALL en juego", juego._ball);
   });
 
-  console.log("Scene elementos", juego._scene.meshes);
 
   if (juego) {
     juego._scene.onBeforeRenderObservable.add(() => {
@@ -548,7 +517,6 @@ setTimeout(async () => {
 }, 1000);
 
 socket.on("recuperarPlayers", (obj) => {
-  console.log("EN JUEGO RECUPERAR PLAYERS", obj);
   for (const key in obj) {
     if (obj.hasOwnProperty(key)) {
       const player = obj[key];
@@ -558,7 +526,6 @@ socket.on("recuperarPlayers", (obj) => {
 });
 
 socket.on("playerMovido", (obj) => {
-  // console.log("OBJETO EN PLAYER MOVIDO", obj);
   if (obj.player.email == juego._usr.email) return;
 
   const character = juego._players[obj.player.email].character;
@@ -566,17 +533,11 @@ socket.on("playerMovido", (obj) => {
 });
 
 socket.on("updateBallPosition", (obj) => {
-  // console.log("OBJETO EN UPDATE BALL POSITION", obj.position);
-  // console.log("POSICION PELOTA ANTES", juego._ball)
   if (obj.usr != juego._usr) {
-    // console.log("OBJETO UPDATE",obj)
     juego._ball.setPosition(obj.position);
   }
-
-  // console.log("POSICION PELOTA DESPUES", juego._ball)
 });
 
 socket.on("partidaFinalizada", (obj) => {
-  console.log("OBJETO EN PARTIDA FINALIZADA", obj);
   if (obj.email == juego._usr.email) juego.gameEnd(obj);
 });

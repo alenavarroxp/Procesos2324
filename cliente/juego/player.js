@@ -13,7 +13,6 @@ class Player {
 
   initPlayer = (juego, player, equipo, callback) => {
     return new Promise((resolve, reject) => {
-      console.log("PLAYER JUEGO CODIGO PLAYER EQUIPO", juego, player, equipo);
       BABYLON.SceneLoader.ImportMesh(
         "",
         "./cliente/juego/public/models/",
@@ -21,12 +20,9 @@ class Player {
         juego._scene,
         (newMeshes, particleSystems, skeletons) => {
           try {
-            console.log("CREANDO MESHES EN INITPLAYER");
-            console.log("mesheshuman", newMeshes);
             this._meshes = newMeshes;
             this._mesh = newMeshes[0];
             this._skeletons = skeletons;
-            console.log("skeletons", skeletons);
             this._mesh.scaling = new BABYLON.Vector3(0.35, 0.35, 0.35);
             this._mesh.name = player.nick;
 
@@ -75,7 +71,6 @@ class Player {
                   0.55,
                   randomPositionZ
                 );
-                console.log("rotation", this._mesh.rotation);
 
                 this._savePosition.equipoRojo = {
                   position: this._mesh.position.clone(),
@@ -141,7 +136,6 @@ class Player {
               if (mesh.name == "BaseHuman_primitive0") mesh.material = material;
             });
 
-            console.log("THIS CRAER PERSONAJS", this);
             juego.addToScene(this._mesh);
           } catch (err) {}
           resolve();
@@ -157,7 +151,6 @@ class Player {
     //Comprobar si la mesh está en la escena y si lo está, no crearla
     if (juego._scene.getMeshByName(player.nick)) return;
 
-    console.log("ADDPLAYER EN PLAYYER JS", juego, player, equipo, position);
     BABYLON.SceneLoader.ImportMesh(
       "",
       "./cliente/juego/public/models/",
@@ -165,7 +158,6 @@ class Player {
       juego._scene,
       (newMeshes, particleSystems, skeletons) => {
         try {
-          console.log("CREANDO MESHES EN ADDPLAYER");
           this._meshes = newMeshes;
           this._mesh = newMeshes[0];
           this._mesh.scaling = new BABYLON.Vector3(0.35, 0.35, 0.35);
@@ -241,7 +233,6 @@ class Player {
 
   remove = function () {
     this._meshes.forEach((mesh) => {
-      console.warn("mesh", mesh);
       mesh.dispose();
     });
   };
@@ -250,21 +241,9 @@ class Player {
     this._actualEquipo = equipo;
   };
 
-  //   playAnimation = function (scene) {
-  //     if (this._isMoving) {
-  //       scene.stopAnimation(this._mesh, this._walkAnimation)
-  //         this._walkAnimation.start(true, 1.0, this._walkAnimation.from, this._walkAnimation.to);
 
-  //         // console.log("CORRIENDO this walk animation", this._walkAnimation)
-  //     } else {
-  //       scene.stopAnimation(this._mesh, this._walkAnimation)
-  //         this._walkAnimation.stop();
-  //         // console.log(" NO CORRIENDO this walk animation", this._walkAnimation)
-  //     }
-  // };
 
   moveForwardAndBackward = function (characters, juego, direccion, ball) {
-    console.log("this", this);
     let angle;
     const newPosition = this._mesh.position.clone();
     switch (this._actualEquipo) {
@@ -298,7 +277,6 @@ class Player {
       this.smoothRotation(angle, juego);
       this.calculateCameraPosition(juego);
       if (this.shootBall(ball, juego)) {
-        console.log("SHOOT BALL");
         ball.shootBall(this, juego);
       }
     }
@@ -338,7 +316,6 @@ class Player {
       this.smoothRotation(angle, juego);
       this.calculateCameraPosition(juego);
       if (this.shootBall(ball, juego)) {
-        console.log("SHOOT BALL");
         ball.shootBall(this, juego);
       }
     }
@@ -349,37 +326,22 @@ class Player {
     // Verificar colisiones con el plano
     if (newPosition.y < 0) return true; // Colisión con el suelo, no permitir mover más abajo
 
-    console.log("CHARACTERS COLISSIONES", characters);
     //COGER LOS CHARACTERS MENOS EL PROPIO
     const charactersArray = Object.values(characters);
     const charactersArrayWithoutMe = charactersArray.filter((character) => {
-      console.log("character", character);
       return character.user.nick != this._mesh.name;
     });
-    console.log("ARRAY CHARACTERS", charactersArray);
-    console.log("CHARACTER COLISSIONE MENOS YO", charactersArrayWithoutMe);
     // Verificar colisiones con otros personajes
     for (const character in charactersArrayWithoutMe) {
-      console.log("CHARACTER", character);
-      console.log("CHARACTERS sin mi", charactersArrayWithoutMe[character]);
-      console.log("CHARACTERS", characters);
       if (
         charactersArrayWithoutMe.hasOwnProperty(character) &&
         this._mesh.name != charactersArrayWithoutMe[character].user.nick
       ) {
         const valor = charactersArrayWithoutMe[character];
-        console.log("VALOR", valor.character._mesh.position);
-        console.log(
-          "VALOR CHARACTER MES POSITION",
-          valor.character._mesh.position
-        );
-        console.log("newPOSITION;", newPosition);
         const distanceVector = newPosition.subtract(
           valor.character._mesh.position
         );
-        console.log("DISTANCEVECTOR", distanceVector);
         const distance = distanceVector.length();
-        console.log("DISTANCE", distance);
 
         // Detener el movimiento si hay colisión con otro personaje
         if (distance < 0.4) {
@@ -500,63 +462,19 @@ class Player {
 
   //Calcula la posición de la cámara
   calculateCameraPosition = function (juego, direccion) {
-    // console.log("ROTATION ACTUAL", this._actualRotation);
-    // switch (direccion) {
-    //   case "Left":
-    //     console.log("LEFT");
-    //     console.log("ROTATION ACTUAL", this._actualRotation);
-    //     break;
-    //   case "Right":
-    //     console.log("RIGHT");
-    //     console.log("ROTATION ACTUAL", this._actualRotation);
-    //     break;
-    // }
-    // // Calcula la posición de la cámara en base a la rotación del personaje
-    // const cameraX = this._actualPosition._x + Math.cos(this._actualRotation._z);
-    // const cameraZ = this._actualPosition._z + Math.sin(this._actualRotation._z);
-    // // Establece la posición de la cámara en la espalda del personaje
-    // juego._camera.position = new BABYLON.Vector3(cameraX, 2, cameraZ);
-    // console.log("CAMERA POSITION", juego._camera.position);
-    // juego._camera.radius = 8;
-    // juego._camera.beta = Math.PI / 5.5;
-    // switch (this._actualEquipo) {
-    //   case "equipoAzul":
-    //     juego._camera.alpha = Math.PI / 2;
-    //     break;
-    //   case "equipoRojo":
-    //     juego._camera.alpha = -Math.PI / 2;
-    //     break;
-    //   default:
-    //     break;
-    // }
-    // console.log("MATH eje z direccion", Math.sin(this._actualRotation._z));
-    // console.log("eje z direccion", this._actualPosition._z);
-    // const direccions = new BABYLON.Vector3(
-    //   this._actualPosition._x,
-    //   this._actualPosition._y,
-    //   this._actualPosition._z - Math.sin(this._actualRotation._z)
-    // );
-    // console.log("DIRRECCCINO", direccions);
-    // // Establece el target de la cámara en la posición del personaje
-    // juego._camera.setTarget(direccions);
-    // console.log("CAMERA TARGET", juego._camera.target);
   };
 
   shootBall = function (ball, juego) {
-    console.log("BALL", ball);
     const distanceVector = ball._ball.position.subtract(
       this._mesh.position.clone()
     );
-    console.log("DISTANCEVECTOR", distanceVector);
     const distance = distanceVector.length();
-    console.log("DISTANCE", distance);
     if (distance < 1) {
       return true;
     }
   };
 
   reset = function (juego) {
-    console.log("this mesh jeje", this);
     let targetMeshPosition;
     let targetRotation = 0;
     switch (this._actualEquipo) {
@@ -566,12 +484,6 @@ class Player {
           this._savePosition.equipoAzul.position._y,
           this._savePosition.equipoAzul.position._z
         );
-        // console.log("meshrotation reset", this._mesh.rotationQuaternion)
-        // this._mesh.rotationQuaternion = new BABYLON.Quaternion(0, 1, 0, 0);
-        //   console.log("meshrotation reset", this._mesh.rotationQuaternion)
-        //   console.log("meshrotation rotation", this._mesh.rotation)
-        // this._mesh.rotation = new BABYLON.Vector3(0, 0, 0);
-        // console.log("meshrotation rotation", this._mesh.rotation)
 
         break;
       case "equipoRojo":

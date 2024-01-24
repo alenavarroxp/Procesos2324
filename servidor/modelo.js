@@ -26,7 +26,6 @@ function Sistema(test) {
 
   this.obtenerUsuario = function (email, callback) {
     for (let usr in this.usuarios) {
-      console.log("usr", usr);
       if (this.usuarios[usr].email == email) {
         callback(this.usuarios[usr]);
         return;
@@ -37,7 +36,6 @@ function Sistema(test) {
 
   this.obtenerUsuarioBD = function (email, callback) {
     this.cad.obtenerUsuario(email, function (usr) {
-      console.log("USUARIO EN BD", usr);
       callback(usr);
     });
   };
@@ -56,31 +54,22 @@ function Sistema(test) {
   };
 
   this.eliminarUsuario = function (nick) {
-    // console.log("Eliminar usuario: " + nick);
-    // console.log("USUARIOS ANTES DE ELIMINAR", this.usuarios)
     if (this.usuarios[nick] == null) {
-      // console.log("El usuario no existe: " + nick);
       return { nick: -1 };
     }
     delete this.usuarios[nick];
-    console.log("Usuario eliminado: " + nick);
-    // console.log("USUARIOS DESPUES DE ELIMINAR", this.usuarios)
     return { nick: nick };
   };
 
   this.eliminarUsuarioBD = function (usr, callback) {
-    console.log("Eliminar usuario: " + usr.nick);
     this.cad.eliminarUsuario(usr, function (res) {
-      console.log("Usuario eliminado de la BD: " + usr);
       callback(res);
     });
   };
 
   this.recuperarUsuario = async function (nick) {
     let modelo = this;
-    console.log("USUARIOS EN RECUPERAR USUARIO", modelo.usuarios);
     if (!modelo.usuarios[nick]) {
-      console.log("no estaba en local");
       await modelo.cad.obtenerUsuario(nick, function (usr) {
         if (!usr) {
           console.log("El usuario " + nick + " no está registrado");
@@ -144,10 +133,8 @@ function Sistema(test) {
 
   this.registrarUsuario = function (obj, callback) {
     let modelo = this;
-    console.log("OBJREGISTRAR", obj);
 
     this.cad.buscarUsuario(obj, function (usr) {
-      console.log("usr", usr);
       if (!usr || usr.error == -2) {
         obj.key = Date.now().toString();
         obj.confirmada = false;
@@ -161,9 +148,7 @@ function Sistema(test) {
           photo: obj.photo,
         });
         this.usuarios = modelo.usuarios;
-        console.log("USUARIOSIIII", this.usuarios);
         if (!modelo.test) {
-          console.log("ENVIAR CORREO");
           correo.enviarEmail(obj.email, obj.key, "Confirmar cuenta");
         }
       } else {
@@ -174,9 +159,7 @@ function Sistema(test) {
 
   this.actualizarUsuario = function (obj, callback) {
     let modelo = this;
-    console.log("OBJACTUALIZAR", obj);
     this.cad.buscarUsuario(obj, function (usr) {
-      console.log("USUARIO ENCONTRADO", usr);
       if (!usr) {
         callback({ error: "Usuario no encontrado" });
       } else {
@@ -199,10 +182,7 @@ function Sistema(test) {
   };
 
   this.actualizarUsuarioLocal = function (usr) {
-    console.log("LOCAL", usr);
-    console.log("users", this.usuarios);
     for (let user in this.usuarios) {
-      console.log("USUARIO", this.usuarios[user]);
       if (
         this.usuarios[user].email == usr.oldEmail &&
         this.usuarios[user].nick == usr.oldNick
@@ -215,22 +195,17 @@ function Sistema(test) {
           photo: usr.photo,
         });
         this.usuarios[usr.nick] = updateUser;
-        console.log("USUARIOS Local tras update", this.usuarios);
       }
     }
   };
 
   this.iniciarSesion = function (obj, callback) {
-    console.log("INICIAR SESION", obj);
     if (!obj.nick) {
       obj.nick = obj.email;
     }
 
-    console.log("OBJ!", obj);
-
     this.cad.buscarUsuario(obj, (usr) => {
       let modelo = this;
-      console.log("Usuario encontrado:", usr); // Agregar esta línea para depuración
       if (!usr) {
         callback({ error: "Usuario no registrado" }, null);
       } else {
@@ -264,7 +239,6 @@ function Sistema(test) {
     const id = Date.now().toString();
     const estado = new Estado();
     estado.cambiarEstado("esperando");
-    console.log("ESperando",estado.esEsperando());
     modelo.partidas[id] = new Partida(
       id,
       obj.email,
@@ -275,13 +249,10 @@ function Sistema(test) {
       estado,
       obj.passCode
     );
-    console.log("PARTIDA RECIEN CREADA", modelo.partidas[id])
-    console.log("ESTADO EN LA PARTIDA", modelo.partidas[id].estado)
     modelo.obtenerUsuario(obj.email, function (usr) {
       modelo.partidas[id].añadirJugador(usr);
     });
     this.partidas = modelo.partidas;
-    console.log("PARTIDAS", this.partidas);
     callback({ id: id });
   };
 
@@ -290,7 +261,6 @@ function Sistema(test) {
       callback({ error: "Partida no encontrada" });
       return;
     } else {
-      console.log("PARTIDA EN SISTEMA", this.partidas[id])
       callback(this.partidas[id]);
     }
   };
@@ -304,7 +274,6 @@ function Sistema(test) {
     for (let partida in this.partidas) {
       if (this.partidas[partida].passCode == obj.passCode) {
         let check = this.partidas[partida].añadirJugador(obj.usr);
-        // console.log("PARTIDAS", this.partidas);
         switch (check) {
           case true:
             callback({ id: partida });
@@ -362,7 +331,6 @@ function Sistema(test) {
 
   this.unirseAEquipo = function (partida, usr, equipo, callback) {
     if (!this.partidas[partida.id]) {
-      console.log("goals");
       return;
     }
     let check = this.partidas[partida.id].unirseAEquipo(usr, equipo);
@@ -407,10 +375,8 @@ function Sistema(test) {
   };
 
   this.actualizarPartidaGol = function (partida, equipo, callback) {
-    console.log("ACTUALIZAR PARTIDA GOL EN SISTEMA", partida, equipo);
     if (!this.partidas[partida.id]) return;
     this.partidas[partida.id].actualizarPartidaGol(equipo);
-    console.log("PARTIDAS", this.partidas[partida.id].equipos);
     callback(this.partidas[partida.id]);
   };
 }
@@ -458,7 +424,6 @@ function Partida(
       if (this.jugadoresConectados == this.cantidadJugadores) {
         this.estado.cambiarEstado("completa")
       }
-      console.log("Jugador agregado: " + usr.nick);
       return true;
     } else {
       if (this.jugadores[usr.nick]) {
@@ -516,8 +481,6 @@ function Partida(
   };
 
   this.actualizarPartidaGol = function (equipo) {
-    console.log("paramtero equipo", equipo);
-    console.log("This equipos equipo", this.equipos);
     this.equipos[equipo].actualizarPartidaGol();
   };
 }
@@ -550,9 +513,7 @@ function Equipo() {
   };
 
   this.actualizarPartidaGol = function () {
-    console.log("GOLES ANTES", this.goles);
     this.goles++;
-    console.log("GOLES DESPUES", this.goles);
   };
 }
 

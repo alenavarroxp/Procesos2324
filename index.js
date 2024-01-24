@@ -18,7 +18,6 @@ const modeloWS = require("./servidor/socket.js");
 const ws = new modeloWS.WSServer();
 
 const haIniciado = function (request, response, next) {
-  console.log("REQUEST", request.user);
   if (request.user) next();
   else response.redirect("/");
 };
@@ -29,7 +28,6 @@ test = eval(args[0]); //test=true
 
 const args2 = process.argv.slice(3);
 let playwright = false;
-console.log("args2", args2);
 playwright = eval(args2[0]); //playwright=true
 
 app.use(express.static(__dirname + "/"));
@@ -53,8 +51,6 @@ passport.use(
       sistema.iniciarSesion(
         { email: email, password: password },
         function (err, usr) {
-          console.log("usr", usr);
-          console.log("err", err);
           if (err) {
             if (err.error == "Contraseña incorrecta") {
               console.log("Contraseña incorrecta");
@@ -117,12 +113,9 @@ app.get(
 );
 
 app.get("/good", function (req, res) {
-  // console.log("REQ", req.user.provider);
-  // console.log("EMAIL", req.user.emails[0].value);
   switch (req.user.provider) {
     case "google":
     case "google-one-tap":
-      // console.log(req.user);
       let nick = req.user.displayName;
       let email = req.user.emails[0].value;
       let photo = req.user.photos[0].value;
@@ -135,14 +128,12 @@ app.get("/good", function (req, res) {
       );
       break;
     case "github":
-      // console.log(req.user);
       let nick2 = req.user.displayName;
       let email2 = req.user.username;
       let photo2 = req.user.photos[0].value;
       sistema.usuarioOAuth(
         { nick: nick2, email: email2, photo: photo2 },
         function (obj) {
-          console.log("obj", obj);
           res.cookie("nick", obj.email);
           res.redirect("/");
         }
@@ -196,9 +187,7 @@ app.get("/obtenerUsuario/:email", function (request, response) {
 
 app.get("/obtenerUsuarioBD/:email", function (request, response) {
   let email = request.params.email;
-  console.log("EMAIL", email);
   sistema.obtenerUsuarioBD(email, function (obj) {
-    console.log("OBJ", obj);
     response.send(obj);
   });
 });
@@ -251,10 +240,8 @@ app.get("/confirmarUsuario/:email/:key", function (request, response) {
 });
 
 app.get("/cerrarSesion", haIniciado, function (request, response) {
-  console.log("CERRAR SESION", request.user);
   let nick =
     request.user.displayName || request.user.username || request.user.nick;
-  console.log("CERRAR SESION NICK", nick);
   request.logOut();
   response.redirect("/");
   if (nick) sistema.eliminarUsuario(nick);
@@ -327,7 +314,6 @@ app.post("/crearPartida", function (request, response) {
 app.get("/obtenerPartida/:id", function (request, response) {
   let id = request.params.id;
   sistema.obtenerPartida(id, function (obj) {
-    console.log("INDEXJS", obj);
     response.send(obj);
   });
 });
@@ -345,13 +331,10 @@ app.post("/unirsePartida", function (request, response) {
 });
 
 app.post("/salirPartida", function (request, response) {
-  console.log("SALIR PARTIDA");
-  console.log("REQUEST", request.body);
   let usr = request.body.usr;
   let partida = request.body.partida;
   sistema.salirPartida(partida, usr, function (obj) {
     sistema.obtenerPartidas(function (obj) {
-      console.log("OBJ", obj);
       io.emit("obtenerPartidas", obj);
     });
     response.send("Usuario salió de la partida");

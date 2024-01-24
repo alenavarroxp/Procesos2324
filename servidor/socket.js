@@ -14,12 +14,10 @@ function WSServer() {
       });
 
       socket.on("sendMessage", (mensaje) => {
-        console.log("Nuevo mensaje", mensaje);
         io.to(mensaje.passCode).emit("chatMessage", mensaje);
       });
 
       socket.on("mensajeBienvenida", (obj) => {
-        console.log("Mensaje de bienvenida", obj);
         io.to(obj.partida.passCode).emit(
           "chatMessage",
           "Se ha unido a la partida " + obj.user.nick
@@ -27,7 +25,6 @@ function WSServer() {
       });
 
       socket.on("cantidadJugadores", (obj) => {
-        console.log("Cantidad de jugadores", obj);
         io.to(obj.passCode).emit("cantidadJugadores", obj);
       });
 
@@ -37,14 +34,12 @@ function WSServer() {
 
       socket.on("obtenerPartidas", () => {
         sistema.obtenerPartidas(function (obj) {
-          console.log("OBJ", obj);
           socket.broadcast.emit("obtenerPartidas", obj);
         });
       });
 
       socket.on("unirseAEquipo", (obj) => {
         sistema.unirseAEquipo(obj.partida, obj.usr, obj.equipo, function (obj) {
-          console.log("SOCKET UNIRSE A EQUIPO: ", obj);
           if (!obj.error)
             io.to(obj.partida.passCode).emit(
               "actualizarContadorEquipo",
@@ -54,12 +49,10 @@ function WSServer() {
       });
 
       socket.on("jugadorReady", (obj) => {
-        console.log("OBJ en servidor jugadorReady", obj);
         io.to(obj.partida.passCode).emit("jugadorReady", obj);
       });
 
       socket.on("actualizarJugadoresReady", (obj) => {
-        console.log("OBJ en servidor actualizarJugadoresReady", obj);
         io.to(obj.partida.passCode).emit("actualizarJugadoresReady", obj);
       });
 
@@ -116,7 +109,6 @@ function WSServer() {
       let contador = 0;
 
       socket.on("contadorServidor", (obj) => {
-        console.log("OBJETO", obj);
         contador = obj.partida.duracion * 60;
         var minutes = Math.floor(contador / 60);
         var seconds = contador % 60;
@@ -166,7 +158,6 @@ function WSServer() {
       });
 
       socket.on("partidaFinalizada", (obj) => {
-        console.log("objeto finalizada", obj);
         this.partidasStatus[obj.partida.passCode] = true;
         io.to(obj.partida.passCode).emit("partidaFinalizada", obj);
       });
@@ -177,27 +168,22 @@ function WSServer() {
       });
 
       socket.on("actualizarPartidaGol", (obj) => {
-        console.log("OBJETO", obj);
         sistema.actualizarPartidaGol(
           obj.partida,
           obj.obj.equipo,
           function (obj) {
-            console.log("OBJ", obj);
             io.to(obj.passCode).emit("actualizarPartidaGol", obj);
           }
         );
       });
 
       socket.on("pantallaFinal", (obj) => {
-        console.log("OBJETO FINAL FINAL", obj);
         io.to(obj.partida.passCode).emit("pantallaFinal", obj);
       });
 
       socket.on("salirPartida", (obj) => {
-        console.log("OBJETO SALIR", obj);
         let usr = obj.usr;
         sistema.salirPartida(obj.partida, obj.usr, function (obj) {
-          console.log("OBJ", obj);
           if (obj.partida) {
             io.to(obj.partida.passCode).emit(
               "actualizarContadorEquipo",
@@ -210,7 +196,6 @@ function WSServer() {
             io.to(obj.partida.passCode).emit("cantidadJugadores", obj.partida);
           }
           sistema.obtenerPartidas(function (obj) {
-            console.log("OBJ", obj);
             socket.broadcast.emit("obtenerPartidas", obj);
           });
         });
@@ -221,14 +206,12 @@ function WSServer() {
           obj.partida,
           obj.estado,
           function (obj) {
-            console.log("OBJ DEVUELTA", obj);
             io.to(obj.passCode).emit("actualizarEstadoPartida", obj);
           }
         );
       });
 
       socket.on("recargarPagina", (obj) => {
-        console.log("OBJETOasdasdasdasdasdasdrecarga", obj);
       });
     });
   };

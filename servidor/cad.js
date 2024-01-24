@@ -43,13 +43,11 @@ function CAD() {
     coleccion
       .find({ email: criterio.email })
       .toArray(async function (error, coleccion) {
-        console.log("Coleccion BUSCAR", coleccion);
         if (coleccion.length == 0) {
           callback(undefined);
         }
         coleccion.forEach(async (element) => {
           if (!element.password) {
-            console.log("USUARIO CON OAUTH CAD");
             if (coleccion.length == 1) {
               callback({
                 error: -2,
@@ -60,13 +58,10 @@ function CAD() {
             }
             return;
           }
-          console.log("ELEMENTO CON CONTRASEÑA", element);
-          console.log("CRITERIO", criterio)
           const isPasswordCorrect = await bcrypt.compare(
             criterio.password,
             element.password
           );
-          console.log("IS PASSWORD CORRECT", isPasswordCorrect);
           if (isPasswordCorrect) callback(element);
           else callback({ error: -1 });
         });
@@ -77,8 +72,6 @@ function CAD() {
     bcrypt.genSalt(10, (err, salt) => {
       if (elemento.password) {
         bcrypt.hash(elemento.password, salt, (err, hash) => {
-          console.log("ELEMENTO", elemento);
-          console.log("HASH", hash);
           elemento.password = hash;
           coleccion.insertOne(elemento, function (err, result) {
             if (err) {
@@ -94,7 +87,6 @@ function CAD() {
   }
 
   this.eliminarUsuario = function (obj, callback) {
-    console.log("ELIMINAR USUARIO CAD", obj);
     eliminar(
       this.usuarios,
       { email: obj.email, password: obj.password },
@@ -103,12 +95,8 @@ function CAD() {
   };
 
   function eliminar(coleccion, criterio, callback) {
-    console.log("ELIMINA", coleccion, criterio);
-
     coleccion.deleteOne({ email: criterio.email });
-    callback(criterio)
-
-    
+    callback(criterio);
   }
 
   function insertarOAuth(coleccion, elemento, callback) {
@@ -120,7 +108,6 @@ function CAD() {
         callback(elemento);
       }
     });
-    
   }
 
   this.buscarOCrearUsuario = function (usr, callback) {
@@ -145,19 +132,15 @@ function CAD() {
   }
 
   this.confirmarUsuario = function (email, key, callback) {
-    console.log("ALGO", email, key)
     confirmar(this.usuarios, email, key, callback);
   };
 
   function confirmar(coleccion, email, key, callback) {
-    console.log("CONFIRMAR")
     coleccion.findOneAndUpdate(
       { email: email, key: key },
       { $set: { confirmada: true } },
       { returnDocument: "after" },
       function (err, doc) {
-        console.log("DOC", doc);
-        console.log("ERR", err);
         if (err) {
           throw err;
         } else {
@@ -174,7 +157,6 @@ function CAD() {
   };
 
   this.insertarPartida = function (partida, callback) {
-    console.log("INSERTARPARTIDA");
     insertar(this.partidas, partida, callback);
   };
 
@@ -200,15 +182,12 @@ function CAD() {
       elemento.newPhoto = elemento.photo;
     }
 
-    console.log("ELEMENTO PARA ACTUALIZAR", elemento);
     if (elemento.newPassword != elemento.password) {
       bcrypt.genSalt(
         10,
         async (err, salt) =>
           await bcrypt.hash(elemento.newPassword, salt, (err, hash) => {
             elemento.newPassword = hash;
-            console.log("hash", hash);
-            console.log("elemento new password", elemento.newPassword);
             col.findOneAndUpdate(
               {
                 email: elemento.email,

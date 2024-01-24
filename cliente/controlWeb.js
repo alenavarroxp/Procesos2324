@@ -63,7 +63,7 @@ function ControlWeb(playwright) {
     google.accounts.id.initialize({
       client_id:
         // "726975145917-reol4tr88j6m8a0mqehb0k6sop45mto2.apps.googleusercontent.com", //local
-      "726975145917-rae33a02hgmi3pjid1dh2dq334igsvqr.apps.googleusercontent.com", //prod
+        "726975145917-rae33a02hgmi3pjid1dh2dq334igsvqr.apps.googleusercontent.com", //prod
       auto_select: false,
       callback: cw.handleCredentialsResponse,
     });
@@ -73,9 +73,6 @@ function ControlWeb(playwright) {
   this.handleCredentialsResponse = function (response) {
     let jwt = response.credential;
     let user = JSON.parse(atob(jwt.split(".")[1]));
-    console.log(user.name);
-    console.log(user.email);
-    console.log(user.picture);
     rest.enviarJwt(jwt);
   };
 
@@ -88,7 +85,6 @@ function ControlWeb(playwright) {
 
   this.validarEmail = function (email) {
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    console.log("VALIDACION", emailPattern.test(email));
     return emailPattern.test(email);
   };
 
@@ -130,18 +126,15 @@ function ControlWeb(playwright) {
                 rest.verificacionRecaptcha(token, function (validado) {
                   captchaValidado = validado;
                 });
-                console.log("captcha", captchaValidado);
               },
               theme: "light",
             });
           });
         }
 
-        console.log("REGISTRO");
         event.preventDefault();
         let nick = $("#nick").val();
         let photo = $("#imagenPerfil").attr("src");
-        console.log("PHOTO", photo);
         let pwd = $("#pwd").val();
 
         if (nick && email && pwd) {
@@ -149,7 +142,6 @@ function ControlWeb(playwright) {
           try {
             if (captchaValidado) {
               rest.obtenerUsuarioBD(email, function (obj) {
-                console.log("USREMAIL", obj.email);
                 if (obj.email != undefined) {
                   cw.mostrarMsg("Ya existe un usuario con ese email");
                   return;
@@ -164,7 +156,6 @@ function ControlWeb(playwright) {
             } else {
               cw.mostrarMsg("Verifica el captcha");
             }
-            console.log(nick, email, pwd);
           } catch (error) {
             cw.mostrarMsg("Error en la verificación reCAPTCHA");
           }
@@ -176,17 +167,14 @@ function ControlWeb(playwright) {
   };
 
   this.cambiarFotoPerfil = function (imagen, existingImage, file, reader) {
-    console.log("cambio de foto de perfil");
     reader.onload = function (e) {
       // Si ya hay una imagen, la reemplazamos; de lo contrario, creamos una nueva
       if (existingImage.length) {
-        console.log("EXISTE IMAGEN");
         existingImage.attr({
           src: e.target.result,
           alt: "Foto de perfil",
         });
       } else {
-        console.log("NO EXISTE IMAGEN");
         const imgElement = $("<img id='imagenPerfil'>")
           .attr({
             src: e.target.result,
@@ -218,7 +206,6 @@ function ControlWeb(playwright) {
         let pwd = $("#pwd").val();
         if (email && pwd) {
           rest.iniciarSesion(email, pwd);
-          console.log("INICIO SESION ", email, pwd);
         } else {
           cw.mostrarMsg("Introduce un email y una contraseña");
         }
@@ -233,7 +220,6 @@ function ControlWeb(playwright) {
       // cw.mostrarPartido();
       $("#navbar").load("./cliente/navbar.html", async function () {
         await rest.obtenerUsuario($.cookie("nick"), function (usr) {
-          console.log("usr", usr);
           $("#username").text(usr.nick);
           if (usr.photo) {
             $("#imgUsuario").removeClass("hidden");
@@ -388,7 +374,6 @@ function ControlWeb(playwright) {
             actualImage.appendChild(divElement);
           }
 
-          console.log("USUARIO", usr);
           $("#usernameInput").attr("placeholder", usr.nick);
           $("#emailInput").attr("placeholder", usr.email);
         });
@@ -423,11 +408,9 @@ function ControlWeb(playwright) {
               if (email) usr.newEmail = email;
               if (photo) usr.newPhoto = photo;
               if (password) usr.newPassword = password;
-              console.log("USR", usr);
               usr.password = currentPassword;
               if (email) {
                 rest.obtenerUsuarioBD(email, function (obj) {
-                  console.log("USREMAIL", obj.email);
                   if (obj.email != undefined) {
                     cw.mostrarMsg("Ya existe un usuario con ese email");
                     return;
@@ -446,10 +429,7 @@ function ControlWeb(playwright) {
   };
 
   this.actualizarNavbar = function () {
-    console.log("ACTUALIZAR NAVBAR");
     rest.obtenerUsuario($.cookie("nick"), function (usr) {
-      console.log("USR", usr);
-      console.log("USR", usr);
       if (usr.photo) {
         $("#imgUsuario").attr("src", usr.photo);
       } else {
@@ -499,7 +479,6 @@ function ControlWeb(playwright) {
       const indiceRandom = Math.floor(Math.random() * caracteres.length);
       passCode += caracteres.charAt(indiceRandom);
     }
-    console.log("PASSCODE GENERADO", passCode);
 
     return passCode;
   };
@@ -508,7 +487,6 @@ function ControlWeb(playwright) {
     if ($("#crearPartida").is(":empty")) {
       cw.limpiarInicio();
 
-      console.log("MOSTRAR CREAR PARTIDA");
       let crearPartidaDiv = document.getElementById("crearPartida");
 
       if (crearPartidaDiv.innerHTML === "") {
@@ -696,12 +674,10 @@ function ControlWeb(playwright) {
   this.mostrarExplorarPartida = async function () {
     if ($("#explorarPartidas").is(":empty")) {
       cw.limpiarInicio();
-      console.log("MOSTRAR EXPLORAR PARTIDA");
       $("#explorarPartidas").load(
         "./cliente/explorarPartidos.html",
         async function () {
           socket.emit("obtenerPartidas");
-          console.log("MOSTRAR EXPLORAR PARTIDA");
           $("#explorarPartidas").removeClass("hidden");
           if (document.getElementById("otp-input").innerHTML == "") {
             const otpContainer = document.getElementById("otp-input");
@@ -750,13 +726,9 @@ function ControlWeb(playwright) {
           await rest.obtenerPartidas(function (partidas) {
             const partidasPadre = document.getElementById("partidas");
             const noPartidas = document.getElementById("no-partidas");
-            console.log("PartidasPadre", partidasPadre);
-            console.log("PARTIDASWEb", partidas);
             const cantidadPartidas = Object.keys(partidas).length;
-            console.log("CANTIDAD PARTIDAS", cantidadPartidas);
 
             if (cantidadPartidas === 0) {
-              console.log("NO HAY PARTIDAS");
               partidasPadre.classList.add("hidden");
               const noPartidasDiv = document.createElement("div");
               noPartidasDiv.classList.add(
@@ -841,12 +813,10 @@ function ControlWeb(playwright) {
     const noPartidas = document.getElementById("no-partidas");
     if (partidasPadre) partidasPadre.innerHTML = "";
     if (!noPartidas) return;
-    console.log("PARTIDAS RENDEREIZAR PARTIDAS ORDENADAS", partidas);
     for (let clave in partidas) {
       noPartidas.style.display = "none";
       partidasPadre.classList.remove("hidden");
       let partida = partidas[clave];
-      console.log("PARTIDA", partida);
       const nuevaPartidaDiv = document.createElement("div");
       nuevaPartidaDiv.id = "part-" + partida.passCode;
       nuevaPartidaDiv.className =
@@ -941,9 +911,8 @@ function ControlWeb(playwright) {
       });
     }
     if (Object.keys(partidas).length == 0) {
-      console.log("NO HAY PARTIDAS");
       partidasPadre.classList.add("hidden");
-      const noPartidasDiv = document.getElementById("no-partidas")
+      const noPartidasDiv = document.getElementById("no-partidas");
       noPartidasDiv.innerHTML = `
         <div class="flex flex-col items-center justify-center w-full h-full">
           <div class="text-center">
@@ -1131,7 +1100,6 @@ function ControlWeb(playwright) {
   };
 
   this.mostrarPartido = function (partida) {
-    console.log("MOSTRAR PARTIDO", partida);
     $("#navbar").addClass("hidden");
     $("#navBarBtn").addClass("hidden");
     $("#container").addClass("hidden");
@@ -1141,7 +1109,6 @@ function ControlWeb(playwright) {
       const user = $.cookie("nick");
       setTimeout(() => {
         if (window.juego) window.juego.setPassCode(partida.passCode);
-        console.log("WINDOW JUEGO", window.juego);
       }, 2500);
 
       window.addEventListener("beforeunload", async function (e) {
@@ -1184,7 +1151,6 @@ function ControlWeb(playwright) {
 
         //CONTADOR
         const contadorTiempo = document.getElementById("contadorTiempo");
-        console.log();
         contadorTiempo.textContent = cw.formatTime(partida.duracion);
         //PASSCODE
         const passCodeDiv = document.getElementById("passCode");
@@ -1218,7 +1184,6 @@ function ControlWeb(playwright) {
 
         //ESPERANDO JUGADORES
         socket.on("cantidadJugadores", (partida) => {
-          console.log("CANTIDAD JUGADORES CONTROL WEB", partida);
           const waitingDiv = document.getElementById("waitingDiv");
           if (partida.estado === "esperando") {
             const waiting = `<h1 class="text-white">Esperando jugadores... ${partida.jugadoresConectados} / ${partida.cantidadJugadores}</h1>`;
@@ -1249,7 +1214,6 @@ function ControlWeb(playwright) {
         });
         if (partida.estado.estado === "esperando") {
           const waitingDiv = document.getElementById("waitingDiv");
-          console.log("waitingDiv ", waitingDiv);
           const waiting = `<h1 class="text-white">Esperando jugadores... ${partida.jugadoresConectados} / ${partida.cantidadJugadores}</h1>`;
           waitingDiv.innerHTML = waiting;
         }
@@ -1259,7 +1223,6 @@ function ControlWeb(playwright) {
 
         // Evento que maneja la recepción de mensajes de chat desde el servidor
         socket.on("chatMessage", (message) => {
-          console.log("CHAT MESSAGE", message);
           const chatMessages = document.getElementById("chatMessages");
           const newMessage = document.createElement("div");
           if (!message.user) {
@@ -1530,9 +1493,7 @@ function ControlWeb(playwright) {
         });
 
         socket.on("actualizarJugadoresReady", function (obj) {
-          console.log("ACTUALIZAR JUGADORES READY", obj);
           const jugadoresReady = document.getElementById("jugadoresReady");
-          console.log("JUGADORES READY", jugadoresReady);
           if (jugadoresReady) jugadoresReady.innerHTML = "";
 
           const veribCheck = document.getElementById("veribCheck");
@@ -1545,8 +1506,6 @@ function ControlWeb(playwright) {
 
           if (veriCheckB && veriCheckR && checkbTeam && checkrTeam) {
             rest.obtenerUsuario($.cookie("nick"), function (usr) {
-              console.log("obj", obj.partida.equipos);
-              console.log("usr", usr);
               if (
                 !obj.partida.equipos["equipoAzul"].jugadores[usr.nick] &&
                 !obj.partida.equipos["equipoRojo"].jugadores[usr.nick]
@@ -1570,8 +1529,6 @@ function ControlWeb(playwright) {
 
               const lockB = document.getElementById("lockB");
               const lockR = document.getElementById("lockR");
-              console.log("lockB", lockB);
-              console.log("lockR", lockR);
               if (lockB && lockR) {
                 if (obj.partida.equipos["equipoAzul"].jugadores[usr.nick]) {
                   veribCheck.innerHTML = `<ion-icon name="checkmark-outline" class="text-4xl text-blue-500 animate__animated animate__jackInTheBox"></ion-icon>`;
@@ -1614,13 +1571,11 @@ function ControlWeb(playwright) {
         });
 
         socket.on("actualizarContadorEquipo", function (obj) {
-          console.log("ACTUALIZAR CONTADOR EQUIPO", obj);
           partida = obj;
           if (!obj) return;
           if (obj.equipos["equipoAzul"]) {
             const cantidadBlue = document.getElementById("cantidadBlue");
             const bluePlayers = document.getElementById("bluePlayers");
-            console.log("cantidadBlueDiv", cantidadBlue);
             if (cantidadBlue && bluePlayers) {
               cantidadBlue.innerHTML =
                 "Jugadores: " +
@@ -1704,7 +1659,6 @@ function ControlWeb(playwright) {
               obj.equipos[i].jugadores
             ).length;
           }
-          console.log("JUGADORES EN EQUIPOS", jugadoresEnEquipos);
 
           let startButton = document.getElementById("startButton");
           if (!startButton) return;
@@ -1747,7 +1701,6 @@ function ControlWeb(playwright) {
           } else {
             rest.obtenerUsuario($.cookie("nick"), function (usr) {
               const modal = document.getElementById("modalStart");
-              console.log("MODAL", modal);
               const isOpen = modal.open;
               socket.emit("jugadorReady", {
                 usr: usr,
@@ -1780,24 +1733,20 @@ function ControlWeb(playwright) {
 
         socket.on("playerCreado", function (obj) {
           try {
-            console.log("PLAYER CREADOWEBBBBBBBBBB", obj);
             if (window.juego)
               window.juego.addOtherPlayer(obj.player, obj.equipo, obj.position);
           } catch (err) {}
         });
 
         socket.on("playerEliminado", function (obj) {
-          console.log("PLAYER ELIMINADO", obj);
           window.juego.removeOtherPlayer(obj.player);
         });
 
         socket.on("marcarGol", function (obj) {
-          console.log("MARCAR GOL", obj);
-          console.log("PARTIDA ANTES DE MARCAR GOLE", partida);
           window.juego.resetGameToGol();
           rest.obtenerUsuario($.cookie("nick"), function (usr) {
             if (usr.email == obj.usr.email) {
-              console.log("EMAIL", obj.usr.email, usr.email);
+              "EMAIL", obj.usr.email, usr.email;
               cw.marcarGol(partida, obj);
             }
           });
@@ -1812,7 +1761,6 @@ function ControlWeb(playwright) {
 
         socket.on("jugadorReady", function (obj) {
           const startButton = document.getElementById("startButton");
-          console.log("JUGADOR READY", obj);
           if (!obj.isOpen) {
             const jugadoresReady = document.getElementById("jugadoresReady");
             jugadoresReady.classList.remove("hidden");
@@ -1903,7 +1851,7 @@ function ControlWeb(playwright) {
                   cw.contador(contadorTiempo, obj.partida, usr.email);
                 }, 4500);
               });
-            }, 400); //4500
+            }, 4500);
           }
         });
 
@@ -1939,8 +1887,6 @@ function ControlWeb(playwright) {
     const golesEquipoAzul = document.getElementById("golesEquipoAzul");
     const golesEquipoRojo = document.getElementById("golesEquipoRojo");
 
-    console.log("prevPartida", prevPartida);
-    console.log("partida", partida);
     const prevGolesAzul = prevPartida.equipos["equipoAzul"].goles;
     const prevGolesRojo = prevPartida.equipos["equipoRojo"].goles;
     const golesAzul = partida.equipos["equipoAzul"].goles;
@@ -2018,16 +1964,7 @@ function ControlWeb(playwright) {
     }
 
     if (partida.numGoles) {
-      console.log(
-        "NUMERO DE GOLES ",
-        partida.numGoles,
-        "azul ",
-        golesAzul,
-        "rojo ",
-        golesRojo
-      );
       if (golesAzul == partida.numGoles || golesRojo == partida.numGoles) {
-        console.log("PARTIDA FINALIZADA");
         rest.obtenerPartida(partida.id, function (partida) {
           rest.obtenerUsuario($.cookie("nick"), function (usr) {
             socket.emit("partidaFinalizada", {
@@ -2064,7 +2001,6 @@ function ControlWeb(playwright) {
   this.mostrarPantallaFinal = function (obj) {
     $("#GUIContador").empty();
     $("#endScreen").load("./cliente/juego/endScreen.html", function () {
-      console.log("endScreen objt", obj);
       const volverInicio = document.getElementById("volverInicio");
       volverInicio.addEventListener("click", () => {
         rest.obtenerUsuario(obj.email, function (usr) {
@@ -2127,7 +2063,6 @@ function ControlWeb(playwright) {
   };
 
   this.marcarGol = function (partida, obj) {
-    console.log("PARTIDA EN MARCAR GOLE", partida);
     socket.emit("actualizarPartidaGol", { partida: partida, obj: obj });
   };
 
@@ -2143,7 +2078,7 @@ function ControlWeb(playwright) {
         setTimeout(function () {
           $("#loading").addClass("hidden");
         }, 1000);
-      }, 50);
+      }, 5000);
     });
   };
 

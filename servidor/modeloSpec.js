@@ -420,7 +420,6 @@ describe("El sistema", function () {
         });
       });
 
-      console.log("res1", res1);
       expect(sistema.usuarios[res1.nick].nick).toEqual("test");
       expect(sistema.usuarios[res1.nick].email).toEqual("test@test.es");
       expect(res1.nick).toEqual("test");
@@ -434,7 +433,6 @@ describe("El sistema", function () {
         });
       });
 
-      console.log("res2", res2);
       expect(res2.email).toEqual(-1);
 
       // Confirma el usuario
@@ -444,12 +442,10 @@ describe("El sistema", function () {
         });
       });
 
-      console.log("confirmRes", confirmRes);
       expect(confirmRes.confirmada).toEqual(true);
 
       const elimRes = await new Promise((resolve) => {
         sistema.eliminarUsuarioBD(res1, (elimRes) => {
-          console.log("eliminado", elimRes);
           resolve(elimRes);
         });
       });
@@ -471,9 +467,6 @@ describe("El sistema", function () {
 
       expect(log1e.error).toEqual("Usuario no registrado");
       expect(log1u).toEqual(null);
-
-      console.log("log1e", log1e);
-      console.log("log1u", log1u);
 
       const res = await new Promise((resolve) => {
         sistema.registrarUsuario(userLogin, (res) => {
@@ -509,9 +502,6 @@ describe("El sistema", function () {
       expect(log2u.email).toEqual(userLogin2.email);
       expect(log2u.confirmada).toEqual(true);
 
-      console.log("log2e", log2e);
-      console.log("logu", log2u);
-
       const userLogin3 = {
         nick: "test",
         email: "test@test.es",
@@ -532,12 +522,10 @@ describe("El sistema", function () {
       expect(log3e.error).toEqual("Contraseña incorrecta");
       expect(log3u).toEqual(null);
 
-      console.log("log3e", log3e);
-      console.log("log3u", log3u);
+      
 
       await new Promise((resolve) => {
         sistema.eliminarUsuarioBD(res, (elimRes) => {
-          console.log("eliminado", elimRes);
           resolve(elimRes);
         });
       });
@@ -555,7 +543,6 @@ describe("El sistema", function () {
 
       await new Promise((resolve) => {
         sistema.eliminarUsuarioBD(rest, (elimRes) => {
-          console.log("eliminado", elimRes);
           resolve(elimRes);
         });
       });

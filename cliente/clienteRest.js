@@ -5,7 +5,6 @@ function ClienteRest() {
     $.getJSON("/agregarUsuario/" + nick, function (data) {
       let msg = "El nick " + nick + " ya está ocupado";
       if (data.nick != -1) {
-        console.log("Usuario " + nick + " ha sido registrado");
         msg = "Bienvenido al sistema, " + nick;
         $.cookie("nick", nick);
       } else {
@@ -23,7 +22,6 @@ function ClienteRest() {
       url: "/agregarUsuario/" + nick,
       success: function (data) {
         if (data.nick != -1) {
-          console.log("Usuario " + nick + " ha sido registrado");
         } else {
           console.log("El nick ya está ocupado");
         }
@@ -63,7 +61,6 @@ function ClienteRest() {
       url: "/actualizarUsuario",
       data: JSON.stringify({ usr: usr }),
       success: function (data) {
-        console.log("DATA", data);
         if (data.error == "Contraseña actual incorrecta") {
           cw.mostrarMsg("Contraseña actual incorrecta");
           return;
@@ -83,13 +80,11 @@ function ClienteRest() {
 
   this.obtenerUsuarios = function () {
     $.getJSON("/obtenerUsuarios", function (data) {
-      console.log(data);
     });
   };
 
   this.numeroUsuarios = function () {
     $.getJSON("/numeroUsuarios", function (data) {
-      console.log(data);
     });
   };
 
@@ -131,7 +126,6 @@ function ClienteRest() {
       success: function (data) {
         let msg = "El nick " + data.nick + " está ocupado";
         if (data.nick != -1) {
-          console.log("Usuario " + data.nick + " ha sido registrado");
           msg = "Bienvenido al sistema, " + data.nick;
           $.cookie("nick", data.nick);
         } else {
@@ -159,10 +153,8 @@ function ClienteRest() {
       data: JSON.stringify({ token: token }),
       success: function (data) {
         if (data.success) {
-          console.log("Captcha correcto");
           callback(true);
         } else {
-          console.log("Captcha incorrecto");
           callback(false);
         }
       },
@@ -185,16 +177,13 @@ function ClienteRest() {
         photo: photo,
       }),
       success: function (data) {
-        console.log("data", data);
         if (data.nick != undefined) {
-          console.log("Usuario " + data.nick + " ha sido registrado");
           // $.cookie("nick", data.nick)
           cw.mostrarToast("Consulta tu correo para confirmar tu cuenta", top);
           cw.limpiar();
           cw.mostrarInicioSesion();
           cw.mostrarToast("Usuario " + data.nick + " ha sido registrado");
         } else {
-          console.log("El usuario ya está registrado");
           cw.mostrarMsg("El usuario ya está registrado");
         }
       },
@@ -212,7 +201,6 @@ function ClienteRest() {
       url: "/iniciarSesion",
       data: JSON.stringify({ email: email, password: password }),
       success: function (data) {
-        console.log("DATA", data.usr);
         if (data.usr.confirmada == false) {
           cw.mostrarMsg(
             "Tienes que confirmar tu cuenta para acceder",
@@ -242,8 +230,6 @@ function ClienteRest() {
           cw.mostrarMsg(data.usr.error);
         }
         if (data.usr.email) {
-          console.log("DATA", data.usr)
-          console.log("Usuario " + data.usr.email + " ha iniciado sesion");
           cw.limpiar();
           $.cookie("nick", data.usr.email);
           cw.mostrarToast("Bienvenido al sistema, " + data.usr.email, top);
@@ -282,7 +268,6 @@ function ClienteRest() {
           cw.mostrarMsg(data.error);
         }
         if (data) {
-          console.log("PARTIDA CREADA EN REST", data)
           cw.obtenerPartida(data.id);
         }
       },
@@ -299,7 +284,6 @@ function ClienteRest() {
       if (data.error) {
         cw.mostrarToast(data.error, top);
       } else {
-        console.log("OBTENRE PARTIDA EN RESSSSSST", data)
         callback(data);
       }
     });
@@ -307,7 +291,6 @@ function ClienteRest() {
 
   this.obtenerPartidas = function (callback) {
     $.getJSON("/obtenerPartidas", function (data) {
-      console.log(data);
       callback(data);
     });
   };
@@ -318,7 +301,6 @@ function ClienteRest() {
       url: "/unirsePartida",
       data: JSON.stringify({ usr: usr, passCode: passCode }),
       success: function (data) {
-        console.log("DARA", data);
         if (data.error) {
           cw.mostrarToast(data.error, top);
         } else {
@@ -336,14 +318,12 @@ function ClienteRest() {
   };
 
   this.salirPartida = function (usr, partida, callback) {
-    console.log("ASDHKASD");
 
     $.ajax({
       type: "POST",
       url: "/salirPartida",
       data: JSON.stringify({ usr: usr, partida: partida }),
       success: function (data) {
-        console.log("DATA", data);
         callback(data);
       },
       error: function (xhr, textStatus, errorThrown) {
@@ -357,7 +337,6 @@ function ClienteRest() {
 
   this.cerrarSesion = function () {
     $.getJSON("/cerrarSesion", function () {
-      console.log("Sesion cerrada");
       $.removeCookie("nick");
     });
   };

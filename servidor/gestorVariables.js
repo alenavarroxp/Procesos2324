@@ -7,9 +7,7 @@ async function accessCLAVECORREO() {
       const [version] = await client.accessSecretVersion({
         name: name,
       });
-      //console.info(`Found secret ${version.name} with state ${version.state}`);
       const datos=version.payload.data.toString("utf8");
-      //console.log("Datos "+datos);
       return datos;
 }
 

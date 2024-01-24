@@ -17,10 +17,8 @@ class Ball {
         juego._scene,
         (newMeshes, particleSystems, skeletons) => {
           try {
-            console.log("newMeshes", newMeshes);
             this._meshes = newMeshes[1];
             this._ball = newMeshes[0];
-            console.log("ball", this._ball);
 
             this._ball.position = new BABYLON.Vector3(0, 0.55, 0);
             this._ball.rotation = new BABYLON.Vector3(0, 0, 0);
@@ -54,19 +52,14 @@ class Ball {
       return true;
     }
 
-    console.log("ELEENTOSMAPA", elementosMapa);
     for (const elemtno in elementosMapa) {
       if (elementosMapa.hasOwnProperty(elemtno)) {
         const pared = elementosMapa[elemtno];
 
         if (pared.name.includes("wall")) {
-          // console.log("pared", pared.name);
           const paredPosition = pared.position;
           const paredDimensions =
             pared.getBoundingInfo().boundingBox.extendSize;
-          // console.log("NEWPOSITION", newPosition);
-          // console.log("paredPosition", paredPosition);
-          // console.log("paredDimensions", paredDimensions);
 
           var margen = 0.25;
           if (
@@ -141,9 +134,7 @@ class Ball {
       smoothPosition.y
     );
 
-    console.log("targetPositionXZ", targetPositionXZ);
     if (!this.checkCollisionsMap(smoothPosition3D, juego._elementMap)) {
-      console.log("smoothPosition", smoothPosition);
       ball.position.x = smoothPosition.x;
       ball.position.z = smoothPosition.y;
       this._actualPosition = ball.position;
