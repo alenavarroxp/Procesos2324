@@ -51,8 +51,10 @@ passport.use(
 //GOOGLE ONE TAP
 passport.use(
   new GoogleOneTapStrategy(
-    {
-      clientID: "726975145917-reol4tr88j6m8a0mqehb0k6sop45mto2.apps.googleusercontent.com", // your google client ID
+    {//LOCAL
+      // clientID: "726975145917-reol4tr88j6m8a0mqehb0k6sop45mto2.apps.googleusercontent.com", // your google client ID
+      //PRODUCCIÓN
+      clientID: "726975145917-rae33a02hgmi3pjid1dh2dq334igsvqr.apps.googleusercontent.com",
       clientSecret: "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", // your google client secret
       verifyCsrfToken: false, // whether to validate the csrf token or not
     },
