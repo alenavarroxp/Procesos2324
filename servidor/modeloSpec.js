@@ -149,7 +149,7 @@ describe("El sistema", function () {
         cantidadJugadores: 2,
         duracion: 3,
         numGoles: 4,
-        estado: "esperando",
+        estado: {estado:"esperando"},
         passCode: "12345678",
       };
     });
@@ -176,7 +176,7 @@ describe("El sistema", function () {
             ).toEqual(2);
             expect(sistema.partidas[Object.keys(res)[0]].duracion).toEqual(3);
             expect(sistema.partidas[Object.keys(res)[0]].numGoles).toEqual(4);
-            expect(sistema.partidas[Object.keys(res)[0]].estado).toEqual(
+            expect(sistema.partidas[Object.keys(res)[0]].estado.estado).toEqual(
               "esperando"
             );
             expect(sistema.partidas[Object.keys(res)[0]].passCode).toEqual(
@@ -340,25 +340,25 @@ describe("El sistema", function () {
 
       sistema.obtenerPartidas(function (res) {
         partida = { id: sistema.partidas[Object.keys(res)[0]].id };
-        expect(sistema.partidas[Object.keys(res)[0]].estado).not.toEqual(
+        expect(sistema.partidas[Object.keys(res)[0]].estado.estado).not.toEqual(
           "jugando"
         );
-        expect(sistema.partidas[Object.keys(res)[0]].estado).not.toEqual(
+        expect(sistema.partidas[Object.keys(res)[0]].estado.estado).not.toEqual(
           "finalizada"
         );
-        expect(sistema.partidas[Object.keys(res)[0]].estado).toEqual(
+        expect(sistema.partidas[Object.keys(res)[0]].estado.estado).toEqual(
           "esperando"
         );
         sistema.actualizarEstadoPartida(partida, "jugando", function (res) {
-          expect(res.estado).toEqual("jugando");
-          expect(res.estado).not.toEqual("esperando");
-          expect(res.estado).not.toEqual("finalizada");
+          expect(res.estado.estado).toEqual("jugando");
+          expect(res.estado.estado).not.toEqual("esperando");
+          expect(res.estado.estado).not.toEqual("finalizada");
         });
 
         sistema.actualizarEstadoPartida(partida, "finalizada", function (res) {
-          expect(res.estado).toEqual("finalizada");
-          expect(res.estado).not.toEqual("esperando");
-          expect(res.estado).not.toEqual("jugando");
+          expect(res.estado.estado).toEqual("finalizada");
+          expect(res.estado.estado).not.toEqual("esperando");
+          expect(res.estado.estado).not.toEqual("jugando");
         });
       });
     });

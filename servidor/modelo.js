@@ -580,8 +580,5 @@ function Estado() {
   };
 }
 
-function Esperando (){
-  Estado.call(this)
-}
 
 module.exports.Sistema = Sistema;
