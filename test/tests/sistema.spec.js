@@ -4,64 +4,83 @@ const redireccionamiento = async (page) => {
   await page.goto("http://localhost:3000/");
 };
 
+const generarCadenaAleatoria = (longitud) => {
+  const caracteres =
+    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  let cadenaAleatoria = "";
+
+  for (let i = 0; i < longitud; i++) {
+    const indiceAleatorio = Math.floor(Math.random() * caracteres.length);
+    cadenaAleatoria += caracteres.charAt(indiceAleatorio);
+  }
+
+  return cadenaAleatoria;
+};
+
 describe("Test de registro e inicio de sesión", () => {
   test("Registro", async ({ page }) => {
-    // //COMPROBAR QUE NO SE PUEDE REGISTRAR CON CAMPOS VACIOS
-    // await page.goto("http://localhost:3000/");
-    // await page.getByText("REGÍSTRATE").click();
-    // await page.getByPlaceholder("Introduce tu nombre de usuario").click();
-    // await page
-    //   .getByPlaceholder("Introduce tu nombre de usuario")
-    //   .fill("Alejandro");
-    // await page.getByRole("button", { name: "Registrar" }).click();
-    // await page.getByPlaceholder("Introduce tu correo electró").click();
-    // await page
-    //   .getByPlaceholder("Introduce tu correo electró")
-    //   .fill("prueba@prueba.com");
-    // await page.getByRole("button", { name: "Registrar" }).click();
-    // await page.getByText("Introduce los campos").click();
-    // await page.getByPlaceholder("Introduce tu contraseña").click();
-    // await page.getByPlaceholder("Introduce tu contraseña").fill("prueba");
-    // await page.getByRole("button", { name: "" }).click();
-    // await page.getByRole("button", { name: "Registrar" }).click();
-    // await page.getByText("Usuario Alejandro ha sido").click();
-    // await page.getByText("Consulta tu correo para").click();
-    // //COMPROBAR CONFIRMADA CUENTA
-    // await page.getByPlaceholder("Introduce tu correo electró").click();
-    // await page
-    //   .getByPlaceholder("Introduce tu correo electró")
-    //   .fill("prueba@prueba.com");
-    // await page.getByRole("button", { name: "Iniciar Sesión" }).click();
-    // await page.getByText("Introduce un email y una").click();
-    // await page.getByPlaceholder("Introduce tu contraseña").click();
-    // await page.getByPlaceholder("Introduce tu contraseña").fill("incorrecta");
-    // await page.getByRole("button", { name: "" }).click();
-    // await page.getByRole("button", { name: "Iniciar Sesión" }).click();
-    // await page.getByText("Contraseña incorrecta").click();
-    // await page.getByPlaceholder("Introduce tu contraseña").click();
-    // await page
-    //   .getByPlaceholder("Introduce tu contraseña")
-    //   .press("Control+Shift+ArrowLeft");
-    // await page.getByPlaceholder("Introduce tu contraseña").fill("prueba");
-    // await page.getByRole("button", { name: "Iniciar Sesión" }).click();
-    // await page.getByText("Tienes que confirmar tu").click();
-    // //COMPROBAR QUE NO SE PUEDE REGISTRAR CON EL MISMO CORREO
-    // await page.getByText("REGÍSTRATE").click();
-    // await page.getByPlaceholder("Introduce tu nombre de usuario").click();
-    // await page
-    //   .getByPlaceholder("Introduce tu nombre de usuario")
-    //   .fill("Alejandro Navarro 2");
-    // await page.getByPlaceholder("Introduce tu correo electró").click();
-    // await page
-    //   .getByPlaceholder("Introduce tu correo electró")
-    //   .fill("prueba@prueba.com");
-    // await page.getByRole("button", { name: "Registrar" }).click();
-    // await page.getByPlaceholder("Introduce tu contraseña").click();
-    // await page.getByText("Introduce los campos").click();
-    // await page.getByPlaceholder("Introduce tu contraseña").click();
-    // await page.getByPlaceholder("Introduce tu contraseña").fill("prueba123");
-    // await page.getByRole("button", { name: "Registrar" }).click();
-    // await page.getByText("Ya existe un usuario con ese").click();
+    //COMPROBAR QUE NO SE PUEDE REGISTRAR CON CAMPOS VACIOS
+    await page.goto("http://localhost:3000/");
+    await page.getByText("REGÍSTRATE").click();
+    await page.getByPlaceholder("Introduce tu nombre de usuario").click();
+    await page
+      .getByPlaceholder("Introduce tu nombre de usuario")
+      .fill("Alejandro");
+    await page.getByRole("button", { name: "Registrar" }).click();
+    await page.getByPlaceholder("Introduce tu correo electró").click();
+
+    const longitudAleatoria = Math.floor(Math.random() * (10 - 5 + 1)) + 5;
+    const partePrueba = generarCadenaAleatoria(longitudAleatoria);
+
+    // Construir la dirección de correo electrónico
+    const direccionCorreo = partePrueba + "@prueba.com";
+    await page
+      .getByPlaceholder("Introduce tu correo electró")
+      .fill(direccionCorreo);
+    await page.getByRole("button", { name: "Registrar" }).click();
+    await page.getByText("Introduce los campos").click();
+    await page.getByPlaceholder("Introduce tu contraseña").click();
+    await page.getByPlaceholder("Introduce tu contraseña").fill("prueba");
+    await page.getByRole("button", { name: "" }).click();
+    await page.getByRole("button", { name: "Registrar" }).click();
+    await page.getByText("Usuario Alejandro ha sido").click();
+    await page.getByText("Consulta tu correo para").click();
+    //COMPROBAR CONFIRMADA CUENTA
+    await page.getByPlaceholder("Introduce tu correo electró").click();
+    await page
+      .getByPlaceholder("Introduce tu correo electró")
+      .fill(direccionCorreo);
+    await page.getByRole("button", { name: "Iniciar Sesión" }).click();
+    await page.getByText("Introduce un email y una").click();
+    await page.getByPlaceholder("Introduce tu contraseña").click();
+    await page.getByPlaceholder("Introduce tu contraseña").fill("incorrecta");
+    await page.getByRole("button", { name: "" }).click();
+    await page.getByRole("button", { name: "Iniciar Sesión" }).click();
+    await page.getByText("Contraseña incorrecta").click();
+    await page.getByPlaceholder("Introduce tu contraseña").click();
+    await page
+      .getByPlaceholder("Introduce tu contraseña")
+      .press("Control+Shift+ArrowLeft");
+    await page.getByPlaceholder("Introduce tu contraseña").fill("prueba");
+    await page.getByRole("button", { name: "Iniciar Sesión" }).click();
+    await page.getByText("Tienes que confirmar tu").click();
+    //COMPROBAR QUE NO SE PUEDE REGISTRAR CON EL MISMO CORREO
+    await page.getByText("REGÍSTRATE").click();
+    await page.getByPlaceholder("Introduce tu nombre de usuario").click();
+    await page
+      .getByPlaceholder("Introduce tu nombre de usuario")
+      .fill("Alejandro Navarro 2");
+    await page.getByPlaceholder("Introduce tu correo electró").click();
+    await page
+      .getByPlaceholder("Introduce tu correo electró")
+      .fill(direccionCorreo);
+    await page.getByRole("button", { name: "Registrar" }).click();
+    await page.getByPlaceholder("Introduce tu contraseña").click();
+    await page.getByText("Introduce los campos").click();
+    await page.getByPlaceholder("Introduce tu contraseña").click();
+    await page.getByPlaceholder("Introduce tu contraseña").fill("prueba123");
+    await page.getByRole("button", { name: "Registrar" }).click();
+    await page.getByText("Ya existe un usuario con ese").click();
   });
 
   test("Inicio de sesión", async ({ page }) => {
@@ -142,146 +161,6 @@ describe("Test de registro e inicio de sesión", () => {
       .getByRole("heading", { name: "Noticias y actualizaciones" })
       .click();
     await page.locator("ol").click();
-  });
-
-  test("Editar perfil funcionalidad", async ({ page }) => {
-    await redireccionamiento(page);
-
-    //CAMBIO DE NOMBRE
-    await page.getByPlaceholder("Introduce tu correo electró").click();
-    await page
-      .getByPlaceholder("Introduce tu correo electró")
-      .fill("playwright@playwright.com");
-    await page.getByPlaceholder("Introduce tu contraseña").click();
-    await page.getByPlaceholder("Introduce tu contraseña").fill("playwright");
-    await page.getByRole("button", { name: "Iniciar Sesión" }).click();
-    await page.getByRole("button", { name: "Editar perfil" }).click();
-    await page.getByRole("button", { name: "Guardar cambios" }).click();
-    await page.getByText("Introduce al menos un campo").click();
-    await page.getByPlaceholder("playwright", { exact: true }).click();
-    await page
-      .getByPlaceholder("playwright", { exact: true })
-      .fill("playwright2");
-    await page.getByRole("button", { name: "Guardar cambios" }).click();
-    await page.getByText("Contraseña actual incorrecta").click();
-    await page.locator("#currentPassword").click();
-    await page.locator("#currentPassword").fill("playwright");
-    await page.getByRole("button", { name: "Guardar cambios" }).click();
-    await page.getByText("playwright2", { exact: true }).click();
-    await expect(page.locator("#username")).toContainText("playwright2");
-    await page.getByText("playwright@playwright.com", { exact: true }).click();
-    await expect(page.locator("#emailValue")).toContainText(
-      "playwright@playwright.com"
-    );
-
-    //CAMBIO DE EMAIL
-    await page.getByRole("button", { name: "Editar perfil" }).click();
-    await page.getByPlaceholder("playwright@playwright.com").click();
-    await page.getByPlaceholder("playwright@playwright.com").fill("noformato");
-    await page.getByRole("button", { name: "Guardar cambios" }).click();
-    await page.getByText("Introduce un email válido").click();
-    await page.getByPlaceholder("playwright@playwright.com").click();
-    await page
-      .getByPlaceholder("playwright@playwright.com")
-      .fill("playwright2@playwright2.com");
-    await page.getByRole("button", { name: "Guardar cambios" }).click();
-    await page.getByText("Contraseña actual incorrecta").click();
-    await page.locator("#currentPassword").click();
-    await page.locator("#currentPassword").fill("playwright");
-    await page.getByRole("button", { name: "Guardar cambios" }).click();
-    await page.getByText("playwright2", { exact: true }).click();
-    await expect(page.locator("#username")).toContainText("playwright2");
-    await page.getByText("playwright2@playwright2.com").click();
-    await expect(page.locator("#emailValue")).toContainText(
-      "playwright2@playwright2.com"
-    );
-
-    //CAMBIO DE CONTRASEÑA
-    await page.getByRole("button", { name: "Editar perfil" }).click();
-    await page.locator("#passwordInput").click();
-    await page.locator("#passwordInput").fill("contraseña");
-    await page.getByRole("button", { name: "Guardar cambios" }).click();
-    await page.getByText("Las contraseñas no coinciden").click();
-    await page.locator("#passwordRepeat").click();
-    await page.locator("#passwordRepeat").fill("contraseña");
-    await page.getByRole("button", { name: "Guardar cambios" }).click();
-    await page.getByText("Contraseña actual incorrecta").click();
-    await page.locator("#currentPassword").click();
-    await page.locator("#currentPassword").fill("contraseña");
-    await page.getByRole("button", { name: "Guardar cambios" }).click();
-    await page.locator("#currentPassword").click();
-    await page.locator("#currentPassword").fill("playwright");
-    await page.getByRole("button", { name: "Guardar cambios" }).click();
-    await page.getByText("playwright2", { exact: true }).click();
-    await expect(page.locator("#username")).toContainText("playwright2");
-    await page.getByText("playwright2@playwright2.com").click();
-    await expect(page.locator("#emailValue")).toContainText(
-      "playwright2@playwright2.com"
-    );
-
-    //COMPROBAR CAMBIOS
-    await page.goto("http://localhost:3000/");
-    await page.getByRole("button", { name: "Salir" }).click();
-    await page.getByPlaceholder("Introduce tu correo electró").click();
-    await page
-      .getByPlaceholder("Introduce tu correo electró")
-      .fill("playwright@playwright.com");
-    await page.getByRole("button", { name: "Iniciar Sesión" }).click();
-    await page.getByText("Introduce un email y una").click();
-    await page.getByPlaceholder("Introduce tu contraseña").click();
-    await page.getByPlaceholder("Introduce tu contraseña").fill("playwright");
-    await page.getByRole("button", { name: "Iniciar Sesión" }).click();
-    await page.getByText("Usuario no registrado").click();
-    await page.getByPlaceholder("Introduce tu correo electró").click();
-    await page
-      .getByPlaceholder("Introduce tu correo electró")
-      .press("Control+a");
-    await page
-      .getByPlaceholder("Introduce tu correo electró")
-      .fill("playwright2@playwright2.com");
-    await page.getByRole("button", { name: "Iniciar Sesión" }).click();
-    await page.getByText("Contraseña incorrecta").click();
-    await page.getByPlaceholder("Introduce tu contraseña").click();
-    await page.getByPlaceholder("Introduce tu contraseña").fill("playwright");
-    await page.getByRole("button", { name: "Iniciar Sesión" }).click();
-    await page.getByPlaceholder("Introduce tu contraseña").click();
-    await page.getByPlaceholder("Introduce tu contraseña").fill("contraseña");
-    await page.getByRole("button", { name: "Iniciar Sesión" }).click();
-    await page.getByText("playwright2", { exact: true }).click();
-    await expect(page.locator("#username")).toContainText("playwright2");
-    await page
-      .getByText("playwright2@playwright2.com", { exact: true })
-      .click();
-    await expect(page.locator("#emailValue")).toContainText(
-      "playwright2@playwright2.com"
-    );
-
-    //RESET DE CAMBIOS
-    await page.getByRole("button", { name: "Editar perfil" }).click();
-    await page.getByPlaceholder("playwright2", { exact: true }).click();
-    await page
-      .getByPlaceholder("playwright2", { exact: true })
-      .fill("playwright");
-    await page.locator("#currentPassword").click();
-    await page.locator("#currentPassword").fill("contraseña");
-    await page.locator("#passwordInput").click();
-    await page.locator("#passwordInput").fill("playwright");
-    await page.locator("#passwordRepeat").click();
-    await page.locator("#passwordRepeat").fill("playwright");
-    await page.getByPlaceholder("playwright2@playwright2.com").click();
-    await page
-      .getByPlaceholder("playwright2@playwright2.com")
-      .fill("playwright@playwright.com");
-
-    await page.getByRole("button", { name: "Guardar cambios" }).click();
-    await page.getByRole("button", { name: "Salir" }).click();
-    await page.getByPlaceholder("Introduce tu correo electró").click();
-    await page
-      .getByPlaceholder("Introduce tu correo electró")
-      .fill("playwright@playwright.com");
-    await page.getByPlaceholder("Introduce tu contraseña").click();
-    await page.getByPlaceholder("Introduce tu contraseña").fill("playwright");
-    await page.getByPlaceholder("Introduce tu contraseña").press("Enter");
   });
 
   test("Crear partido funcionalidad", async ({ page }) => {
@@ -472,5 +351,143 @@ describe("Test de registro e inicio de sesión", () => {
     await page.getByText("No se ha encontrado la").click();
   });
 
-  
+  test("Editar perfil funcionalidad", async ({ page }) => {
+    await redireccionamiento(page);
+
+    //CAMBIO DE NOMBRE
+    await page.getByPlaceholder("Introduce tu correo electró").click();
+    await page
+      .getByPlaceholder("Introduce tu correo electró")
+      .fill("playwright@playwright.com");
+    await page.getByPlaceholder("Introduce tu contraseña").click();
+    await page.getByPlaceholder("Introduce tu contraseña").fill("playwright");
+    await page.getByRole("button", { name: "Iniciar Sesión" }).click();
+    await page.getByRole("button", { name: "Editar perfil" }).click();
+    await page.getByRole("button", { name: "Guardar cambios" }).click();
+    await page.getByText("Introduce al menos un campo").click();
+    await page.getByPlaceholder("playwright", { exact: true }).click();
+    await page
+      .getByPlaceholder("playwright", { exact: true })
+      .fill("playwright2");
+    await page.getByRole("button", { name: "Guardar cambios" }).click();
+    await page.getByText("Contraseña actual incorrecta").click();
+    await page.locator("#currentPassword").click();
+    await page.locator("#currentPassword").fill("playwright");
+    await page.getByRole("button", { name: "Guardar cambios" }).click();
+    await page.getByText("playwright2", { exact: true }).click();
+    await expect(page.locator("#username")).toContainText("playwright2");
+    await page.getByText("playwright@playwright.com", { exact: true }).click();
+    await expect(page.locator("#emailValue")).toContainText(
+      "playwright@playwright.com"
+    );
+
+    //CAMBIO DE EMAIL
+    await page.getByRole("button", { name: "Editar perfil" }).click();
+    await page.getByPlaceholder("playwright@playwright.com").click();
+    await page.getByPlaceholder("playwright@playwright.com").fill("noformato");
+    await page.getByRole("button", { name: "Guardar cambios" }).click();
+    await page.getByText("Introduce un email válido").click();
+    await page.getByPlaceholder("playwright@playwright.com").click();
+    await page
+      .getByPlaceholder("playwright@playwright.com")
+      .fill("playwright2@playwright2.com");
+    await page.getByRole("button", { name: "Guardar cambios" }).click();
+    await page.getByText("Contraseña actual incorrecta").click();
+    await page.locator("#currentPassword").click();
+    await page.locator("#currentPassword").fill("playwright");
+    await page.getByRole("button", { name: "Guardar cambios" }).click();
+    await page.getByText("playwright2", { exact: true }).click();
+    await expect(page.locator("#username")).toContainText("playwright2");
+    await page.getByText("playwright2@playwright2.com").click();
+    await expect(page.locator("#emailValue")).toContainText(
+      "playwright2@playwright2.com"
+    );
+
+    //CAMBIO DE CONTRASEÑA
+    await page.getByRole("button", { name: "Editar perfil" }).click();
+    await page.locator("#passwordInput").click();
+    await page.locator("#passwordInput").fill("contraseña");
+    await page.getByRole("button", { name: "Guardar cambios" }).click();
+    await page.getByText("Las contraseñas no coinciden").click();
+    await page.locator("#passwordRepeat").click();
+    await page.locator("#passwordRepeat").fill("contraseña");
+    await page.getByRole("button", { name: "Guardar cambios" }).click();
+    await page.getByText("Contraseña actual incorrecta").click();
+    await page.locator("#currentPassword").click();
+    await page.locator("#currentPassword").fill("contraseña");
+    await page.getByRole("button", { name: "Guardar cambios" }).click();
+    await page.locator("#currentPassword").click();
+    await page.locator("#currentPassword").fill("playwright");
+    await page.getByRole("button", { name: "Guardar cambios" }).click();
+    await page.getByText("playwright2", { exact: true }).click();
+    await expect(page.locator("#username")).toContainText("playwright2");
+    await page.getByText("playwright2@playwright2.com").click();
+    await expect(page.locator("#emailValue")).toContainText(
+      "playwright2@playwright2.com"
+    );
+
+    //COMPROBAR CAMBIOS
+    await page.goto("http://localhost:3000/");
+    await page.getByRole("button", { name: "Salir" }).click();
+    await page.getByPlaceholder("Introduce tu correo electró").click();
+    await page
+      .getByPlaceholder("Introduce tu correo electró")
+      .fill("playwright@playwright.com");
+    await page.getByRole("button", { name: "Iniciar Sesión" }).click();
+    await page.getByText("Introduce un email y una").click();
+    await page.getByPlaceholder("Introduce tu contraseña").click();
+    await page.getByPlaceholder("Introduce tu contraseña").fill("playwright");
+    await page.getByRole("button", { name: "Iniciar Sesión" }).click();
+    await page.getByText("Usuario no registrado").click();
+    await page.getByPlaceholder("Introduce tu correo electró").click();
+    await page
+      .getByPlaceholder("Introduce tu correo electró")
+      .press("Control+a");
+    await page
+      .getByPlaceholder("Introduce tu correo electró")
+      .fill("playwright2@playwright2.com");
+    await page.getByRole("button", { name: "Iniciar Sesión" }).click();
+    await page.getByText("Contraseña incorrecta").click();
+    await page.getByPlaceholder("Introduce tu contraseña").click();
+    await page.getByPlaceholder("Introduce tu contraseña").fill("playwright");
+    await page.getByRole("button", { name: "Iniciar Sesión" }).click();
+    await page.getByPlaceholder("Introduce tu contraseña").click();
+    await page.getByPlaceholder("Introduce tu contraseña").fill("contraseña");
+    await page.getByRole("button", { name: "Iniciar Sesión" }).click();
+    await page.getByText("playwright2", { exact: true }).click();
+    await expect(page.locator("#username")).toContainText("playwright2");
+    await page
+      .getByText("playwright2@playwright2.com", { exact: true })
+      .click();
+    await expect(page.locator("#emailValue")).toContainText(
+      "playwright2@playwright2.com"
+    );
+
+    //RESET DE CAMBIOS
+    await page.getByRole("button", { name: "Editar perfil" }).click();
+    await page.getByPlaceholder("playwright2", { exact: true }).click();
+    await page
+      .getByPlaceholder("playwright2", { exact: true })
+      .fill("playwright");
+    await page.locator("#currentPassword").click();
+    await page.locator("#currentPassword").fill("contraseña");
+    await page.locator("#passwordInput").click();
+    await page.locator("#passwordInput").fill("playwright");
+    await page.locator("#passwordRepeat").click();
+    await page.locator("#passwordRepeat").fill("playwright");
+    await page.getByPlaceholder("playwright2@playwright2.com").click();
+    await page
+      .getByPlaceholder("playwright2@playwright2.com")
+      .fill("playwright@playwright.com");
+
+    await page.getByRole("button", { name: "Guardar cambios" }).click();
+    await page.getByRole("button", { name: "Salir" }).click();
+    await page.getByPlaceholder("Introduce tu correo electró").click();
+    await page
+      .getByPlaceholder("Introduce tu correo electró")
+      .fill("playwright@playwright.com");
+    await page.getByPlaceholder("Introduce tu contraseña").click();
+    await page.getByPlaceholder("Introduce tu contraseña").fill("playwright");
+    await page.getByPlaceholder("Introduce tu contraseña").press("Enter");
+  });
 });
