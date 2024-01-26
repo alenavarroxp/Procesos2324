@@ -221,7 +221,7 @@ test("Creacion de partida", async () => {
     await page2.getByRole("button", { name: "EMPEZAR" }).click();
     await page1.getByRole("button", { name: "EMPEZAR" }).click();
 
-    await page1.waitForTimeout(6000); // Espera 1 segundo (1000 milisegundos)
+    await page1.waitForTimeout(6000);
     await page1.reload();
 
     await page1.getByText("Partidos", { exact: true }).click();
